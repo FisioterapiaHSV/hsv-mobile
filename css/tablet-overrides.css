@@ -1,0 +1,275 @@
+/* Adaptaciones para Tablets/iPads - Mantiene toda la funcionalidad */
+
+:root {
+  --primary: #f6d3dc;
+  --accent: #e47b9c;
+  --text: #2d3748;
+  --muted: #718096;
+  --bg: #f7fafc;
+  --card: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Touch-friendly inputs */
+input, textarea, select, button {
+  font-size: 16px !important; /* Prevenir zoom en iOS */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.input, input.input, textarea.input, select.input {
+  min-height: 44px; /* iOS touch target minimum */
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.input:focus, input.input:focus, textarea.input:focus, select.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Botones touch-friendly */
+.btn, button.btn {
+  min-height: 44px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  touch-action: manipulation;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Layout responsive para tablets */
+.wrap {
+  max-width: 100%;
+  padding: 20px;
+}
+
+.section {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Grids responsivos */
+@media (max-width: 1024px) {
+  [style*="grid-template-columns:repeat(2,1fr)"],
+  [style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  
+  [style*="grid-template-columns:repeat(3,1fr)"],
+  [style*="grid-template-columns:1fr 1fr 1fr"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Tablas responsivas */
+table {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+/* Header móvil */
+.sub-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--primary);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Goniometría - hacer scrollable horizontalmente en tablets pequeños */
+#goni_list {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#goni_list table {
+  min-width: 600px;
+}
+
+/* Marcha - ajustar layout */
+#marcha_phases_table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Escalas - mejor distribución en tablets */
+#pruebas_section > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* Formulario de plan - columnas adaptativas */
+#agudo [style*="grid-template-columns:1fr 1fr 1fr"] {
+  grid-template-columns: 1fr !important;
+}
+
+@media (min-width: 900px) {
+  #agudo [style*="grid-template-columns:1fr 1fr 1fr"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  #agudo [style*="grid-template-columns:1fr 1fr 1fr"] {
+    grid-template-columns: 1fr 1fr 1fr !important;
+  }
+}
+
+/* Ocultar elementos de navegación de escritorio que no aplican */
+.sidebar, #nav-main {
+  display: none !important;
+}
+
+/* Vista única - mostrar la activa */
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+/* Espaciado para teclado virtual en iOS */
+@supports (-webkit-touch-callout: none) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Botones de acción fijos en la parte inferior */
+.actions-fixed {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 16px 20px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  z-index: 50;
+}
+
+.actions-fixed .btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Mejorar legibilidad en tablets */
+h3 {
+  font-size: 1.3rem;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+h4 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+/* Checkbox y radio más grandes */
+input[type="checkbox"],
+input[type="radio"] {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+/* Toast notifications */
+.toast {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Pantalla de carga */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

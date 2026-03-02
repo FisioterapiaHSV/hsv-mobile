@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#4A90E2">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>HSV - Valoraciones y Planes Móvil</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <div class="container">
+    <header class="main-header">
+      <h1>🏥 HSV Móvil</h1>
+      <p class="subtitle">Valoraciones y Planes de Tratamiento</p>
+    </header>
+
+    <main class="menu-grid">
+      <button class="menu-btn valoracion-btn" onclick="location.href='valoracion.html'">
+        <span class="icon">📋</span>
+        <span class="label">Nueva Valoración</span>
+        <span class="desc">Crear valoración completa</span>
+      </button>
+
+      <button class="menu-btn plan-btn" onclick="location.href='plan.html'">
+        <span class="icon">📅</span>
+        <span class="label">Nuevo Plan</span>
+        <span class="desc">Crear plan de tratamiento</span>
+      </button>
+
+      <button class="menu-btn list-btn" onclick="location.href='lista.html'">
+        <span class="icon">📂</span>
+        <span class="label">Mis Borradores</span>
+        <span class="desc">Ver y gestionar borradores</span>
+      </button>
+
+      <button class="menu-btn export-btn" onclick="exportAll()">
+        <span class="icon">💾</span>
+        <span class="label">Exportar Todo</span>
+        <span class="desc">Exportar a JSON para escritorio</span>
+      </button>
+    </main>
+
+    <footer class="main-footer">
+      <p>Hogar San Vicente de Paúl</p>
+      <p class="version">Versión Móvil 1.0.0</p>
+    </footer>
+  </div>
+
+  <script src="js/export.js"></script>
+  <script>
+    // Registrar Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('✅ Service Worker registrado'))
+        .catch(err => console.warn('⚠️ Error al registrar SW:', err));
+    }
+
+    // Mostrar contador de borradores
+    function updateBadges() {
+      const valoraciones = JSON.parse(localStorage.getItem('hsv_mobile_valoraciones') || '[]');
+      const planes = JSON.parse(localStorage.getItem('hsv_mobile_planes') || '[]');
+      const total = valoraciones.length + planes.length;
+      
+      const listBtn = document.querySelector('.list-btn');
+      if (total > 0 && listBtn) {
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = total;
+        listBtn.appendChild(badge);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', updateBadges);
+  </script>
+</body>
+</html>

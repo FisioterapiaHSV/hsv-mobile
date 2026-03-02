@@ -1,0 +1,2761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#d4c5f9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="HSV Tablet">
+  <title>Fisioterapia - Hogar San Vicente</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/tablet-overrides.css">
+  <style>
+    /* ===== PALETA PASTEL MODERNA ===== */
+    :root {
+      --primary-soft: #d4c5f9;
+      --primary-light: #ede9fe;
+      --primary-accent: #c8b6ff;
+      --secondary-soft: #fbdfdb;
+      --secondary-light: #fff7f5;
+      --secondary-accent: #f8c8bb;
+      --accent-teal: #c3e7df;
+      --accent-yellow: #fef3c7;
+      --text-dark: #4a5568;
+      --text-light: #718096;
+      --border-soft: #f0e5ff;
+      --bg-soft: #fafbff;
+    }
+
+    /* Animación Pop para tarjetas */
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    /* Detección de dispositivo */
+    #device-check {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #d4c5f9 0%, #c3e7df 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      color: var(--text-dark);
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    #device-check .content {
+      max-width: 500px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    }
+    
+    #device-check h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    #device-check h2 {
+      color: var(--text-dark);
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+    
+    #device-check p {
+      font-size: 1rem;
+      color: var(--text-light);
+      margin-bottom: 1rem;
+    }
+    
+    #device-check .specs {
+      background: var(--primary-light);
+      padding: 1.5rem;
+      border-radius: 16px;
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      border-left: 4px solid var(--primary-soft);
+    }
+    
+    /* Pantalla de inicio */
+    .patient-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: white;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      z-index: 9999;
+      padding: 2rem;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      overflow-y: auto;
+      padding-top: 3rem;
+    }
+    
+    .patient-card {
+      background: white;
+      padding: 3.5rem 3rem;
+      border-radius: 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+      max-width: 700px;
+      width: 100%;
+      text-align: center;
+    }
+    
+    .patient-card h1 {
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+      font-size: 2.2rem;
+      font-weight: 700;
+    }
+    
+    .patient-card > p {
+      color: var(--text-light);
+      margin-bottom: 2.5rem;
+      font-size: 1.05rem;
+    }
+    
+    .patient-card label {
+      display: block;
+      margin-bottom: 0.8rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      font-size: 1rem;
+    }
+    
+    .patient-card select {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      border: 2px solid var(--border-soft);
+      border-radius: 14px;
+      font-size: 1rem;
+      background: white;
+      color: var(--text-dark);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .patient-card select:hover {
+      border-color: var(--primary-soft);
+      background: var(--primary-light);
+    }
+    
+    .patient-card select:focus {
+      outline: none;
+      border-color: var(--primary-soft);
+      box-shadow: 0 0 0 4px rgba(212, 197, 249, 0.2);
+    }
+    
+    .patient-card button {
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 1.2rem;
+      background: linear-gradient(135deg, var(--primary-soft) 0%, var(--primary-accent) 100%);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(212, 197, 249, 0.3);
+    }
+    
+    .patient-card button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(212, 197, 249, 0.4);
+    }
+    
+    .patient-card button:active {
+      transform: translateY(0);
+    }
+    
+    /* Menú principal */
+    .main-menu {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      background: var(--bg-soft);
+      min-height: 100vh;
+    }
+    
+    .menu-header {
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent-teal) 100%);
+      color: var(--text-dark);
+      padding: 2.5rem;
+      border-radius: 24px;
+      margin-bottom: 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+    
+    .menu-header h1 {
+      margin: 0;
+      font-size: 2.2rem;
+      font-weight: 700;
+    }
+    
+    .menu-header p {
+      margin: 0.5rem 0 0 0;
+      color: var(--text-light);
+      font-size: 1.05rem;
+    }
+    
+    .menu-header button {
+      background: white;
+      color: var(--primary-soft);
+      border: 2px solid var(--primary-soft);
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .menu-header button:hover {
+      background: var(--primary-light);
+      box-shadow: 0 4px 12px rgba(212, 197, 249, 0.2);
+    }
+    
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .menu-btn {
+      background: white;
+      border: 2px solid var(--border-soft);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .menu-btn:hover {
+      border-color: var(--primary-soft);
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(212, 197, 249, 0.15);
+      background: var(--primary-light);
+    }
+    
+    .menu-btn:active {
+      transform: translateY(-2px);
+    }
+    
+    .menu-btn .icon {
+      font-size: 3.5rem;
+      transition: transform 0.3s ease;
+    }
+    
+    .menu-btn:hover .icon {
+      transform: scale(1.1);
+    }
+    
+    .menu-btn .label {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+    
+    .menu-btn .desc {
+      color: var(--text-light);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    
+    .badge {
+      background: linear-gradient(135deg, #fbdfdb 0%, #f8c8bb 100%);
+      color: #8b4a47;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      box-shadow: 0 2px 8px rgba(251, 223, 219, 0.4);
+    }
+    
+    /* ========================================= */
+    /* ESTILOS PARA GONIOMETRÍA */
+    /* ========================================= */
+    
+    /* Botón de medición asumida (pastel suave) - por defecto */
+    .goni-assumed {
+      background: #e8f5e9 !important;
+      color: #558b2f !important;
+      font-weight: 600;
+      border: 2px solid #c8e6c9 !important;
+    }
+    
+    /* Botón vacío (sin medición) */
+    .goni-empty {
+      background: #f5f5f5 !important;
+      color: #9ca3af !important;
+      border: 2px solid #e5e7eb !important;
+    }
+    
+    /* Botón medido - EXCELENTE (≥90% del ROM esperado) */
+    .goni-measured-good {
+      background: #c8e6c9 !important;
+      color: #1b5e20 !important;
+      font-weight: 700;
+      border: 2px solid #a5d6a7 !important;
+    }
+    
+    /* Botón medido - BUENO (80-89% del ROM esperado) */
+    .goni-measured-warn {
+      background: #fef3c7 !important;
+      color: #b45309 !important;
+      font-weight: 700;
+      border: 2px solid #fde68a !important;
+    }
+    
+    /* Botón medido - MODERADO (65-79% del ROM esperado) */
+    .goni-measured-mid {
+      background: #fed7aa !important;
+      color: #92400e !important;
+      font-weight: 700;
+      border: 2px solid #fdba74 !important;
+    }
+    
+    /* Botón medido - DEFICIENTE (<65% del ROM esperado) */
+    .goni-measured-bad {
+      background: #fbcfe8 !important;
+      color: #831843 !important;
+      font-weight: 700;
+      border: 2px solid #f8a9d0 !important;
+    }
+    
+    /* Botón de segmento seleccionado (selectores arriba de tablas) */
+    .seg-btn--selected {
+      background: #ede9fe !important;
+      color: #6d28d9 !important;
+      border-color: #d4c5f9 !important;
+    }
+    
+    .seg-btn--selected i {
+      color: #d4c5f9 !important;
+      opacity: 1 !important;
+    }
+    
+    .seg-btn:not(.seg-btn--selected) i {
+      opacity: 0.2;
+    }
+
+    /* Estilos para botones de selección de tipo */
+    .btn-select-type {
+      transition: all 0.3s ease;
+    }
+
+    .btn-select-type:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+      filter: brightness(1.05);
+    }
+
+    .btn-select-type:active {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Estilos para botones de modal */
+    .btn-continue-modal {
+      transition: all 0.3s ease;
+    }
+
+    .btn-continue-modal:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(212, 197, 249, 0.4) !important;
+    }
+
+    .btn-continue-modal:active {
+      transform: translateY(0px);
+      box-shadow: 0 4px 12px rgba(212, 197, 249, 0.2) !important;
+    }
+
+    .btn-cancel-modal {
+      transition: all 0.3s ease;
+    }
+
+    .btn-cancel-modal:hover {
+      background: var(--border-light) !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .btn-cancel-modal:active {
+      transform: translateY(0px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Verificación de dispositivo -->
+  <div id="device-check" style="display:none;">
+    <div class="content">
+      <h1>⚠️</h1>
+      <h2>Advertencia de Pantalla</h2>
+      <p>Esta aplicación está optimizada para <strong>tablets o iPads</strong>.</p>
+      <p>Tu pantalla actual:<br><strong id="screen-dims"></strong></p>
+      <div class="specs">
+        <p>Recomendado:</p>
+        <p>• Ancho: 768px mínimo<br>• Alto: 1000px mínimo<br>• O usa zoom del navegador (Ctrl + / Ctrl -)</p>
+      </div>
+      <p style="margin-top:1.5rem;font-size:0.95rem;opacity:0.8;">Puedes continuar, pero algunos elementos pueden verse pequeños. Usa el zoom del navegador si es necesario.</p>
+    </div>
+  </div>
+
+  <!-- Pantalla de Login de Responsable -->
+  <div id="patient-selector" class="patient-screen">
+    <div class="patient-card">
+      <div style="text-align: center; margin-bottom: 2.5rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;"><img src="icons/DirectorioI.png" alt="Fisioterapia" style="width: 80px; height: 80px; object-fit: contain;"></div>
+        <h1 style="color: var(--text-dark); margin: 0 0 0.5rem 0; font-size: 3.2rem; font-weight: 700; letter-spacing: 0.5px; font-family: 'Poppins', 'Segoe UI', sans-serif; text-transform: uppercase;">Fisioterapia</h1>
+        <p style="color: var(--text-light); margin: 0; font-size: 0.95rem; letter-spacing: 0.5px;">Hogar San Vicente</p>
+      </div>
+
+      <!-- Grid de Responsables (se genera dinámicamente) -->
+      <div id="responsables-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- Los responsables se generan dinámicamente desde localStorage -->
+      </div>
+
+      <!-- Modal de Contraseña (hidden by default) -->
+      <form id="login-form" style="display:none;" onsubmit="handleLogin(event)">
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display:block;margin-bottom:0.8rem;font-weight:600;color:var(--text-dark);">Responsable Seleccionado</label>
+          <input type="text" id="responsable-display" disabled
+                 style="width:100%;padding:1rem 1.2rem;border:2px solid var(--border-soft);border-radius:14px;font-size:1rem;background:#f5f5f5;color:var(--text-dark);font-weight:500;" />
+          <input type="hidden" id="responsable-select" />
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+          <label style="display:block;margin-bottom:0.8rem;font-weight:600;color:var(--text-dark);">Contraseña *</label>
+          <input type="password" id="password-input" required placeholder="Ingresa tu contraseña"
+                 style="width:100%;padding:1rem 1.2rem;border:2px solid var(--border-soft);border-radius:14px;font-size:1rem;background:white;color:var(--text-dark);transition:all 0.3s ease;font-weight:500;" />
+        </div>
+
+        <div id="login-error" style="display:none;padding:12px 16px;border-radius:12px;background:#fef2f2;color:#7c2d2d;border-left:4px solid var(--secondary-soft);margin-bottom:1.5rem;font-weight:600;">
+          <!-- Error message will be displayed here -->
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+          <button type="button" onclick="cancelPasswordPrompt()" 
+                  style="flex:1;padding:1.2rem;background:#f5f5f5;color:var(--text-dark);border:2px solid var(--border-soft);border-radius:14px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all 0.3s ease;">
+            Atrás
+          </button>
+          <button type="submit" class="btn" 
+                  style="flex:1;padding:1.2rem;background:linear-gradient(135deg, var(--primary-soft) 0%, var(--primary-accent) 100%);color:white;border:none;border-radius:14px;font-size:1.1rem;font-weight:600;cursor:pointer;transition:all 0.3s ease;box-shadow:0 4px 15px rgba(212, 197, 249, 0.3);">
+            Ingresar →
+          </button>
+        </div>
+      </form>
+
+      <p style="text-align:center;margin-top:1.5rem;color:var(--text-light);font-size:0.9rem;">
+        Sistema de Gestión HSV © 2025
+      </p>
+    </div>
+  </div>
+
+  <!-- Aplicación principal (oculta hasta autenticarse) -->
+  <div id="main-app" style="display:none;">
+    <!-- Menú Principal Simplificado -->
+    <div id="view-menu" class="main-menu">
+      <!-- Badge del responsable en la esquina superior derecha -->
+      <div id="responsable-badge" style="position: fixed; top: 2rem; right: 2rem; background: transparent; padding: 1rem 1.5rem; border: 2px solid var(--secondary-soft); border-radius: 12px; box-shadow: 0 4px 15px rgba(251, 223, 219, 0.2); z-index: 100; max-width: 280px;">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <img id="responsable-badge-icon" src="icons/GloriaI.png" alt="Avatar" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover; flex-shrink: 0;">
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--secondary-accent); letter-spacing: 0.5px;" id="responsable-badge-title">PSS</div>
+          <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark);" id="responsable-badge-name">Nombre</div>
+        </div>
+      </div>
+
+      <!-- Botón Cerrar sesión (puerta) en esquina inferior derecha -->
+      <button onclick="logout()" style="position: fixed; bottom: 2rem; right: 2rem; background: transparent; border: 2px solid var(--secondary-soft); border-radius: 12px; padding: 0.8rem 1rem; cursor: pointer; font-size: 1.5rem; z-index: 100; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(251, 223, 219, 0.2);"
+              onmouseover="this.style.borderColor='var(--secondary-accent)';this.style.boxShadow='0 6px 20px rgba(251, 223, 219, 0.3)'"
+              onmouseout="this.style.borderColor='var(--secondary-soft)';this.style.boxShadow='0 4px 15px rgba(251, 223, 219, 0.2)'">
+        🚪
+      </button>
+
+      <!-- Botón Configuración (solo visible para Tavata) -->
+      <button id="btn-config-app" onclick="openConfigApp()" style="display: none; position: fixed; bottom: 2rem; left: 2rem; background: transparent; border: 2px solid var(--primary-soft); border-radius: 12px; padding: 0.8rem 1rem; cursor: pointer; font-size: 1.5rem; z-index: 100; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(212, 197, 249, 0.2);"
+              onmouseover="this.style.borderColor='var(--primary-accent)';this.style.boxShadow='0 6px 20px rgba(212, 197, 249, 0.3)'"
+              onmouseout="this.style.borderColor='var(--primary-soft)';this.style.boxShadow='0 4px 15px rgba(212, 197, 249, 0.2)'">
+        ⚙️
+      </button>
+
+      <!-- Contenedor central con título y menú -->
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem;">
+        <!-- Título central -->
+        <div style="text-align: center; margin-bottom: 3rem;">
+          <h1 style="margin: 0; font-size: 3.5rem; font-weight: 700; color: var(--text-dark); letter-spacing: 0.5px; font-family: 'Poppins', 'Segoe UI', sans-serif; text-transform: uppercase;">Fisioterapia</h1>
+          <p style="margin: 1rem 0 0 0; font-size: 1.1rem; color: var(--text-light); font-weight: 500;">Menú Principal</p>
+        </div>
+
+        <!-- Botones del menú -->
+        <div class="menu-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 900px; margin-bottom: 2rem;">
+          <!-- Botón Agregar (abre modal) -->
+          <button class="menu-btn" onclick="openAgregarModal()" style="position:relative;">
+            <span class="icon">➕</span>
+            <span class="label">Agregar</span>
+            <span class="desc">Crear valoración o plan</span>
+          </button>
+
+          <!-- Botón Horarios -->
+          <button class="menu-btn" onclick="window.location.href='horarios.html'" style="position:relative;">
+            <span class="icon">📅</span>
+            <span class="label">Horarios</span>
+            <span class="desc">Sesiones y talleres</span>
+          </button>
+
+          <!-- Botón Borradores -->
+          <button class="menu-btn" onclick="showView('view_lista')" style="position:relative;">
+            <span class="icon">📂</span>
+            <span class="label">Borradores</span>
+            <span class="desc">Mis documentos guardados</span>
+            <span id="badge-count" class="badge" style="display:none;"></span>
+          </button>
+        </div>
+
+        <!-- Botón Cerrar sesión -->
+        <button onclick="logout()" class="btn" 
+                style="background: var(--secondary-soft); color: var(--text-dark); border: 2px solid var(--secondary-soft); padding: 0.8rem 2rem; border-radius: 12px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; margin-top: 2rem;">
+          ← Cerrar sesión
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal para seleccionar Valoración o Plan -->
+    <div id="agregar-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+      <div style="background:white;border-radius:20px;max-width:500px;width:100%;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.1);text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:1.5rem;">➕</div>
+        <h2 style="color:var(--text-dark);margin:0 0 1rem 0;font-size:1.8rem;font-weight:700;">¿Qué deseas crear?</h2>
+        <p style="color:var(--text-light);margin:0 0 2rem 0;font-size:1rem;">Selecciona el tipo de documento</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;">
+          <button class="btn-select-type" onclick="selectAgregarType('valoracion')" style="padding:20px;background:white;border:2px solid #D2B5C9;border-radius:14px;cursor:pointer;transition:all 0.3s ease;color:var(--text-dark);font-weight:600;font-size:1.1rem;">
+            <div style="font-size:2rem;margin-bottom:0.5rem;">📋</div>
+            Valoración
+          </button>
+          <button class="btn-select-type" onclick="selectAgregarType('plan')" style="padding:20px;background:white;border:2px solid #D2B5C9;border-radius:14px;cursor:pointer;transition:all 0.3s ease;color:var(--text-dark);font-weight:600;font-size:1.1rem;">
+            <div style="font-size:2rem;margin-bottom:0.5rem;">🏋🏻‍♀️</div>
+            Plan
+          </button>
+        </div>
+
+        <button onclick="closeAgregarModal()" style="width:100%;padding:12px;background:var(--border-soft);border:none;border-radius:10px;cursor:pointer;font-weight:600;color:var(--text-light);transition:all 0.3s ease;">
+          Cancelar
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal para seleccionar Usuaria -->
+    <div id="usuaria-selector-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+      <div style="background:white;border-radius:20px;max-width:500px;width:100%;padding:40px;box-shadow:0 20px 60px rgba(0,0,0,0.1);">
+        <div style="text-align:center;margin-bottom:2rem;">
+          <div style="font-size:2.5rem;margin-bottom:1rem;">👤</div>
+          <h2 style="color:var(--text-dark);margin:0 0 0.5rem 0;font-size:1.8rem;font-weight:700;">Selecciona Usuaria</h2>
+          <p style="color:var(--text-light);margin:0;font-size:0.95rem;">¿Para quién crear <span id="tipo-documento-modal">valoración</span>?</p>
+        </div>
+
+        <div style="margin-bottom:2rem;">
+          <select id="usuaria-select-modal" style="width:100%;padding:1rem 1.2rem;border:2px solid var(--border-soft);border-radius:14px;font-size:1rem;background:white;color:var(--text-dark);cursor:pointer;transition:all 0.3s ease;font-weight:500;">
+            <option value="">-- Selecciona una usuaria --</option>
+          </select>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <button class="btn-cancel-modal" onclick="cancelUsuariaSelection()" style="padding:12px;background:var(--border-soft);border:none;border-radius:10px;cursor:pointer;font-weight:600;color:var(--text-light);transition:all 0.3s ease;">
+            Cancelar
+          </button>
+          <button class="btn-continue-modal" onclick="confirmUsuariaSelection()" style="padding:12px;background:linear-gradient(135deg, #9b6dd6 0%, #7c5dcc 100%);color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(155, 109, 214, 0.4);">
+            Continuar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    
+<!-- Subvista: Agregar Valoración -->
+  
+
+<!-- Subvista: Agregar Plan -->
+  <section id="view_addplan" class="view">
+    <header class="sub-header">
+      <button class="btn btn-pink back" onclick="goBackToMenu()">← Regresar</button>
+      <div class="user-badge">
+        <span id="plan-usuaria-display">Nuevo Plan</span>
+        <span style="display:block;font-size:0.85rem;opacity:0.9;margin-top:2px;" id="plan-responsable-display"></span>
+      </div>
+    </header>
+    <main class="wrap">
+      <section class="section">
+        <h3>Fecha y horario</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start">
+          <label>Fecha:
+            <input class="input" id="plan_fecha" type="date" readonly />
+            <div class="date-readable" id="plan_fecha_label" style="margin-top:8px;color:var(--muted);font-size:0.95rem"></div>
+          </label>
+
+          <label>Hora programada — Inicio (intervalos 30 min):
+            <select class="input" id="plan_hora_start"></select>
+          </label>
+
+          <label>Hora programada — Término (intervalos 30 min):
+            <select class="input" id="plan_hora_end"></select>
+          </label>
+        </div>
+      </section>
+
+      <section class="section">
+        <h3>Responsable y Apoyo</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+          <label>Responsable:
+            <select class="input" id="plan_responsable">
+              <option value="">-- Selecciona responsable --</option>
+              <!-- LFT -->
+              <option data-prefix="LFT">Tavata Alexa Basurto Ramírez</option>
+              <!-- PSS -->
+              <option data-prefix="PSS">Gloria Iraís Espinosa Peralta</option>
+              <option data-prefix="PSS">Jorge Eduardo Rodríguez Romero</option>
+              <option data-prefix="PSS">Andrea Ofelia Carrillo Valdés</option>
+              <option data-prefix="PSS">Alejandra María Contreras Cruz</option>
+              <option data-prefix="PSS">Gabriel Rodríguez Hernández</option>
+              <option data-prefix="PSS">Leslie Amellali Santillán García</option>
+              <option data-prefix="PSS">Francisco Nava Chávez</option>
+              <option data-prefix="PSS">Estefanía Zanabria</option>
+            </select>
+          </label>
+          <label>Apoyo:
+            <select class="input" id="plan_apoyo">
+              <option value="">-- Selecciona apoyo --</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="section">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-items:center">
+          <label>Habitación<input class="input" id="plan_habitacion" placeholder="Habitación" readonly /></label>
+        </div>
+      </section>
+
+      <!-- Motivo del plan (obligatorio para firmar) -->
+      <section class="section">
+        <h3>Motivo del plan</h3>
+        <label style="display:block;margin-bottom:8px">Motivo clínico (justificación) — obligatorio para firmar:</label>
+        <textarea class="input autosize" id="plan_motivo" placeholder="Ej.: Actualización postoperatoria; transición agudo->crónico; ajuste por nueva indicación clínica; renovación periódica de objetivos." style="width:100%;min-height:100px"></textarea>
+        <div id="plan_motivo_error" class="field-error" style="display:none;margin-top:6px"></div>
+      </section>
+
+      <section class="section">
+        <h3>Tipo de padecimiento</h3>
+        <select class="input" id="plan_tipo" style="max-width:300px">
+          <option value="Crónico">Crónico</option>
+          <option value="Agudo">Agudo</option>
+        </select>
+      </section>
+
+      <!-- Crónico -->
+      <section id="cronico" class="section">
+        <h3>Plan - Crónico</h3>
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div>
+            <h4 style="margin:0 0 10px;font-size:1rem">Objetivo general</h4>
+            <textarea class="input autosize" id="plan_obj_gen" placeholder="Escribe el objetivo general..." style="width:100%;min-height:100px"></textarea>
+          </div>
+          <div>
+            <h4 style="margin:0 0 10px;font-size:1rem">Plan de tratamiento general</h4>
+            <textarea class="input autosize" id="plan_plan_gen" placeholder="Describe estrategias, medios físicos y ejercicios..." style="width:100%;min-height:100px"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Agudo -->
+      <section id="agudo" class="section" style="display:none;background:white !important">
+        <h3>Plan - Agudo</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:start">
+          <div>
+            <h4 style="margin:0 0 12px;font-size:1rem;color:var(--primary)">Corto plazo</h4>
+            <div style="margin-bottom:16px">
+              <label style="display:block;font-weight:600;margin-bottom:6px">Objetivo:</label>
+              <textarea class="input" id="plan_corto" placeholder="Objetivo (corto plazo)..." style="width:100%;min-height:90px"></textarea>
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px">Plan:</label>
+              <textarea class="input" id="plan_corto_plan" placeholder="Plan (corto plazo)..." style="width:100%;min-height:90px"></textarea>
+            </div>
+          </div>
+
+          <div>
+            <h4 style="margin:0 0 12px;font-size:1rem;color:var(--primary)">Mediano plazo</h4>
+            <div style="margin-bottom:16px">
+              <label style="display:block;font-weight:600;margin-bottom:6px">Objetivo:</label>
+              <textarea class="input" id="plan_mediano" placeholder="Objetivo (mediano plazo)..." style="width:100%;min-height:90px"></textarea>
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px">Plan:</label>
+              <textarea class="input" id="plan_mediano_plan" placeholder="Plan (mediano plazo)..." style="width:100%;min-height:90px"></textarea>
+            </div>
+          </div>
+
+          <div>
+            <h4 style="margin:0 0 12px;font-size:1rem;color:var(--primary)">Largo plazo</h4>
+            <div style="margin-bottom:16px">
+              <label style="display:block;font-weight:600;margin-bottom:6px">Objetivo:</label>
+              <textarea class="input" id="plan_largo" placeholder="Objetivo (largo plazo)..." style="width:100%;min-height:90px"></textarea>
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px">Plan:</label>
+              <textarea class="input" id="plan_largo_plan" placeholder="Plan (largo plazo)..." style="width:100%;min-height:90px"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CIF table -->
+      <section class="section">
+        <h3>Cuadro basado en CIF</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:start">
+          <div>
+            <label style="display:block;margin-bottom:8px;font-weight:600">Deficiencia:</label>
+            <div id="cif_deficiencias_container"></div>
+            <button type="button" class="btn btn-ghost" id="btn_add_deficiencia" style="margin-top:8px;width:100%">+ Agregar estructura</button>
+          </div>
+          <div>
+            <label style="display:block;margin-bottom:8px;font-weight:600">Limitación:</label>
+            <textarea class="input auto-bullet" id="cif_limitacion" placeholder="Actividades..." style="width:100%;min-height:120px"></textarea>
+          </div>
+          <div>
+            <label style="display:block;margin-bottom:8px;font-weight:600">Restricción:</label>
+            <textarea class="input auto-bullet" id="cif_restriccion" placeholder="Participación..." style="width:100%;min-height:120px"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:12px">
+        <div>
+          <span id="plan_status" style="font-weight:700;color:var(--muted)">Estado: Borrador</span>
+          <div id="plan_msg" style="color:var(--muted);font-size:14px"></div>
+        </div>
+          <div>
+          <button class="btn btn-cancel" onclick="showView('view-menu')">Cancelar</button>
+          <button class="btn btn-draft" id="btn_save_draft">Guardar borrador</button>
+          <button class="btn btn-firmar" id="btn_sign_plan">Firmar</button>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- ========================= VISTA 7: SEGUIMIENTO ========================= -->
+  <section id="view_seguimiento" class="view">
+    <header class="sub-header">
+      <button class="btn btn-pink back" onclick="window.showView('view_expediente')">← Regresar</button>
+      <div class="user-badge">María López</div>
+    </header>
+
+    <main class="wrap">
+      <section class="section" style="display:flex;align-items:center;justify-content:space-between">
+        <h3>Notas de seguimiento</h3>
+        <div style="display:flex;gap:12px;align-items:center">
+          <label style="display:flex;gap:8px;align-items:center">Mostrar:
+            <select id="notes_filter_tipo" class="input" style="min-width:160px">
+              <option value="all">Todas</option>
+              <option value="seguimiento">Seguimiento</option>
+              <option value="negacion">Negación</option>
+              <option value="cancelacion_justificada">Cancelación</option>
+              <option value="cumplimiento">Cumplimiento</option>
+              <option value="notificacion">Notificación</option>
+            </select>
+          </label>
+          <button id="btn_add_note" class="btn btn-mint" onclick="if(window._addNote && window._addNote.clearNoteForm) window._addNote.clearNoteForm(); window.showView('view_addnote')">➕ Agregar nota</button>
+        </div>
+      </section>
+
+      <div style="margin-bottom:20px;padding:12px;background:#f9f9f9;border-radius:8px">
+        <label style="display:block;margin-bottom:8px;font-weight:600">📅 Selecciona mes:</label>
+        <div id="seg_mes_selector"></div>
+      </div>
+
+      <div class="notes-container">
+        <div class="note-card">
+          <div class="note-head">
+            <div class="note-title">Seguimiento • 03 Octubre 2025 • 09:00 AM</div>
+            <div class="note-meta">Responsable: Lic. Hans | Apoyo: — | Estado: Borrador</div>
+          </div>
+          <div class="note-body">
+            <strong>Objetivo de sesión:</strong> Fortalecimiento de miembro inferior.
+            <div class="note-general">Se realizó tratamiento con electroterapia y ejercicios activos asistidos. Paciente toleró bien la sesión sin signos de fatiga excesiva.</div>
+          </div>
+          <ul class="activity-list" style="display:none;list-style:disc;padding-left:20px">
+            <li>Electroterapia – 15 minutos</li>
+            <li>Ejercicios activos asistidos de hombro y codo</li>
+            <li>Movilización pasiva de miembro superior</li>
+          </ul>
+          <div class="btn-row">
+            <button class="btn btn-edit">Editar</button>
+            <button class="btn btn-sign">Firmar</button>
+            <button class="btn btn-del">Eliminar</button>
+          </div>
+        </div>
+
+        <div class="note-card">
+          <div class="note-head">
+            <div class="note-title">Seguimiento • 30 Septiembre 2025 • 11:15 AM</div>
+            <div class="note-meta">Responsable: Lic. Hans | Apoyo: Enfermera Diana | Estado: Firmada</div>
+          </div>
+          <div class="note-body">
+            <strong>Objetivo de sesión:</strong> Disminuir el dolor lumbar y mejorar la flexibilidad.
+            <div class="note-general">Se aplicó termoterapia y ejercicios de fortalecimiento de miembro inferior. Paciente refiere sensación de alivio tras la sesión.</div>
+          </div>
+          <ul class="activity-list" style="display:none;list-style:disc;padding-left:20px">
+            <li>Compresas calientes – 20 minutos</li>
+            <li>Ejercicios de fortalecimiento de cuádriceps</li>
+            <li>Trabajo de equilibrio y propiocepción</li>
+          </ul>
+          <div class="btn-row">
+            <button class="btn btn-view" onclick="toggleActivities(this)">Ver actividades realizadas</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- ========================= VISTA: VALORACIONES ========================= -->
+  <section id="view_valoraciones" class="view">
+    <header class="sub-header">
+      <button class="btn btn-pink back" onclick="window.showView('view_expediente')">← Regresar</button>
+      <div class="user-badge">Valoraciones</div>
+    </header>
+    <main class="wrap">
+      <section class="section" style="display:flex;align-items:center;justify-content:space-between">
+        <h3>Valoraciones</h3>
+        <button class="btn btn-mint" id="btn_add_valoracion" onclick="clearValoracionForm && typeof clearValoracionForm === 'function' ? clearValoracionForm() : null; window.showView('view_addvaloracion');">➕ Agregar nueva valoración</button>
+      </section>
+      <div style="margin-bottom:20px;padding:12px;background:#f9f9f9;border-radius:8px">
+        <label style="display:block;margin-bottom:8px;font-weight:600">📅 Selecciona mes:</label>
+        <div id="val_mes_selector"></div>
+      </div>
+      <section class="section">
+        <div id="valoraciones_list" class="list">
+          <!-- populated by js/valoracion.js -->
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <!-- Subvista: Agregar Valoración -->
+  <section id="view_addvaloracion" class="view">
+    <header class="sub-header">
+      <button class="btn btn-pink back" onclick="window.showView('view-menu')">← Regresar</button>
+      <div>
+        <span id="val-usuaria-display">Nueva Valoración</span>
+        <span style="display:block;font-size:0.85rem;opacity:0.9;margin-top:2px;" id="val-responsable-display"></span>
+      </div>
+    </header>
+    <main class="wrap">
+      <section class="section" style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div>
+            <label>Fecha<input class="input" id="val_fecha" type="date" /></label>
+            <div class="date-readable" id="val_fecha_label" style="margin-top:6px;color:var(--muted);font-size:0.95rem"></div>
+          </div>
+          <div>
+            <label>Hora inicio<select class="input" id="val_hora_start"></select></label>
+          </div>
+          <div>
+            <label>Hora fin<select class="input" id="val_hora_end"></select></label>
+          </div>
+        </div>
+</section>
+
+      <section class="section">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;align-items:center">
+          <label>Tipo<input class="input" id="val_tipo" placeholder="Tipo de valoración" /></label>
+          <label>Habitación<input class="input" id="val_habitacion" placeholder="Habitación" readonly /></label>
+          <label>Responsable<select class="input" id="val_responsable">
+            <option value="">-- Selecciona responsable --</option>
+          </select></label>
+          <label>Apoyo<select class="input" id="val_apoyo">
+            <option value="">-- Selecciona apoyo --</option>
+          </select></label>
+        </div>
+      </section>
+
+      <section class="section">
+        <h3>Antecedentes</h3>
+        <div id="val_antecedentes_container" style="margin-bottom:8px">
+          <!-- antecedents appended here -->
+        </div>
+        <div style="display:flex;gap:8px">
+          <input class="input" id="val_new_antecedente" placeholder="Agregar antecedente..." />
+          <button class="btn btn-ghost" id="btn_add_antecedente">Agregar antecedente</button>
+        </div>
+      </section>
+
+      <section class="section" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+        <h3>Formato ALICIA</h3>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+          <label><strong>Aparición / Inicio</strong>
+            <input class="input" id="alic_a" placeholder="¿Cuándo inició?" />
+          </label>
+          <label><strong>Localización</strong>
+            <input class="input" id="alic_l" placeholder="¿Dónde se localiza?" />
+          </label>
+          <label><strong>Irradiación</strong>
+            <input class="input" id="alic_i" placeholder="¿Hacia dónde se irradia?" />
+          </label>
+          <label><strong>Características</strong>
+            <input class="input" id="alic_c" placeholder="Tipo de dolor/síntoma" />
+          </label>
+          <label><strong>Intensidad (EVA 0-10)</strong>
+            <input class="input" id="alic_i2" type="number" min="0" max="10" placeholder="Escala 0-10" />
+          </label>
+          <label><strong>Atenuantes / Agravantes</strong>
+            <input class="input" id="alic_a2" placeholder="Qué lo mejora o empeora" />
+          </label>
+        </div>
+      </section>
+
+      <section class="section" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+        <h3>Postura</h3>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+          <label><strong>Anterior</strong>
+            <textarea class="input" id="post_anterior" style="min-height:80px" placeholder="Vista anterior..."></textarea>
+          </label>
+          <label><strong>Lateral</strong>
+            <textarea class="input" id="post_lateral" style="min-height:80px" placeholder="Vista lateral..."></textarea>
+          </label>
+          <label><strong>Posterior</strong>
+            <textarea class="input" id="post_posterior" style="min-height:80px" placeholder="Vista posterior..."></textarea>
+          </label>
+          <div id="cefalo_caudal_container" style="display:none">
+            <label><strong>Céfalo-caudal</strong>
+              <textarea class="input" id="post_cefalo" style="min-height:80px" placeholder="Vista céfalo-caudal..."></textarea>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Goniometría -->
+  <section class="section" id="goni_section" style="background:#f9f9f9;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <h3 style="margin:0">Goniometría</h3>
+        </div>
+        <div class="row-space-between mt-sm wrap-gap-8">
+          <div class="min-w-360">
+            <div style="font-size:0.95rem;margin-bottom:8px">Selecciona segmentos a valorar:</div>
+            <div id="goni_segments" class="wrap-gap-8"></div>
+          </div>
+          <div class="right min-w-220">
+            <button id="btn_apply_goni_selection" class="btn-apply-goni" disabled title="Aplicar selección">Aplicar selección</button>
+          </div>
+        </div>
+
+  <div id="goni_list" class="mt-sm"></div>
+      </section>
+
+  <!-- Daniels (Fuerza muscular) -->
+  <section class="section" id="daniels_section" style="background:#f9f9f9;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+        <h3>Daniels — Fuerza muscular (0–5)</h3>
+        <div style="margin-top:8px;">
+          <div id="daniels_container"></div>
+          <div style="margin-top:8px;color:var(--muted);font-size:0.9rem">Selecciona 0–5 para cada grupo muscular; deja en blanco si no corresponde.</div>
+        </div>
+      </section>
+
+      <!-- Marcha -->
+      <section class="section" id="marcha_section" style="background:#f9f9f9;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-top:8px">
+        <div class="row-space-between">
+          <h3 style="margin:0;font-weight:700">Marcha</h3>
+        </div>
+        <!-- Bloque: Fases -->
+        <div class="row mt-sm">
+          <div class="min-w-360" style="flex:1">
+            <h4 style="margin:0 0 8px;font-size:1rem">Fases</h4>
+            <div style="background:#fff;border-radius:8px;padding:10px;box-shadow:0 0 0 1px rgba(0,0,0,0.02)">
+              <table id="marcha_phases_table" style="width:100%;border-collapse:collapse;table-layout:fixed">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;padding:8px 6px;width:50%">Fase</th>
+                    <th style="text-align:center;padding:8px 6px;width:25%">Der</th>
+                    <th style="text-align:center;padding:8px 6px;width:25%">Izq</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- filas generadas por js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="flex-basis:360px;max-width:420px">
+            <h4 style="margin:0 0 8px;font-size:1rem">Descripción breve</h4>
+            <textarea id="marcha_desc" class="input" placeholder="Observaciones de la marcha (ej.: acortamiento de fase de apoyo derecho)" style="min-height:160px;border-radius:8px;background:#fff;border:1px solid #e6e6e6;padding:8px;resize:vertical;width:100%"></textarea>
+          </div>
+        </div>
+
+        <!-- Bloque: Constantes y Variantes -->
+        <div style="margin-top:12px">
+          <h4 style="margin:6px 0 8px;font-weight:700">Constantes y Determinantes (marca si está alterado)</h4>
+          <div id="marcha_constants" style="display:flex;flex-wrap:wrap;gap:8px">
+            <!-- botones generados por js -->
+          </div>
+          <div style="margin-top:8px;color:var(--muted);font-size:0.9rem">Pulsa sobre cada elemento para marcarlo como alterado. El color verde indica normal; el color rojo indica alteración.</div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN DE ESCALAS ESTANDARIZADAS -->
+      <section class="section" id="escalas_section" style="background:#f0f9ff;border:1px solid #c3e7df;border-radius:8px;padding:16px;margin-top:8px">
+        <h3 style="margin-top:0">Escalas Estandarizadas</h3>
+        <p style="color:var(--muted);font-size:0.95rem;margin:0 0 12px">Selecciona una escala para completar su cuestionario. El sistema guardará tus respuestas automáticamente.</p>
+        <div id="escalas_list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+          <!-- Populated by JavaScript -->
+        </div>
+      </section>
+
+      <section class="section">
+        <h3>Diagnóstico fisioterapéutico</h3>
+        <textarea class="input" id="val_diagnostico" style="min-height:120px"></textarea>
+      </section>
+
+      <section class="section">
+        <h3>Observaciones</h3>
+        <textarea class="input" id="val_observaciones" placeholder="Observaciones generales (opcional)" style="min-height:100px"></textarea>
+      </section>
+
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
+        <div id="val_msg" style="color:var(--muted)"></div>
+          <div>
+          <button class="btn btn-cancel" onclick="window.showView('view-menu')">Cancelar</button>
+          <button class="btn btn-draft" id="btn_save_valoracion">Guardar como borrador</button>
+          <button class="btn btn-firmar" id="btn_sign_valoracion">Firmar</button>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- Subvista: Completar Escala -->
+  <section id="view_complete_scale" class="view">
+    <header class="sub-header">
+      <button class="btn btn-pink back" id="scale_back_btn" onclick="window.showView('view_addvaloracion'); window.scrollTo(0, 0);">← Volver</button>
+      <div class="user-badge" id="scale_title">Escala</div>
+    </header>
+    <main class="wrap">
+      <section class="section">
+        <div id="scale_content_container"></div>
+      </section>
+    </main>
+  </section>
+
+  <!-- Subvista: Ver Valoración (read-only, compact clinical summary) -->
+  <section id="view_valoracion_view" class="view">
+    <header class="sub-header">
+      <button class="btn btn-pink back" onclick="window.showView('view_valoraciones')">← Regresar</button>
+      <div class="user-badge">Ver Valoración</div>
+    </header>
+    <main class="wrap">
+      <section class="section">
+        <h3 id="vv_title">Valoración — <span id="vv_fecha_title"></span></h3>
+        <div id="vv_container"></div>
+      </section>
+    </main>
+  </section>
+
+  <!-- Subvista: Ver Valoración - Formulario completo (read-only) -->
+  <section id="view_valoracion_full" class="view">
+    <header class="sub-header">
+      <button class="btn btn-ghost back" onclick="window.showView('view_valoracion_view')">← Volver al resumen</button>
+      <div class="user-badge">Formulario completo (solo lectura)</div>
+    </header>
+    <main class="wrap">
+      <section class="section">
+        <h3 id="vvf_title">Formulario — <span id="vvf_fecha_title"></span></h3>
+        <div id="vv_full_container"></div>
+      </section>
+    </main>
+  </section>
+
+  <!-- Subvista: Agregar Nota -->
+  <section id="view_addnote" class="view">
+    <header class="sub-header">
+      <button class="btn btn-pink back" onclick="window.showView('view_seguimiento')">← Regresar</button>
+      <div class="user-badge">Nueva Nota de Seguimiento</div>
+    </header>
+    <main class="wrap">
+      <section class="section">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <h3>Nueva nota</h3>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="text-align:right">
+                <div id="note_countdown" style="font-weight:700;color:#b91c1c">07:00</div>
+              </div>
+            <div style="text-align:right">
+              <div style="font-size:12px;color:var(--muted)">Estado</div>
+              <div id="note_status" style="font-weight:700;color:var(--muted)">Borrador</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h4>Encabezado</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:center">
+          <label>Fecha (auto)
+            <input class="input" id="note_fecha" type="date" readonly />
+            <div class="date-readable" id="note_fecha_label" style="margin-top:6px;color:var(--muted);font-size:0.95rem"></div>
+          </label>
+          <label>Responsable
+            <select class="input" id="note_responsable">
+              <option value="">Selecciona responsable</option>
+              <option data-prefix="LFT">Tavata Alexa Basurto Ramírez</option>
+              <option data-prefix="PSS">Gloria Iraís Espinosa Peralta</option>
+              <option data-prefix="PSS">Jorge Eduardo Rodríguez Romero</option>
+              <option data-prefix="PSS">Andrea Ofelia Carrillo Valdés</option>
+              <option data-prefix="PSS">Alejandra María Contreras Cruz</option>
+              <option data-prefix="PSS">Gabriel Rodríguez Hernández</option>
+              <option data-prefix="PSS">Leslie Amellali Santillán García</option>
+              <option data-prefix="PSS">Francisco Nava Chávez</option>
+              <option data-prefix="PSS">Estefanía Zanabria</option>
+            </select>
+          </label>
+          <label>Apoyo
+            <select class="input" id="note_apoyo">
+              <option value="">Selecciona apoyo</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="section">
+        <h4>Horario programado</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+          <label>Inicio programado
+            <select class="input" id="note_sched_start"></select>
+          </label>
+          <label>Fin programado
+            <select class="input" id="note_sched_end"></select>
+          </label>
+        </div>
+      </section>
+
+      <section class="section" id="horarios_reales_section">
+        <h4>Hora real</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">
+          <label>Inicio real
+            <input class="input" id="note_real_start" type="time" />
+          </label>
+          <label>Fin real
+            <input class="input" id="note_real_end" type="time" />
+          </label>
+        </div>
+      </section>
+
+      <section class="section">
+        <h4>Tipo de nota</h4>
+        <select class="input" id="note_tipo">
+          <option value="seguimiento">Seguimiento</option>
+          <option value="negacion">Negación</option>
+          <option value="cancelacion_justificada">Cancelación justificada</option>
+          <option value="notificacion">Notificación</option>
+          <option value="cumplimiento">Cumplimiento</option>
+        </select>
+      </section>
+
+      <!-- Dynamic sections per type -->
+      <section id="sec_seguimiento" class="section">
+        <h4>Seguimiento - clínico</h4>
+        
+        <!-- Signos vitales -->
+        <div style="background:#f9fafb;padding:16px;border-radius:10px;border:1px solid #e5e7eb;margin-bottom:16px">
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:12px;cursor:pointer">
+            <input type="checkbox" id="vitals_ok" style="width:18px;height:18px" /> 
+            <span style="font-weight:600;color:#374151">Signos vitales dentro de parámetros</span>
+          </label>
+          <div id="vitals_fields" style="display:none;margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px">
+            <input class="input" id="v_ta" placeholder="TA (ej. 120/80)" style="min-width:0" />
+            <input class="input" id="v_spo2" placeholder="SpO₂ (%)" style="min-width:0" />
+            <input class="input" id="v_fc" placeholder="FC (lpm)" style="min-width:0" />
+          </div>
+        </div>
+
+        <!-- Formato PSOAP -->
+        <div style="background:#ffffff;padding:20px;border-radius:10px;border:1px solid #e5e7eb">
+          <h5 style="margin:0 0 16px 0;color:#111827;font-size:1rem;font-weight:700">Formato PSOAP</h5>
+          
+          <div style="margin-bottom:16px">
+            <label style="display:block;margin-bottom:6px;font-weight:600;color:#374151;font-size:0.9rem">P - Presentación</label>
+            <textarea class="input" id="note_presentation" placeholder="Descripción inicial de la presentación..." style="min-height:70px;width:100%"></textarea>
+          </div>
+          
+          <div style="margin-bottom:16px">
+            <label style="display:block;margin-bottom:6px;font-weight:600;color:#374151;font-size:0.9rem">S - Subjetivo</label>
+            <textarea class="input" id="note_subjective" placeholder="Información subjetiva reportada por la usuaria..." style="min-height:70px;width:100%"></textarea>
+          </div>
+          
+          <div style="margin-bottom:16px">
+            <label style="display:block;margin-bottom:6px;font-weight:600;color:#374151;font-size:0.9rem">O - Objetivo</label>
+            <textarea class="input" id="note_objective" placeholder="Observaciones objetivas y mediciones..." style="min-height:70px;width:100%"></textarea>
+          </div>
+          
+          <div style="margin-bottom:16px">
+            <label style="display:block;margin-bottom:6px;font-weight:600;color:#374151;font-size:0.9rem">A - Análisis</label>
+            <textarea class="input" id="note_analysis" placeholder="Análisis e interpretación clínica..." style="min-height:70px;width:100%"></textarea>
+          </div>
+          
+          <div>
+            <label style="display:block;margin-bottom:6px;font-weight:600;color:#374151;font-size:0.9rem">P - Plan / Observaciones</label>
+            <textarea class="input" id="note_plan_obs" placeholder="Plan de acción y observaciones adicionales..." style="min-height:90px;width:100%"></textarea>
+          </div>
+        </div>
+
+        <!-- Ejercicio terapéutico -->
+        <div style="margin-top:20px;background:#ffffff;padding:20px;border-radius:10px;border:1px solid #e5e7eb">
+          <h5 style="margin:0 0 16px 0;color:#111827;font-size:1rem;font-weight:700">Ejercicio terapéutico</h5>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+            <input class="input" id="ex_name" placeholder="Ejercicio" style="min-width:0;flex:1;min-width:180px" />
+            <input class="input" id="ex_sets" placeholder="Series" style="width:70px;min-width:0" />
+            <input class="input" id="ex_reps" placeholder="Reps" style="width:70px;min-width:0" />
+            <input class="input" id="ex_type" placeholder="Tipo" style="min-width:0;width:120px" />
+            <input class="input" id="ex_rest" placeholder="Desc. (s)" style="width:80px;min-width:0" />
+            <input class="input" id="ex_equip" placeholder="Equipo" style="min-width:0;width:120px" />
+            <button class="btn btn-mint" id="btn_add_ex" style="white-space:nowrap">➕ Añadir</button>
+          </div>
+          <ul id="list_exercises" style="margin-top:12px;padding-left:0;list-style:none"></ul>
+        </div>
+
+        <!-- Agentes físicos -->
+        <div style="margin-top:20px;background:#ffffff;padding:20px;border-radius:10px;border:1px solid #e5e7eb">
+          <h5 style="margin:0 0 16px 0;color:#111827;font-size:1rem;font-weight:700">Agentes físicos</h5>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+            <input class="input" id="ag_type" placeholder="Tipo de agente" style="min-width:0;flex:1;min-width:180px" />
+            <input class="input" id="ag_dur" placeholder="Minutos" style="width:80px;min-width:0" />
+            <input class="input" id="ag_mod" placeholder="Modalidad" style="min-width:0;flex:1;min-width:140px" />
+            <button class="btn btn-mint" id="btn_add_agent" style="white-space:nowrap">➕ Añadir</button>
+          </div>
+          <ul id="list_agents" style="margin-top:12px;padding-left:0;list-style:none"></ul>
+        </div>
+
+        <!-- Circuitos terapéuticos -->
+        <div style="margin-top:20px;background:#ffffff;padding:20px;border-radius:10px;border:1px solid #e5e7eb">
+          <h5 style="margin:0 0 16px 0;color:#111827;font-size:1rem;font-weight:700">Circuitos terapéuticos</h5>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+            <input class="input" id="ci_activity" placeholder="Actividad del circuito" style="min-width:0;flex:1;min-width:200px" />
+            <input class="input" id="ci_dur" placeholder="Minutos" style="width:80px;min-width:0" />
+            <input class="input" id="ci_rounds" placeholder="Rondas" style="width:80px;min-width:0" />
+            <button class="btn btn-mint" id="btn_add_circuit" style="white-space:nowrap">➕ Añadir</button>
+          </div>
+          <ul id="list_circuits" style="margin-top:12px;padding-left:0;list-style:none"></ul>
+        </div>
+      </section>
+
+      <!-- Negación -->
+      <section id="sec_negacion" class="section" style="display:none">
+        <h4>Negación</h4>
+        <label style="display:block;margin-bottom:6px;font-weight:600;color:#374151;font-size:0.9rem">Motivo de cancelación</label>
+        <textarea class="input" id="neg_reason" placeholder="Describe el motivo de la negación..." style="min-height:100px;width:100%;background:#fff"></textarea>
+      </section>
+
+      <!-- Cancelación justificada -->
+      <section id="sec_cancelacion" class="section" style="display:none">
+        <h4>Cancelación justificada</h4>
+        <label><input type="checkbox" id="cj_vitals" /> Altered vital signs (verified)</label>
+        <label><input type="checkbox" id="cj_medical" /> Medical appointment</label>
+        <label><input type="checkbox" id="cj_house" /> Household activities</label>
+        <div id="cj_vitals_extra" style="display:none;margin-top:8px">
+          <input class="input" id="cj_who" placeholder="Quién verificó" />
+          <input class="input" id="cj_time" placeholder="Hora verificación" />
+          <input class="input" id="cj_ta" placeholder="TA" />
+          <input class="input" id="cj_spo2" placeholder="SpO₂" />
+          <input class="input" id="cj_fc" placeholder="FC" />
+        </div>
+      </section>
+
+      <!-- Notificación -->
+      <section id="sec_notificacion" class="section" style="display:none">
+        <h4>Notificación</h4>
+        <label style="display:block;margin-bottom:6px;font-weight:600;color:#374151;font-size:0.9rem">Detalle de la notificación</label>
+        <textarea class="input" id="not_detail" placeholder="Describe la notificación..." style="min-height:100px;width:100%;background:#fff"></textarea>
+      </section>
+
+      <!-- Cumplimiento -->
+      <section id="sec_cumplimiento" class="section" style="display:none">
+        <h4>Cumplimiento</h4>
+        <label>Selecciona plan activo
+          <select class="input" id="cum_plan_select"><option value="">-- Ninguno --</option></select>
+        </label>
+        <label><input type="checkbox" id="cum_show_done" /> Mostrar también los objetivos ya cumplidos</label>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:8px">
+          <div>
+            <h5>General</h5>
+            <div id="cum_general_list"></div>
+          </div>
+          <div>
+            <h5>Corto / Mediano / Largo</h5>
+            <div id="cum_other_lists"></div>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <label style="display:block;margin-bottom:6px;font-weight:600;color:#374151;font-size:0.9rem">Observaciones de cumplimiento</label>
+          <textarea class="input" id="cum_obs" placeholder="Observaciones adicionales sobre el cumplimiento..." style="min-height:100px;width:100%;background:#fff"></textarea>
+        </div>
+      </section>
+
+      <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:12px">
+        <div>
+          <div id="note_msg" style="color:var(--muted);font-size:14px"></div>
+        </div>
+        <div>
+          <button class="btn btn-cancel" onclick="window.showView('view_seguimiento')">Cancelar</button>
+          <button class="btn btn-draft" id="btn_save_note">Guardar como borrador</button>
+          <button class="btn btn-firmar" id="btn_sign_note">Firmar</button>
+          <!-- Dev helpers: force clear cooldowns and toggle cooldown behavior -->
+          <!-- cooldown feature removed -->
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- ========================= VISTA 8: ASISTENCIA INDIVIDUAL ========================= -->
+  <section id="view_asistencia" class="view">
+    <header class="sub-header">
+      <button class="btn btn-pink back" onclick="window.showView('view_expediente')">← Regresar</button>
+      <div class="user-badge">María López</div>
+    </header>
+
+    <main class="wrap">
+      <section class="section" style="text-align:center">
+        <h3>Lista de Asistencia</h3>
+        <div class="month-nav">
+          <button class="month-btn" id="prevMonth"><i class="fa-solid fa-chevron-left"></i></button>
+          <span id="monthTitle"><strong></strong></span>
+          <button class="month-btn" id="nextMonth"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="calendar" id="calendar"></div>
+        <div class="total-sessions" id="totalSessions"></div>
+      </section>
+    </main>
+  </section>
+
+  <!-- ========================= VISTA: ASISTENCIA GENERAL ========================= -->
+  <section id="view_asistencia_general" class="view">
+    <header class="sub-header">
+      <button class="btn btn-pink back" onclick="window.showAsistenciaGeneralMenu()">← Atrás</button>
+      <div class="user-badge">Reporte Mensual de Asistencia</div>
+    </header>
+    <main class="wrap">
+      <section class="section">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+          <h3>Reporte mensual: <span id="asist_gen_mes_readable" style="color:var(--primary)"></span></h3>
+          <div style="display:flex;gap:12px;align-items:center">
+            <label style="display:flex;gap:8px;align-items:center">
+              <strong>Mes:</strong>
+              <input type="month" class="input" id="asist_gen_mes" style="min-width:150px"/>
+            </label>
+          </div>
+        </div>
+
+        <!-- Pestañas de navegación -->
+        <div class="tab-nav" style="display:flex;gap:8px;margin-bottom:20px;border-bottom:2px solid #e5e7eb">
+          <button class="tab-btn active" data-tab="sesiones" onclick="window.showAsistenciaTab('sesiones')" style="padding:12px 24px;border:none;background:transparent;cursor:pointer;font-weight:600;color:#6b7280;border-bottom:3px solid transparent;transition:all 0.2s">
+            <i class="fa-solid fa-notes-medical" style="margin-right:6px"></i>Sesiones
+          </button>
+          <button class="tab-btn" data-tab="talleres" onclick="window.showAsistenciaTab('talleres')" style="padding:12px 24px;border:none;background:transparent;cursor:pointer;font-weight:600;color:#6b7280;border-bottom:3px solid transparent;transition:all 0.2s">
+            <i class="fa-solid fa-users-line" style="margin-right:6px"></i>Talleres
+          </button>
+          <button class="tab-btn" data-tab="mixto" onclick="window.showAsistenciaTab('mixto')" style="padding:12px 24px;border:none;background:transparent;cursor:pointer;font-weight:600;color:#6b7280;border-bottom:3px solid transparent;transition:all 0.2s">
+            <i class="fa-solid fa-table-list" style="margin-right:6px"></i>Vista Mixta
+          </button>
+        </div>
+
+        <!-- Vista de Sesiones -->
+        <div id="asist_tab_sesiones" class="asist-tab-content" style="display:block">
+          <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+            <div id="asist_gen_lista_servicios" style="min-height:200px">
+              <!-- Lista de sesiones generada dinámicamente -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Vista de Talleres -->
+        <div id="asist_tab_talleres" class="asist-tab-content" style="display:none">
+          <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+            <div id="asist_gen_lista_talleres" style="min-height:200px">
+              <!-- Lista de talleres generada dinámicamente -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Vista Mixta (ambas en una sola página) -->
+        <div id="asist_tab_mixto" class="asist-tab-content" style="display:none">
+          <!-- Sección de Sesiones en vista mixta -->
+          <div style="margin-bottom:32px">
+            <h4 style="margin-bottom:12px;color:var(--primary);border-bottom:2px solid var(--primary);padding-bottom:8px">
+              <i class="fa-solid fa-notes-medical"></i> Sesiones del Mes
+            </h4>
+            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+              <div id="asist_gen_lista_servicios_mixto" style="min-height:200px">
+                <!-- Lista de sesiones (copia) -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección de Talleres en vista mixta -->
+          <div style="margin-bottom:32px">
+            <h4 style="margin-bottom:12px;color:var(--primary);border-bottom:2px solid var(--primary);padding-bottom:8px">
+              <i class="fa-solid fa-users-line"></i> Asistencia a Talleres
+            </h4>
+            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+              <div id="asist_gen_lista_talleres_mixto" style="min-height:200px">
+                <!-- Lista de talleres (copia) -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="asist_gen_msg" style="margin-top:12px;padding:12px;background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;display:none">
+          <div style="display:flex;align-items:center;gap:8px">
+            <i class="fa-solid fa-info-circle" style="color:#f59e0b"></i>
+            <span id="asist_gen_msg_text"></span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  
+
+
+<!-- Vista: Lista de Borradores -->
+    <section id="view_lista" class="view">
+      <header class="sub-header">
+        <button class="btn btn-pink back" onclick="showView('view-menu')">← Menú</button>
+        <div class="user-badge">Mis Borradores</div>
+      </header>
+      <main class="wrap">
+        <section class="section">
+          <div style="display:flex;gap:1rem;margin-bottom:1.5rem;">
+            <button class="btn btn-primary" id="tab-valoraciones" onclick="switchTab('valoraciones')" style="flex:1;">
+              Valoraciones (<span id="count-val">0</span>)
+            </button>
+            <button class="btn btn-secondary" id="tab-planes" onclick="switchTab('planes')" style="flex:1;">
+              Planes (<span id="count-plan">0</span>)
+            </button>
+          </div>
+
+          <div id="list-valoraciones"></div>
+          <div id="list-planes" style="display:none;"></div>
+
+          <div style="display:flex;gap:1rem;margin-top:2rem;">
+            <button class="btn btn-success" onclick="exportAll()" style="flex:1;">💾 Exportar Todo</button>
+            <button class="btn btn-secondary" onclick="importJSON()" style="flex:1;">📥 Importar</button>
+          </div>
+        </section>
+      </main>
+    </section>
+  </div>
+
+  <!-- Elemento oculto para compatibilidad con módulos originales -->
+  <div id="userName" style="display:none;"></div>
+
+  <!-- Scripts -->
+  <script src="js/constants.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/confetti.js"></script>
+  <script src="js/valoracion.js"></script>
+  <script src="js/escalas.js"></script>
+  <script src="js/plan.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/pdf-export.js"></script>
+  
+  <script>
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW:', e));
+    }
+
+    // Verificar tamaño de pantalla - DESACTIVADO para permitir cualquier tamaño
+    function checkDevice() {
+      // Simplemente ajustar zoom si es necesario
+      const width = window.innerWidth;
+      if (width < 1200) {
+        document.body.style.zoom = '0.8';
+      }
+      return true; // Siempre permitir
+    }
+
+    // Lista de usuarias predeterminadas
+    const USUARIAS = [
+      { "nombre": "Virginia Vargas Acevedo", "habitacion": "2" },
+      { "nombre": "Angélica Martínez Osornio", "habitacion": "4" },
+      { "nombre": "María Eugenia Romo García", "habitacion": "5" },
+      { "nombre": "María Isabel Tellez Velázquez", "habitacion": "6" },
+      { "nombre": "María Gloria Aguilar Morín", "habitacion": "7" },
+      { "nombre": "Ana Rosa Alemon Tovar", "habitacion": "8" },
+      { "nombre": "Fidelina Quezada Pérez", "habitacion": "9" },
+      { "nombre": "Beatriz Margarita Barajas y Zazueta", "habitacion": "11" },
+      { "nombre": "Martha Sanchez Hernández", "habitacion": "12" },
+      { "nombre": "Maria Guillermina Sierra y Estéves", "habitacion": "105" },
+      { "nombre": "Norma Patricia Guadalupe Maravoto Guerrero", "habitacion": "107" },
+      { "nombre": "María Elena Cortés Pardo", "habitacion": "107" },
+      { "nombre": "Beatriz Carvajal Villegas", "habitacion": "108" },
+      { "nombre": "Velia Torres Camacho", "habitacion": "108" },
+      { "nombre": "María del Carmen Rosario Anguiano Carey", "habitacion": "109" },
+      { "nombre": "María Guadalupe Huerta Juárez", "habitacion": "110" },
+      { "nombre": "María Guadalupe Cristina Castillo López", "habitacion": "112" },
+      { "nombre": "Isabel García Alcalá", "habitacion": "113" },
+      { "nombre": "Bertha Ochoa Hoyos", "habitacion": "117" },
+      { "nombre": "Teodora Hilda Margarita García Hernández", "habitacion": "118" },
+      { "nombre": "Margarita Medina Godínez", "habitacion": "119" },
+      { "nombre": "Sonia Buzon Ramírez", "habitacion": "120" },
+      { "nombre": "Virginia Barba Casillas", "habitacion": "121" },
+      { "nombre": "María Eugenia Vázquez e Ibarra", "habitacion": "122" },
+      { "nombre": "Lucia Pérez Hernández", "habitacion": "123" },
+      { "nombre": "Alicia Sandoval Guerrero", "habitacion": "124" },
+      { "nombre": "Irma Rosado Palomar", "habitacion": "125" },
+      { "nombre": "Salvador González", "habitacion": "204" },
+      { "nombre": "Ma. de Lourdes Ramírez Martínez", "habitacion": "205" },
+      { "nombre": "María Antinea López Monroy", "habitacion": "206" },
+      { "nombre": "María Victoria Ruiz Moran", "habitacion": "207" },
+      { "nombre": "María Elena Mancera y Aguayo", "habitacion": "208" },
+      { "nombre": "María de la Peña Cardona", "habitacion": "209" },
+      { "nombre": "Aura Paz Martha Graciela Luz Cravioto", "habitacion": "210" },
+      { "nombre": "María Elena Muñoz Lara", "habitacion": "211" },
+      { "nombre": "Virginia Reyes Velázquez", "habitacion": "213" },
+      { "nombre": "Teresa Gutiérrez Zamorano", "habitacion": "214" },
+      { "nombre": "Nidia María Donde Diego", "habitacion": "215" },
+      { "nombre": "Eva Gutiérrez y Sotelo", "habitacion": "216" },
+      { "nombre": "María Concepción Medina y Nicolau", "habitacion": "217" },
+      { "nombre": "Aurora Benítez Avila", "habitacion": "218" },
+      { "nombre": "Elizabeth Leon Mendózo", "habitacion": "219" },
+      { "nombre": "Aida Santos Rosas", "habitacion": "220" },
+      { "nombre": "María del Carmen Sánchez Vazquez", "habitacion": "222" },
+      { "nombre": "Rosa María D'arce Arzate", "habitacion": "223" },
+      { "nombre": "Elena Yolanda Guevara y Gómez", "habitacion": "301" },
+      { "nombre": "Teodora Graciela García Carbajal", "habitacion": "302" },
+      { "nombre": "Herminia Hernández Rodríguez", "habitacion": "303" },
+      { "nombre": "Dolores Domínguez y Magaña Peon", "habitacion": "305" },
+      { "nombre": "Angelica Magdalena Osorio Lugo", "habitacion": "306" },
+      { "nombre": "Martha Aguilera Carrillo", "habitacion": "308" },
+      { "nombre": "María Amador Moreno", "habitacion": "310" },
+      { "nombre": "Nora Patricia Rivas Borja", "habitacion": "312" },
+      { "nombre": "Juana Mesquite", "habitacion": "313" },
+      { "nombre": "María Eugenia Solano Sainos", "habitacion": "314" },
+      { "nombre": "María Guadalupe Gasca Boyer", "habitacion": "320" },
+      { "nombre": "María Mendoza Alvarez", "habitacion": "322" },
+      { "nombre": "Enedina Martínez Ochoa", "habitacion": "323" },
+      { "nombre": "Ma Isabel Silva Ramírez", "habitacion": "324" },
+      { "nombre": "Bertha Rosa Solano Guerrero", "habitacion": "326" },
+      { "nombre": "Silvia Margarita Méndez Berrueta", "habitacion": "328" },
+      { "nombre": "María del Rosario García Alcalá", "habitacion": "330" },
+      { "nombre": "Yolanda Barajas del Castillo", "habitacion": "333" },
+      { "nombre": "Estefana Sánchez de Anda", "habitacion": "5to Piso" },
+      { "nombre": "Ma. Jesús Razo Madrigal", "habitacion": "5to Piso" },
+      { "nombre": "María Magdalena García Alcalá", "habitacion": "5to Piso" },
+      { "nombre": "Ma. del Carmen Rivera Soria", "habitacion": "5to Piso" },
+      { "nombre": "María del Rosario Huerta Pérez", "habitacion": "5to Piso" },
+      { "nombre": "Susana Patricia Moysen Márquez", "habitacion": "5to Piso" },
+      { "nombre": "María Eva Delgadillo Escareño", "habitacion": "5to Piso" },
+      { "nombre": "Blanca Estela", "habitacion": "No aplica" },
+      { "nombre": "Juana del Angel", "habitacion": "No aplica" },
+      { "nombre": "Georgina \"Coquis\" Ayala", "habitacion": "No aplica" },
+      { "nombre": "Antonia Enriqueta Andrade Uriosti", "habitacion": "No aplica" },
+      { "nombre": "Mary (Cuidadora)", "habitacion": "No aplica" },
+      { "nombre": "Laura (Cuidadora)", "habitacion": "No aplica" }
+    ];
+
+    // Cargar usuarias en el selector
+    function cargarUsuarias() {
+      const select = document.getElementById('patient-name-input');
+      USUARIAS.forEach(usuaria => {
+        const option = document.createElement('option');
+        option.value = usuaria.nombre;
+        option.textContent = `${usuaria.nombre} - Hab. ${usuaria.habitacion}`;
+        select.appendChild(option);
+      });
+    }
+
+    // Gestión de paciente
+    let currentPatient = localStorage.getItem('hsv_mobile_current_patient') || '';
+
+    function setPatientAndContinue() {
+      const name = document.getElementById('patient-name-input').value.trim();
+      if (!name) {
+        alert('Por favor selecciona una usuaria');
+        return;
+      }
+      currentPatient = name;
+      localStorage.setItem('hsv_mobile_current_patient', name);
+      document.getElementById('userName').textContent = name;
+      document.getElementById('current-patient-name').textContent = name;
+      document.getElementById('patient-selector').style.display = 'none';
+      document.getElementById('main-app').style.display = 'block';
+      updateBadges();
+    }
+
+    function changePatient() {
+      if (confirm('¿Cambiar de paciente? Asegúrate de exportar tus borradores primero.')) {
+        document.getElementById('patient-selector').style.display = 'flex';
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('patient-name-input').value = '';
+      }
+    }
+
+    function updateBadges() {
+      const vals = JSON.parse(localStorage.getItem('hsv_valoraciones_v1') || '[]');
+      const plans = JSON.parse(localStorage.getItem('hsv_plans_v1') || '[]');
+      const total = vals.length + plans.length;
+      
+      document.getElementById('count-val').textContent = vals.length;
+      document.getElementById('count-plan').textContent = plans.length;
+      
+      const badge = document.getElementById('badge-count');
+      if (total > 0) {
+        badge.textContent = total;
+        badge.style.display = 'flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
+    // Sistema de vistas
+    function showView(viewId) {
+      // Mostrar main-app si no está visible
+      const mainApp = document.getElementById('main-app');
+      if (mainApp.style.display === 'none') {
+        mainApp.style.display = 'block';
+      }
+      
+      // Ocultar todas las vistas
+      document.querySelectorAll('.view, .main-menu').forEach(v => v.style.display = 'none');
+      
+      // Mostrar la vista solicitada
+      const view = document.getElementById(viewId);
+      if (view) {
+        view.style.display = 'block';
+        
+        // Mostrar usuaria en el header si es valoración o plan
+        if (viewId === 'view_addvaloracion') {
+          mostrarUsuariaEnView('valoracion');
+        } else if (viewId === 'view_addplan') {
+          mostrarUsuariaEnView('plan');
+        }
+        
+        // Inicializar la vista según sea necesario
+        setTimeout(() => {
+          if (viewId === 'view_addvaloracion') {
+            // Disparar evento para que valoracion.js inicialice
+            const event = new CustomEvent('viewShown', { detail: { viewId: viewId } });
+            document.dispatchEvent(event);
+            
+            // Inicializar campos manualmente si es necesario
+            if (typeof initializeValoracionView === 'function') {
+              initializeValoracionView();
+            }
+            
+            // Initialize standard scales if available
+            if (window.HSV_Escalas && typeof window.HSV_Escalas.init === 'function') {
+              window.HSV_Escalas.init();
+            }
+          } else if (viewId === 'view_addplan') {
+            // Disparar evento para que plan.js inicialice
+            const event = new CustomEvent('viewShown', { detail: { viewId: viewId } });
+            document.dispatchEvent(event);
+            
+            // Inicializar campos manualmente
+            if (typeof initializePlanView === 'function') {
+              initializePlanView();
+            }
+          } else if (viewId === 'view_lista') {
+            if (typeof renderLista === 'function') {
+              renderLista();
+            }
+          }
+        }, 100);
+      } else if (viewId === 'view-menu') {
+        document.getElementById('view-menu').style.display = 'block';
+      }
+    }
+    
+    // Asignar la función a window para que los módulos puedan accederla
+    window.showView = showView;
+
+    // Mostrar usuaria en las vistas de valoración o plan
+    function mostrarUsuariaEnView(tipo) {
+      const paciente = sessionStorage.getItem('paciente_actual');
+      const responsable = sessionStorage.getItem('responsable_name');
+      
+      if (tipo === 'valoracion') {
+        const elem1 = document.getElementById('val-usuaria-display');
+        const elem2 = document.getElementById('val-responsable-display');
+        if (elem1) elem1.textContent = '👤 ' + paciente;
+        if (elem2) elem2.textContent = responsable;
+      } else if (tipo === 'plan') {
+        const elem1 = document.getElementById('plan-usuaria-display');
+        const elem2 = document.getElementById('plan-responsable-display');
+        if (elem1) elem1.textContent = '👤 ' + paciente;
+        if (elem2) elem2.textContent = responsable;
+      }
+    }
+
+    // Volver al menú desde valoración o plan (limpiando sesión de paciente)
+    function goBackToMenu() {
+      sessionStorage.removeItem('paciente_actual');
+      showView('view-menu');
+    }
+
+    // Inicializar vista de valoración
+    function initializeValoracionView() {
+      console.log('Inicializando vista de valoración...');
+      
+      // Esperar a que los módulos estén cargados
+      setTimeout(() => {
+        if (window.HSV_Valoracion) {
+          try {
+            // Inicializar componentes de valoración
+            if (typeof window.HSV_Valoracion.renderSegmentSelectors === 'function') {
+              window.HSV_Valoracion.renderSegmentSelectors();
+            }
+            if (typeof window.HSV_Valoracion.renderGoniTables === 'function') {
+              window.HSV_Valoracion.renderGoniTables();
+            }
+            if (typeof window.HSV_Valoracion.renderDanielsTable === 'function') {
+              window.HSV_Valoracion.renderDanielsTable();
+            }
+            if (typeof window.HSV_Valoracion.renderMarchaSection === 'function') {
+              window.HSV_Valoracion.renderMarchaSection();
+            }
+            if (typeof window.HSV_Valoracion.renderEscalasSection === 'function') {
+              window.HSV_Valoracion.renderEscalasSection();
+            }
+            console.log('✓ Valoración inicializada');
+          } catch(e) {
+            console.error('Error inicializando valoración:', e);
+          }
+        } else {
+          console.warn('HSV_Valoracion no disponible');
+        }
+      }, 150);
+    }
+
+    // Inicializar vista de plan
+    function initializePlanView() {
+      console.log('Inicializando vista de plan...');
+      
+      // Esperar a que los módulos estén cargados
+      setTimeout(() => {
+        // Toggle agudo/crónico - MANEJADO POR plan.js initTipoToggle()
+        // (código removido para evitar duplicación)
+        
+        // Inicializar deficiencias CIF
+        if (window.HSV_Plan) {
+          try {
+            if (typeof window.HSV_Plan.initDateAndSchedule === 'function') {
+              window.HSV_Plan.initDateAndSchedule();
+            }
+            if (typeof window.HSV_Plan.enableAutoBullets === 'function') {
+              window.HSV_Plan.enableAutoBullets();
+            }
+            
+            // Inicializar botón de deficiencias manualmente
+            const btnAddDef = document.getElementById('btn_add_deficiencia');
+            const containerDef = document.getElementById('cif_deficiencias_container');
+            
+            if (btnAddDef && containerDef) {
+              // Limpiar listener anterior
+              const newBtn = btnAddDef.cloneNode(true);
+              btnAddDef.parentNode.replaceChild(newBtn, btnAddDef);
+              
+              newBtn.addEventListener('click', () => {
+                agregarDeficienciaManual();
+              });
+              
+              // Agregar una estructura inicial si está vacío
+              if (containerDef.children.length === 0) {
+                agregarDeficienciaManual();
+              }
+            }
+            
+            console.log('✓ Plan inicializado');
+          } catch(e) {
+            console.error('Error inicializando plan:', e);
+          }
+        } else {
+          console.warn('HSV_Plan no disponible');
+        }
+      }, 150);
+    }
+
+    // Función manual para agregar deficiencias
+    function agregarDeficienciaManual() {
+      const container = document.getElementById('cif_deficiencias_container');
+      if (!container) return;
+      
+      const estructuraDiv = document.createElement('div');
+      estructuraDiv.className = 'cif-estructura-item';
+      estructuraDiv.style.cssText = 'border:1px solid #e5e7eb;border-radius:8px;padding:12px;margin-bottom:12px;background:#f9f9f9';
+      estructuraDiv.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <label style="font-weight:600;font-size:0.9rem;margin:0">Estructura:</label>
+          <button type="button" class="btn-eliminar-estructura" style="background:#fecaca;color:#991b1b;border:none;border-radius:6px;padding:4px 10px;font-size:0.85rem;cursor:pointer;font-weight:600">✕ Eliminar</button>
+        </div>
+        <input type="text" class="input estructura-input" placeholder="Ej.: Sistema musculoesquelético" style="width:100%;margin-bottom:12px" />
+        <label style="display:block;font-weight:600;font-size:0.9rem;margin-bottom:6px">Funciones afectadas:</label>
+        <div class="funciones-container"></div>
+        <button type="button" class="btn-add-funcion" style="background:#d1fae5;color:#065f46;border:none;border-radius:6px;padding:6px 12px;font-size:0.85rem;cursor:pointer;width:100%;margin-top:8px;font-weight:600">+ Agregar función</button>
+      `;
+      
+      container.appendChild(estructuraDiv);
+      
+      // Event listeners
+      estructuraDiv.querySelector('.btn-eliminar-estructura').addEventListener('click', () => estructuraDiv.remove());
+      estructuraDiv.querySelector('.btn-add-funcion').addEventListener('click', () => {
+        const funcionesContainer = estructuraDiv.querySelector('.funciones-container');
+        const funcionDiv = document.createElement('div');
+        funcionDiv.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
+        funcionDiv.innerHTML = `
+          <input type="text" class="input funcion-input" placeholder="Ej.: Movilidad articular reducida" style="flex:1" />
+          <button type="button" class="btn-eliminar-funcion" style="background:#fecaca;color:#991b1b;border:none;border-radius:6px;padding:4px 8px;font-size:0.85rem;cursor:pointer;font-weight:600">✕</button>
+        `;
+        funcionesContainer.appendChild(funcionDiv);
+        funcionDiv.querySelector('.btn-eliminar-funcion').addEventListener('click', () => funcionDiv.remove());
+      });
+      
+      // Agregar función inicial
+      const funcionesContainer = estructuraDiv.querySelector('.funciones-container');
+      const funcionDiv = document.createElement('div');
+      funcionDiv.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px';
+      funcionDiv.innerHTML = `
+        <input type="text" class="input funcion-input" placeholder="Ej.: Movilidad articular reducida" style="flex:1" />
+        <button type="button" class="btn-eliminar-funcion" style="background:#fecaca;color:#991b1b;border:none;border-radius:6px;padding:4px 8px;font-size:0.85rem;cursor:pointer;font-weight:600">✕</button>
+      `;
+      funcionesContainer.appendChild(funcionDiv);
+      funcionDiv.querySelector('.btn-eliminar-funcion').addEventListener('click', () => funcionDiv.remove());
+    }
+
+    // Lista de borradores
+    let currentTab = 'valoraciones';
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById('tab-valoraciones').className = tab === 'valoraciones' ? 'btn btn-primary' : 'btn btn-secondary';
+      document.getElementById('tab-planes').className = tab === 'planes' ? 'btn btn-primary' : 'btn btn-secondary';
+      document.getElementById('list-valoraciones').style.display = tab === 'valoraciones' ? 'block' : 'none';
+      document.getElementById('list-planes').style.display = tab === 'planes' ? 'block' : 'none';
+    }
+
+    function renderLista() {
+      const vals = JSON.parse(localStorage.getItem('hsv_valoraciones_v1') || '[]');
+      const plans = JSON.parse(localStorage.getItem('hsv_plans_v1') || '[]');
+      
+      updateBadges();
+      
+      // Renderizar valoraciones
+      const valContainer = document.getElementById('list-valoraciones');
+      valContainer.innerHTML = '';
+      if (vals.length === 0) {
+        valContainer.innerHTML = '<p style="text-align:center;color:#718096;">No hay valoraciones guardadas</p>';
+      } else {
+        vals.forEach(v => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.style.marginBottom = '1rem';
+          card.style.padding = '1.5rem';
+          card.innerHTML = `
+            <div style="display:flex;justify-content:space-between;margin-bottom:1rem;">
+              <div>
+                <h4 style="margin:0 0 0.5rem;">${v.paciente}</h4>
+                <p style="margin:0;color:#718096;font-size:0.9rem;">${v.fecha} • ${v.tipo || 'Valoración'}</p>
+              </div>
+              <div style="text-align:right;color:#718096;font-size:0.9rem;">
+                ${v.responsable_prefix || ''} ${v.responsable || ''}
+              </div>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <button class="btn btn-edit" onclick="editValoracion('${v.id}')">✏️ Editar</button>
+              <button class="btn btn-primary" onclick="downloadPDFFormulario('valoracion', '${v.id}')">📋 Formulario</button>
+              <button class="btn btn-del" onclick="deleteItem('valoracion', '${v.id}')">🗑️</button>
+            </div>
+          `;
+          valContainer.appendChild(card);
+        });
+      }
+      
+      // Renderizar planes
+      const planContainer = document.getElementById('list-planes');
+      planContainer.innerHTML = '';
+      if (plans.length === 0) {
+        planContainer.innerHTML = '<p style="text-align:center;color:#718096;">No hay planes guardados</p>';
+      } else {
+        plans.forEach(p => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.style.marginBottom = '1rem';
+          card.style.padding = '1.5rem';
+          card.innerHTML = `
+            <div style="display:flex;justify-content:space-between;margin-bottom:1rem;">
+              <div>
+                <h4 style="margin:0 0 0.5rem;">${p.paciente}</h4>
+                <p style="margin:0;color:#718096;font-size:0.9rem;">${p.fecha} • ${p.tipo || 'Plan'}</p>
+              </div>
+              <div style="text-align:right;color:#718096;font-size:0.9rem;">
+                ${p.responsable_prefix || ''} ${p.responsable || ''}
+              </div>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+              <button class="btn btn-edit" onclick="editPlan('${p.id}')">✏️ Editar</button>
+              <button class="btn btn-primary" onclick="downloadPDFFormulario('plan', '${p.id}')">📋 Formulario</button>
+              <button class="btn btn-del" onclick="deleteItem('plan', '${p.id}')">🗑️</button>
+            </div>
+          `;
+          planContainer.appendChild(card);
+        });
+      }
+    }
+
+    function editValoracion(id) {
+      // Los módulos originales manejan esto
+      showView('view_addvaloracion');
+    }
+
+    function editPlan(id) {
+      // Los módulos originales manejan esto
+      showView('view_addplan');
+    }
+
+    function deleteItem(tipo, id) {
+      if (!confirm('¿Eliminar este elemento?')) return;
+      const key = tipo === 'valoracion' ? 'hsv_valoraciones_v1' : 'hsv_plans_v1';
+      const items = JSON.parse(localStorage.getItem(key) || '[]');
+      const filtered = items.filter(item => item.id !== id);
+      localStorage.setItem(key, JSON.stringify(filtered));
+      renderLista();
+      showToast('Eliminado correctamente', 'success');
+    }
+
+    // Toast helper
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      toast.textContent = message;
+      toast.style.cssText = 'position:fixed;top:80px;right:20px;background:white;padding:1rem 1.5rem;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.2);z-index:9999;';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // ============================================
+    // FUNCIONES DE EXPORTACIÓN E IMPORTACIÓN
+    // ============================================
+    
+    function exportAll() {
+      const vals = JSON.parse(localStorage.getItem('hsv_valoraciones_v1') || '[]');
+      const plans = JSON.parse(localStorage.getItem('hsv_plans_v1') || '[]');
+      
+      if (vals.length === 0 && plans.length === 0) {
+        alert('No hay borradores para exportar');
+        return;
+      }
+      
+      const data = {
+        valoraciones: vals,
+        planes: plans,
+        paciente: currentPatient,
+        exported_at: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `HSV_${currentPatient}_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Exportado correctamente', 'success');
+    }
+    
+    function exportSingle(tipo, id) {
+      const key = tipo === 'valoracion' ? 'hsv_valoraciones_v1' : 'hsv_plans_v1';
+      const items = JSON.parse(localStorage.getItem(key) || '[]');
+      const item = items.find(i => i.id === id);
+      
+      if (!item) {
+        alert('No se encontró el elemento');
+        return;
+      }
+      
+      const data = {
+        tipo: tipo,
+        data: item,
+        paciente: currentPatient,
+        exported_at: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `HSV_${tipo}_${item.paciente}_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Exportado correctamente', 'success');
+    }
+    
+    function importJSON() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const data = JSON.parse(event.target.result);
+            
+            // Importar datos
+            if (data.valoraciones && Array.isArray(data.valoraciones)) {
+              const existing = JSON.parse(localStorage.getItem('hsv_valoraciones_v1') || '[]');
+              const merged = [...existing, ...data.valoraciones];
+              localStorage.setItem('hsv_valoraciones_v1', JSON.stringify(merged));
+            }
+            
+            if (data.planes && Array.isArray(data.planes)) {
+              const existing = JSON.parse(localStorage.getItem('hsv_plans_v1') || '[]');
+              const merged = [...existing, ...data.planes];
+              localStorage.setItem('hsv_plans_v1', JSON.stringify(merged));
+            }
+            
+            // Si es un solo item
+            if (data.tipo && data.data) {
+              const key = data.tipo === 'valoracion' ? 'hsv_valoraciones_v1' : 'hsv_plans_v1';
+              const existing = JSON.parse(localStorage.getItem(key) || '[]');
+              existing.push(data.data);
+              localStorage.setItem(key, JSON.stringify(existing));
+            }
+            
+            renderLista();
+            updateBadges();
+            showToast('Importado correctamente', 'success');
+          } catch(err) {
+            alert('Error al importar: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+    
+    // ============================================
+    // FUNCIONES DE DESCARGA PDF
+    // ============================================
+    
+    // Usar las funciones del export.js para PDFs
+    async function downloadPDFNarrada(tipo, id) {
+      if (tipo === 'valoracion') {
+        exportValoracionNarradaPDF(id);
+      } else {
+        // TODO: Implementar exportPlanNarradoPDF cuando esté listo
+        showToast('PDF de plan narrado próximamente', 'info');
+      }
+    }
+    
+    async function downloadPDFFormulario(tipo, id) {
+      if (tipo === 'valoracion') {
+        exportValoracionFormularioCompletoPDF(id);
+      } else {
+        // TODO: Implementar exportPlanFormularioCompletoPDF cuando esté listo
+        showToast('PDF de plan formulario próximamente', 'info');
+      }
+    }
+    
+
+
+    // ============================================
+    // AUTENTICACIÓN Y LOGIN
+    // ============================================
+    
+    // Cargar pasantes dinámicamente desde localStorage
+    function getPasantesData() {
+      const saved = localStorage.getItem('hsv_pasantes');
+      if (saved) {
+        let pasantes = JSON.parse(saved);
+        localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
+        return pasantes;
+      }
+      // Datos por defecto
+      return [
+        { nombre: 'Tavata Alexa Basurto Ramírez', prefijo: 'LFT', password: '1234', icono: 'icons/AlexaI.png' },
+        { nombre: 'Gloria Iraís Espinosa Peralta', prefijo: 'PSS', password: '1111', icono: 'icons/GloriaI.png' },
+        { nombre: 'Jorge Eduardo Rodríguez Romero', prefijo: 'PSS', password: '2222', icono: 'icons/JorgeI.png' },
+        { nombre: 'Andrea Ofelia Carrillo Valdés', prefijo: 'PSS', password: '3333', icono: 'icons/default.png' },
+        { nombre: 'Alejandra María Contreras Cruz', prefijo: 'PSS', password: '4444', icono: 'icons/default.png' },
+        { nombre: 'Gabriel Rodríguez Hernández', prefijo: 'PSS', password: '5555', icono: 'icons/default.png' },
+        { nombre: 'Leslie Amellali Santillán García', prefijo: 'PSS', password: '6666', icono: 'icons/default.png' },
+        { nombre: 'Francisco Nava Chávez', prefijo: 'PSS', password: '7777', icono: 'icons/default.png' },
+        { nombre: 'Estefanía Zanabria', prefijo: 'PSS', password: '8888', icono: 'icons/default.png' }
+      ];
+    }
+
+    // Generar grid de responsables dinámicamente
+    function renderResponsablesGrid() {
+      const grid = document.getElementById('responsables-grid');
+      if (!grid) return;
+      
+      const pasantes = getPasantesData();
+      grid.innerHTML = '';
+      
+      pasantes.forEach((p, index) => {
+        const delay = 0.1 + (index * 0.05);
+        const nombreCorto = p.nombre.split(' ').slice(0, 2).join(' ');
+        const rolTexto = p.prefijo === 'LFT' ? 'Licenciada en Fisioterapia' : 'Pasante de Servicio Social';
+        
+        const div = document.createElement('div');
+        div.onclick = () => selectResponsableByIndex(index);
+        div.style.cssText = `display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; padding: 2rem; border: 2px solid var(--border-soft); border-radius: 16px; background: white; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); animation: popIn 0.5s ease-out ${delay}s both;`;
+        div.onmouseover = function() { this.style.borderColor='var(--primary-soft)';this.style.boxShadow='0 12px 35px rgba(212, 197, 249, 0.4)';this.style.transform='translateY(-8px)'; };
+        div.onmouseout = function() { this.style.borderColor='var(--border-soft)';this.style.boxShadow='0 4px 20px rgba(0, 0, 0, 0.08)';this.style.transform='translateY(0)'; };
+        
+        div.innerHTML = `
+          <img src="${p.icono || 'icons/default.png'}" alt="${nombreCorto}" style="width: 80px; height: 80px; border-radius: 12px; margin-bottom: 0.8rem; object-fit: cover;" onerror="this.src='icons/DirectorioI.png'">
+          <p style="margin: 0; color: var(--text-dark); font-weight: 600; font-size: 0.9rem; text-align: center;">${nombreCorto}<br><span style="font-size: 0.8rem; color: var(--text-light); font-weight: 400;">${rolTexto}</span></p>
+        `;
+        
+        grid.appendChild(div);
+      });
+    }
+
+    // Seleccionar responsable por índice
+    function selectResponsableByIndex(index) {
+      const pasantes = getPasantesData();
+      const responsable = pasantes[index];
+      if (responsable) {
+        document.getElementById('login-form').style.display = 'block';
+        document.getElementById('responsable-select').value = index;
+        document.getElementById('responsable-display').value = responsable.nombre;
+        document.getElementById('password-input').value = '';
+        document.getElementById('password-input').focus();
+        document.getElementById('login-error').style.display = 'none';
+      }
+    }
+
+    // Cancelar la solicitud de contraseña
+    function cancelPasswordPrompt() {
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('responsable-select').value = '';
+      document.getElementById('responsable-display').value = '';
+      document.getElementById('password-input').value = '';
+      document.getElementById('login-error').style.display = 'none';
+    }
+
+    function handleLogin(event) {
+      event.preventDefault();
+      const responsableIndex = document.getElementById('responsable-select').value;
+      const password = document.getElementById('password-input').value;
+      const errorDiv = document.getElementById('login-error');
+
+      if (responsableIndex === '' || !password) {
+        showLoginError('Por favor completa todos los campos');
+        return;
+      }
+
+      const pasantes = getPasantesData();
+      const responsable = pasantes[parseInt(responsableIndex)];
+      
+      if (!responsable || responsable.password !== password) {
+        showLoginError('Responsable o contraseña incorrectos');
+        document.getElementById('password-input').value = '';
+        return;
+      }
+
+      // Login exitoso
+      sessionStorage.setItem('responsable_id', responsableIndex);
+      sessionStorage.setItem('responsable_name', responsable.nombre);
+      
+      // Usar el prefijo del pasante
+      const prefijo = responsable.prefijo || 'PSS';
+      sessionStorage.setItem('responsable_prefijo', prefijo);
+      
+      // Actualizar badge
+      document.getElementById('responsable-badge-title').textContent = prefijo;
+      const nombreParts = responsable.nombre.split(' ');
+      const nombreCorto = nombreParts[0] + ' ' + nombreParts[nombreParts.length - 1];
+      document.getElementById('responsable-badge-name').textContent = nombreCorto;
+      
+      // Usar el icono del pasante
+      document.getElementById('responsable-badge-icon').src = responsable.icono || 'icons/DirectorioI.png';
+      
+      document.getElementById('patient-selector').style.display = 'none';
+      document.getElementById('main-app').style.display = 'block';
+      
+      // Mostrar botón de configuración solo para Tavata Alexa
+      if (typeof window.configApp !== 'undefined' && window.configApp.checkShowConfigButton) {
+        window.configApp.checkShowConfigButton();
+      }
+      
+      errorDiv.style.display = 'none';
+    }
+
+    function showLoginError(message) {
+      const errorDiv = document.getElementById('login-error');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 5000);
+    }
+
+    function logout() {
+      if (confirm('¿Deseas cerrar sesión?')) {
+        sessionStorage.removeItem('responsable_id');
+        sessionStorage.removeItem('responsable_name');
+        document.getElementById('login-form').reset();
+        document.getElementById('patient-selector').style.display = 'flex';
+        document.getElementById('main-app').style.display = 'none';
+        document.getElementById('login-error').style.display = 'none';
+      }
+    }
+
+    // ============================================
+    // MODAL AGREGAR (Valoración o Plan)
+    // ============================================
+
+    let tipoDocumentoActual = null; // Variable para almacenar el tipo seleccionado
+
+    function openAgregarModal() {
+      document.getElementById('agregar-modal').style.display = 'flex';
+    }
+
+    function closeAgregarModal() {
+      document.getElementById('agregar-modal').style.display = 'none';
+    }
+
+    function selectAgregarType(type) {
+      tipoDocumentoActual = type;
+      closeAgregarModal();
+      
+      // Mostrar modal de selección de usuaria
+      openUsuariaSelector(type);
+    }
+
+    // ============================================
+    // MODAL SELECCIÓN DE USUARIA
+    // ============================================
+
+    function openUsuariaSelector(type) {
+      const modal = document.getElementById('usuaria-selector-modal');
+      const tipoNombre = type === 'valoracion' ? 'valoración' : 'plan';
+      document.getElementById('tipo-documento-modal').textContent = tipoNombre;
+      
+      // Cargar usuarias en el select desde el array USUARIAS precargado
+      const select = document.getElementById('usuaria-select-modal');
+      select.innerHTML = '<option value="">-- Selecciona una usuaria --</option>';
+      
+      // Usar el array USUARIAS que ya está precargado
+      USUARIAS.forEach(u => {
+        const option = document.createElement('option');
+        option.value = u.nombre;
+        option.textContent = u.nombre;
+        select.appendChild(option);
+      });
+      
+      modal.style.display = 'flex';
+    }
+
+    function cancelUsuariaSelection() {
+      document.getElementById('usuaria-selector-modal').style.display = 'none';
+      tipoDocumentoActual = null;
+      document.getElementById('usuaria-select-modal').value = '';
+    }
+
+    function confirmUsuariaSelection() {
+      const usuaria = document.getElementById('usuaria-select-modal').value;
+      
+      if (!usuaria) {
+        alert('Por favor selecciona una usuaria');
+        return;
+      }
+      
+      // Cerrar modal
+      document.getElementById('usuaria-selector-modal').style.display = 'none';
+      
+      // Guardar usuaria seleccionada en sessionStorage
+      sessionStorage.setItem('paciente_actual', usuaria);
+      
+      // Abrir vista según tipo
+      if (tipoDocumentoActual === 'valoracion') {
+        showView('view_addvaloracion');
+      } else if (tipoDocumentoActual === 'plan') {
+        showView('view_addplan');
+      }
+      
+      tipoDocumentoActual = null;
+    }
+
+    // Cerrar modales al hacer clic fuera
+    document.addEventListener('click', (e) => {
+      const agregarModal = document.getElementById('agregar-modal');
+      const usuariaModal = document.getElementById('usuaria-selector-modal');
+      
+      if (e.target === agregarModal) {
+        closeAgregarModal();
+      }
+      if (e.target === usuariaModal) {
+        cancelUsuariaSelection();
+      }
+    });
+
+    // Cargar apoyos dinámicamente desde localStorage
+    function loadApoyosIntoSelects() {
+      try {
+        const savedApoyos = localStorage.getItem('hsv_apoyos');
+        let apoyosList = [];
+        
+        if (savedApoyos) {
+          const apoyosData = JSON.parse(savedApoyos);
+          apoyosList = apoyosData.map(a => a.nombre);
+        } else {
+          // Valores por defecto
+          apoyosList = [
+            'Paola Saraí Olivares Pérez',
+            'Sebastián'
+          ];
+        }
+        
+        // Cargar en plan_apoyo
+        const planApoyoSelect = document.getElementById('plan_apoyo');
+        if (planApoyoSelect) {
+          const currentValue = planApoyoSelect.value;
+          // Limpiar opciones excepto la primera
+          while (planApoyoSelect.options.length > 1) {
+            planApoyoSelect.remove(1);
+          }
+          // Agregar apoyos dinámicos
+          apoyosList.forEach(apoyo => {
+            const option = document.createElement('option');
+            option.value = apoyo;
+            option.textContent = apoyo;
+            option.dataset.prefix = 'EF';
+            planApoyoSelect.appendChild(option);
+          });
+          // Agregar opción "Ninguno"
+          const ningunoOption = document.createElement('option');
+          ningunoOption.value = '';
+          ningunoOption.textContent = '— Ninguno —';
+          planApoyoSelect.appendChild(ningunoOption);
+          // Restaurar valor anterior si existía
+          if (currentValue) {
+            planApoyoSelect.value = currentValue;
+          }
+        }
+        
+        // Cargar en val_apoyo (valoración)
+        const valApoyoSelect = document.getElementById('val_apoyo');
+        if (valApoyoSelect) {
+          const currentValue = valApoyoSelect.value;
+          // Limpiar opciones excepto la primera
+          while (valApoyoSelect.options.length > 1) {
+            valApoyoSelect.remove(1);
+          }
+          // Agregar apoyos dinámicos
+          apoyosList.forEach(apoyo => {
+            const option = document.createElement('option');
+            option.value = apoyo;
+            option.textContent = apoyo;
+            option.dataset.prefix = 'EF';
+            valApoyoSelect.appendChild(option);
+          });
+          // Restaurar valor anterior si existía
+          if (currentValue) {
+            valApoyoSelect.value = currentValue;
+          }
+        }
+        
+        // Cargar en note_apoyo (notas/addnote)
+        const noteApoyoSelect = document.getElementById('note_apoyo');
+        if (noteApoyoSelect) {
+          const currentValue = noteApoyoSelect.value;
+          // Limpiar opciones excepto la primera
+          while (noteApoyoSelect.options.length > 1) {
+            noteApoyoSelect.remove(1);
+          }
+          // Agregar apoyos dinámicos
+          apoyosList.forEach(apoyo => {
+            const option = document.createElement('option');
+            option.value = apoyo;
+            option.textContent = apoyo;
+            option.dataset.prefix = 'EF';
+            noteApoyoSelect.appendChild(option);
+          });
+          // Agregar opción "Ninguno"
+          const ningunoOption = document.createElement('option');
+          ningunoOption.value = '';
+          ningunoOption.textContent = 'Ninguno';
+          noteApoyoSelect.appendChild(ningunoOption);
+          // Restaurar valor anterior si existía
+          if (currentValue) {
+            noteApoyoSelect.value = currentValue;
+          }
+        }
+      } catch (e) {
+        console.warn('Error cargando apoyos:', e);
+      }
+    }
+
+    // Inicializar grid de responsables y permitir confirmar con Enter
+    document.addEventListener('DOMContentLoaded', () => {
+      // Cargar apoyos dinámicamente desde localStorage
+      loadApoyosIntoSelects();
+      
+      // Renderizar grid de responsables dinámicamente
+      renderResponsablesGrid();
+      
+      const usuariaSelect = document.getElementById('usuaria-select-modal');
+      if (usuariaSelect) {
+        usuariaSelect.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            confirmUsuariaSelection();
+          }
+        });
+      }
+    });
+
+    // Restaurar sesión si existe
+    window.addEventListener('load', () => {
+      const responsableId = sessionStorage.getItem('responsable_id');
+      const responsableName = sessionStorage.getItem('responsable_name');
+      
+      if (responsableId && responsableName) {
+        document.getElementById('patient-selector').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        
+        // Restaurar badge del responsable
+        const esPSS = responsableId !== 'lic-martinez'; // Tavata Alexa es LFT, los demás son PSS
+        const prefijo = esPSS ? 'PSS' : 'LFT';
+        document.getElementById('responsable-badge-title').textContent = prefijo;
+        const nombreParts = responsableName.split(' ');
+        const nombreCorto = nombreParts[0] + ' ' + nombreParts[nombreParts.length - 1];
+        document.getElementById('responsable-badge-name').textContent = nombreCorto;
+        
+        // Restaurar icono del responsable
+        const iconMap = {
+          '0': 'AlexaI.png',
+          '1': 'GloriaI.png',
+          '2': 'JoannaI.png',
+          '3': 'AleI.png',
+          '4': 'JorgeI.png'
+        };
+        document.getElementById('responsable-badge-icon').src = 'icons/' + iconMap[responsableId];
+      } else {
+        document.getElementById('patient-selector').style.display = 'flex';
+        document.getElementById('main-app').style.display = 'none';
+      }
+    });
+
+    // Inicializar
+    cargarUsuarias(); // Cargar lista de usuarias
+    
+    if (!checkDevice()) {
+      // Dispositivo muy pequeño
+    } else {
+      updateBadges();
+    }
+  </script>
+
+  <!-- Script de inicialización para módulos -->
+  <script>
+    // Interceptar window.showView para que funcione con los módulos originales
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('✓ HSV Tablet inicializado');
+      
+      // Dar tiempo a que valoracion.js y plan.js se carguen
+      setTimeout(() => {
+        console.log('✓ Módulos JS cargados');
+      }, 200);
+    });
+  </script>
+
+  <!-- ============================================ -->
+  <!-- MODALES NECESARIOS PARA VALORACIÓN Y PLAN -->
+  <!-- ============================================ -->
+  
+  <!-- Modal de Goniometría -->
+  <div id="goniModalOverlay" class="modal-overlay" aria-hidden="true" style="display:none">
+    <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="goniModalTitle">
+      <h4 id="goniModalTitle">Medición goniométrica</h4>
+      <div style="margin-top:8px">
+        <div id="goniModalContext" style="font-weight:700;margin-bottom:8px"></div>
+        <label>Valor medido (°)<input id="goni_value" class="input" type="number" min="0" max="360" /></label>
+        <div style="margin-top:10px;color:var(--muted);font-size:13px" id="goni_expected"></div>
+        <div style="margin-top:8px;color:var(--muted);font-size:13px" id="goni_interpretation"></div>
+      </div>
+      <div class="modal-actions" style="margin-top:12px">
+        <button id="goniCancel" class="btn btn-ghost btn-cancel">Cancelar</button>
+        <button id="goniSave" class="btn btn-mint">Guardar medición</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- VISTA DE CONFIGURACIÓN DE LA APP (ADMIN) -->
+  <!-- ============================================ -->
+  <section id="view_config_app" class="view" style="display:none;">
+    <header class="sub-header">
+      <button class="btn btn-pink back" onclick="closeConfigApp()">← Volver</button>
+      <div class="user-badge">⚙️ Configuración</div>
+    </header>
+    <main class="wrap" style="padding-bottom: 100px;">
+      <section class="section" style="background: linear-gradient(135deg, #d4c5f9 0%, #c3e7df 100%); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+        <h2 style="margin: 0 0 8px 0; color: var(--text-dark);">⚙️ Configuración de la App</h2>
+        <p style="margin: 0; color: var(--text-light); font-size: 0.95rem;">Panel de administración - Solo accesible para LFT</p>
+      </section>
+
+      <!-- Sección: Gestión de Pasantes -->
+      <section class="section" style="border: 2px solid var(--primary-soft); border-radius: 12px;">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
+          <span>👥</span> Gestión de Pasantes
+        </h3>
+        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 16px;">Agregar, editar o eliminar pasantes del sistema</p>
+        
+        <div id="config_pasantes_list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+          <!-- Se llena dinámicamente -->
+        </div>
+        
+        <button class="btn btn-mint" onclick="openAddPasanteModal()" style="width: 100%;">
+          ➕ Agregar nuevo pasante
+        </button>
+      </section>
+
+      <!-- Sección: Gestión de Apoyos -->
+      <section class="section" style="border: 2px solid var(--accent-teal); border-radius: 12px;">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
+          <span>🤝</span> Gestión de Apoyos
+        </h3>
+        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 16px;">Agregar, editar o eliminar personal de apoyo</p>
+        
+        <div id="config_apoyos_list" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+          <!-- Se llena dinámicamente -->
+        </div>
+        
+        <button class="btn" onclick="openAddApoyoModal()" style="width: 100%; background: var(--accent-teal); color: var(--text-dark);">
+          ➕ Agregar nuevo apoyo
+        </button>
+      </section>
+
+      <!-- Sección: Gestión de Usuarias -->
+      <section class="section" style="border: 2px solid var(--secondary-soft); border-radius: 12px;">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
+          <span>🏠</span> Gestión de Usuarias
+        </h3>
+        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 16px;">Agregar, editar o eliminar usuarias del hogar</p>
+        
+        <div style="margin-bottom: 12px;">
+          <input type="text" id="config_usuaria_search" class="input" placeholder="🔍 Buscar usuaria..." oninput="filterUsuariasConfig()" style="width: 100%;">
+        </div>
+        
+        <div id="config_usuarias_list" style="display: flex; flex-direction: column; gap: 8px; max-height: 400px; overflow-y: auto; margin-bottom: 16px;">
+          <!-- Se llena dinámicamente -->
+        </div>
+        
+        <button class="btn" onclick="openAddUsuariaModal()" style="width: 100%; background: var(--secondary-soft); color: var(--text-dark);">
+          ➕ Agregar nueva usuaria
+        </button>
+      </section>
+
+      <!-- Sección: Cambiar Contraseñas -->
+      <section class="section" style="border: 2px solid var(--accent-yellow); border-radius: 12px;">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
+          <span>🔐</span> Cambiar Contraseñas
+        </h3>
+        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 16px;">Modificar contraseñas de acceso de los pasantes</p>
+        
+        <div id="config_passwords_list" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Se llena dinámicamente -->
+        </div>
+      </section>
+
+      <!-- Sección: Protección de Datos de Horarios -->
+      <section class="section" style="border: 2px solid #fbbf24; border-radius: 12px; background: #fef3c7;">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px; color: #b45309;">
+          <span>🔒</span> Protección de Datos de Horarios
+        </h3>
+        <p style="color: #78350f; font-size: 0.9rem; margin-bottom: 16px;">Backups automáticos y recuperación de datos</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button class="btn" onclick="descargarBackup()" style="width: 100%; text-align: left; padding: 12px 16px; background: #10b981; color: white;">
+            📥 Descargar Backup de Horarios
+          </button>
+          <button class="btn" onclick="restoreFromBackup()" style="width: 100%; text-align: left; padding: 12px 16px; background: #3b82f6; color: white;">
+            🔄 Restaurar desde Backup
+          </button>
+        </div>
+        <p style="color: #78350f; font-size: 0.85rem; margin-top: 12px; padding: 8px; background: rgba(255,255,255,0.5); border-radius: 6px;">
+          ℹ️ Los backups se crean automáticamente cuando guardas horarios, ausencias o vacaciones. Puedes descargar una copia en cualquier momento.
+        </p>
+      </section>
+
+      <!-- Sección: Datos y Respaldo -->
+      <section class="section" style="border: 2px solid #e5e7eb; border-radius: 12px;">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px;">
+          <span>💾</span> Datos y Respaldo
+        </h3>
+        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 16px;">Exportar o limpiar datos del sistema</p>
+        
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button class="btn btn-ghost" onclick="exportAllData()" style="width: 100%; text-align: left; padding: 12px 16px;">
+            📤 Exportar todos los datos (JSON)
+          </button>
+          <button class="btn btn-ghost" onclick="importDataFromFile()" style="width: 100%; text-align: left; padding: 12px 16px;">
+            📥 Importar datos desde archivo
+          </button>
+          <button class="btn" onclick="clearAllHorarios()" style="width: 100%; text-align: left; padding: 12px 16px; background: #fee2e2; color: #dc2626;">
+            🗑️ Limpiar todos los horarios
+          </button>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <!-- Modal: Agregar/Editar Pasante -->
+  <div id="modal_pasante" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:16px;max-width:450px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+      <h3 id="modal_pasante_title" style="margin:0 0 16px 0;color:var(--text-dark);">Agregar Pasante</h3>
+      
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="font-weight:600;color:var(--text-dark);font-size:0.9rem;">Nombre completo</label>
+          <input type="text" id="pasante_nombre" class="input" placeholder="Nombre completo del pasante" style="width:100%;margin-top:4px;">
+        </div>
+        <div>
+          <label style="font-weight:600;color:var(--text-dark);font-size:0.9rem;">Prefijo</label>
+          <select id="pasante_prefijo" class="input" style="width:100%;margin-top:4px;">
+            <option value="PSS">PSS (Pasante de Servicio Social)</option>
+            <option value="LFT">LFT (Licenciada en Fisioterapia)</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-weight:600;color:var(--text-dark);font-size:0.9rem;">Contraseña</label>
+          <input type="text" id="pasante_password" class="input" placeholder="Contraseña de acceso" style="width:100%;margin-top:4px;">
+        </div>
+        <div>
+          <label style="font-weight:600;color:var(--text-dark);font-size:0.9rem;">Icono (ruta)</label>
+          <input type="text" id="pasante_icono" class="input" placeholder="icons/NombreI.png" style="width:100%;margin-top:4px;">
+        </div>
+      </div>
+      
+      <div style="display:flex;gap:8px;margin-top:20px;">
+        <button class="btn btn-ghost" onclick="closeModalPasante()" style="flex:1;">Cancelar</button>
+        <button class="btn btn-mint" onclick="savePasante()" style="flex:1;">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Agregar/Editar Apoyo -->
+  <div id="modal_apoyo" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:16px;max-width:450px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+      <h3 id="modal_apoyo_title" style="margin:0 0 16px 0;color:var(--text-dark);">Agregar Apoyo</h3>
+      
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="font-weight:600;color:var(--text-dark);font-size:0.9rem;">Nombre completo</label>
+          <input type="text" id="apoyo_nombre" class="input" placeholder="Nombre completo del apoyo" style="width:100%;margin-top:4px;">
+        </div>
+        <div>
+          <label style="font-weight:600;color:var(--text-dark);font-size:0.9rem;">Rol</label>
+          <input type="text" id="apoyo_rol" class="input" placeholder="Ej: Voluntario, Auxiliar, etc." style="width:100%;margin-top:4px;">
+        </div>
+      </div>
+      
+      <div style="display:flex;gap:8px;margin-top:20px;">
+        <button class="btn btn-ghost" onclick="closeModalApoyo()" style="flex:1;">Cancelar</button>
+        <button class="btn" onclick="saveApoyo()" style="flex:1;background:var(--accent-teal);color:var(--text-dark);">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Agregar/Editar Usuaria -->
+  <div id="modal_usuaria" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:16px;max-width:450px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+      <h3 id="modal_usuaria_title" style="margin:0 0 16px 0;color:var(--text-dark);">Agregar Usuaria</h3>
+      
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="font-weight:600;color:var(--text-dark);font-size:0.9rem;">Nombre completo</label>
+          <input type="text" id="usuaria_nombre" class="input" placeholder="Nombre completo de la usuaria" style="width:100%;margin-top:4px;">
+        </div>
+        <div>
+          <label style="font-weight:600;color:var(--text-dark);font-size:0.9rem;">Habitación</label>
+          <input type="text" id="usuaria_habitacion" class="input" placeholder="Ej: 105, 5to Piso, No aplica" style="width:100%;margin-top:4px;">
+        </div>
+      </div>
+      
+      <div style="display:flex;gap:8px;margin-top:20px;">
+        <button class="btn btn-ghost" onclick="closeModalUsuaria()" style="flex:1;">Cancelar</button>
+        <button class="btn" onclick="saveUsuaria()" style="flex:1;background:var(--secondary-soft);color:var(--text-dark);">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Cambiar Contraseña -->
+  <div id="modal_password" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:16px;max-width:450px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+      <h3 style="margin:0 0 8px 0;color:var(--text-dark);">🔐 Cambiar Contraseña</h3>
+      <p id="password_user_name" style="margin:0 0 16px 0;color:var(--text-light);font-size:0.9rem;">Usuario</p>
+      
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div>
+          <label style="font-weight:600;color:var(--text-dark);font-size:0.9rem;">Nueva contraseña</label>
+          <input type="text" id="new_password" class="input" placeholder="Ingresa la nueva contraseña" style="width:100%;margin-top:4px;">
+        </div>
+        <div>
+          <label style="font-weight:600;color:var(--text-dark);font-size:0.9rem;">Confirmar contraseña</label>
+          <input type="text" id="confirm_password" class="input" placeholder="Confirma la nueva contraseña" style="width:100%;margin-top:4px;">
+        </div>
+      </div>
+      
+      <div style="display:flex;gap:8px;margin-top:20px;">
+        <button class="btn btn-ghost" onclick="closeModalPassword()" style="flex:1;">Cancelar</button>
+        <button class="btn" onclick="saveNewPassword()" style="flex:1;background:var(--accent-yellow);color:var(--text-dark);">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input file oculto para importar datos -->
+  <input type="file" id="import_data_file" accept=".json" style="display:none;" onchange="handleDataImport(event)">
+
+</body>
+</html>
+
+

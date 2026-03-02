@@ -1,0 +1,228 @@
+/* ===== ESTILOS ESPECÍFICOS PARA HORARIOS ===== */
+
+:root {
+  --primary-soft: #d4c5f9;
+  --primary-light: #ede9fe;
+  --primary-accent: #c8b6ff;
+  --secondary-soft: #fbdfdb;
+  --secondary-light: #fff7f5;
+  --secondary-accent: #f8c8bb;
+  --accent-teal: #c3e7df;
+  --accent-yellow: #fef3c7;
+  --text-dark: #4a5568;
+  --text-light: #718096;
+  --border-soft: #f0e5ff;
+  --bg-soft: #fafbff;
+}
+
+/* Grid responsivo optimizado */
+@media (min-width: 768px) {
+  .horarios-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .horarios-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* Animaciones suaves */
+.day-card {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover mejorado para items */
+.horario-item {
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.horario-item:hover {
+  transform: translateX(4px);
+  transition: transform 0.2s ease;
+}
+
+/* Estilos para tipos específicos */
+.horario-item.sesion {
+  border-left-width: 6px;
+}
+
+.horario-item.taller {
+  border-left-width: 6px;
+}
+
+/* Mejoras para dispositivos pequeños */
+@media (max-width: 480px) {
+  .horarios-header h1 {
+    font-size: 1.3rem !important;
+  }
+
+  .day-card {
+    border-radius: 8px;
+  }
+
+  .day-content {
+    min-height: 150px;
+  }
+
+  .week-selector {
+    padding: 15px;
+    gap: 10px;
+  }
+
+  .week-selector button {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn-add {
+    width: 100%;
+  }
+
+  .modal-content {
+    padding: 16px;
+    margin: 16px;
+  }
+
+  .day-checkboxes {
+    grid-template-columns: 1fr;
+  }
+
+  .time-inputs {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-soft);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-soft);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-accent);
+}
+
+/* Estados de carga */
+.loading .spinner {
+  animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Transiciones de modal */
+.modal-horario {
+  animation: fadeIn 0.2s ease-in;
+}
+
+.modal-content {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Mejoras de accesibilidad */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--primary-soft);
+  outline-offset: 2px;
+}
+
+/* Hover para botones */
+.btn-add:active {
+  transform: translateY(0);
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Estilos para impresión */
+@media print {
+  .action-buttons,
+  .week-selector,
+  .bottom-nav,
+  .modal-horario,
+  .horarios-header {
+    display: none !important;
+  }
+
+  .horarios-container {
+    padding-bottom: 0 !important;
+  }
+
+  .day-card {
+    page-break-inside: avoid;
+    border: 1px solid var(--border-soft);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .day-card {
+    background: #2d3748;
+  }
+
+  .day-content {
+    color: #e2e8f0;
+  }
+
+  .day-header {
+    background: linear-gradient(135deg, #b8a9e6 0%, #b39fd9 100%);
+  }
+
+  .horario-item {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    color: #e2e8f0;
+  }
+
+  .horario-name {
+    color: #e2e8f0;
+  }
+
+  .empty-day {
+    color: #a0aec0;
+  }
+}

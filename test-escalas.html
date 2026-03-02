@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test SPPB Scale</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        input[type="radio"], input[type="number"] { margin: 5px; padding: 5px; }
+        label { display: block; margin: 10px 0; }
+        button { padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #45a049; }
+        .summary { background: #e8f5e9; padding: 15px; border-radius: 4px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>Test SPPB Scale Implementation</h1>
+    
+    <div id="test-container"></div>
+
+    <script src="js/escalas.js"></script>
+    <script>
+        // Mock showView function
+        window.showView = function(viewId) {
+            console.log('showView called with:', viewId);
+        };
+
+        // Initialize the escalas module
+        console.log('Initializing SPPB test...');
+        
+        if (window.HSV_Escalas) {
+            console.log('✓ HSV_Escalas module loaded');
+            
+            // Create a mock container
+            const container = document.getElementById('test-container');
+            
+            // Add necessary containers
+            container.innerHTML = `
+                <div id="escalas_list" style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;"></div>
+                <div id="view_complete_scale" style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+                    <div id="scale_title">Scale Title</div>
+                    <div id="scale_content_container"></div>
+                </div>
+            `;
+            
+            // Initialize the module
+            window.HSV_Escalas.init();
+            
+            console.log('✓ SPPB module initialized');
+            
+            // Simulate opening SPPB scale
+            setTimeout(() => {
+                console.log('Opening SPPB scale...');
+                window.HSV_Escalas.openScale('SPPB');
+                console.log('✓ SPPB scale opened');
+            }, 500);
+        } else {
+            console.error('✗ HSV_Escalas module not loaded');
+        }
+    </script>
+</body>
+</html>

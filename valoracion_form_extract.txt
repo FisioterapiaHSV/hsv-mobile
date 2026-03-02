@@ -1,0 +1,319 @@
+  <!-- Subvista: Agregar Valoración -->
+  <section id="view_addvaloracion" class="view">
+    <header class="sub-header">
+      <button class="btn btn-pink back" onclick="window.showView('view_valoraciones')">← Regresar</button>
+      <div class="user-badge">Nueva Valoración</div>
+    </header>
+    <main class="wrap">
+      <section class="section" style="display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div>
+            <label>Fecha<input class="input" id="val_fecha" type="date" /></label>
+            <div class="date-readable" id="val_fecha_label" style="margin-top:6px;color:var(--muted);font-size:0.95rem"></div>
+          </div>
+          <div>
+            <label>Hora inicio<select class="input" id="val_hora_start"></select></label>
+          </div>
+          <div>
+            <label>Hora fin<select class="input" id="val_hora_end"></select></label>
+          </div>
+        </div>
+        <div class="muted-right">
+          <div style="font-size:12px;color:var(--muted)">Tiempo restante</div>
+          <div id="val_countdown" class="countdown">20:00</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:center">
+          <label>Tipo<input class="input" id="val_tipo" placeholder="Tipo de valoración" /></label>
+          <label>Responsable<select class="input" id="val_responsable">
+            <option value="">-- Selecciona responsable --</option>
+          </select></label>
+          <label>Apoyo<select class="input" id="val_apoyo">
+            <option value="">-- Selecciona apoyo --</option>
+          </select></label>
+        </div>
+      </section>
+
+      <section class="section">
+        <h3>Antecedentes</h3>
+        <div id="val_antecedentes_container" style="margin-bottom:8px">
+          <!-- antecedents appended here -->
+        </div>
+        <div style="display:flex;gap:8px">
+          <input class="input" id="val_new_antecedente" placeholder="Agregar antecedente..." />
+          <button class="btn btn-ghost" id="btn_add_antecedente">Agregar antecedente</button>
+        </div>
+      </section>
+
+      <section class="section" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+        <h3>Formato ALICIA</h3>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+          <label><strong>Aparición / Inicio</strong>
+            <input class="input" id="alic_a" placeholder="¿Cuándo inició?" />
+          </label>
+          <label><strong>Localización</strong>
+            <input class="input" id="alic_l" placeholder="¿Dónde se localiza?" />
+          </label>
+          <label><strong>Irradiación</strong>
+            <input class="input" id="alic_i" placeholder="¿Hacia dónde se irradia?" />
+          </label>
+          <label><strong>Características</strong>
+            <input class="input" id="alic_c" placeholder="Tipo de dolor/síntoma" />
+          </label>
+          <label><strong>Intensidad (EVA 0-10)</strong>
+            <input class="input" id="alic_i2" type="number" min="0" max="10" placeholder="Escala 0-10" />
+          </label>
+          <label><strong>Atenuantes / Agravantes</strong>
+            <input class="input" id="alic_a2" placeholder="Qué lo mejora o empeora" />
+          </label>
+        </div>
+      </section>
+
+      <section class="section" style="background:white;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+        <h3>Postura</h3>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+          <label><strong>Anterior</strong>
+            <textarea class="input" id="post_anterior" style="min-height:80px" placeholder="Vista anterior..."></textarea>
+          </label>
+          <label><strong>Lateral</strong>
+            <textarea class="input" id="post_lateral" style="min-height:80px" placeholder="Vista lateral..."></textarea>
+          </label>
+          <label><strong>Posterior</strong>
+            <textarea class="input" id="post_posterior" style="min-height:80px" placeholder="Vista posterior..."></textarea>
+          </label>
+          <div id="cefalo_caudal_container" style="display:none">
+            <label><strong>Céfalo-caudal</strong>
+              <textarea class="input" id="post_cefalo" style="min-height:80px" placeholder="Vista céfalo-caudal..."></textarea>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Goniometría -->
+  <section class="section" id="goni_section" style="background:#f9f9f9;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <h3 style="margin:0">Goniometría</h3>
+        </div>
+        <div class="row-space-between mt-sm wrap-gap-8">
+          <div class="min-w-360">
+            <div style="font-size:0.95rem;margin-bottom:8px">Selecciona segmentos a valorar:</div>
+            <div id="goni_segments" class="wrap-gap-8"></div>
+          </div>
+          <div class="right min-w-220">
+            <button id="btn_apply_goni_selection" class="btn-apply-goni" disabled title="Aplicar selección">Aplicar selección</button>
+          </div>
+        </div>
+
+  <div id="goni_list" class="mt-sm"></div>
+      </section>
+
+  <!-- Daniels (Fuerza muscular) -->
+  <section class="section" id="daniels_section" style="background:#f9f9f9;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+        <h3>Daniels — Fuerza muscular (0–5)</h3>
+        <div style="margin-top:8px;">
+          <div id="daniels_container"></div>
+          <div style="margin-top:8px;color:var(--muted);font-size:0.9rem">Selecciona 0–5 para cada grupo muscular; deja en blanco si no corresponde.</div>
+        </div>
+      </section>
+
+      <!-- Marcha -->
+      <section class="section" id="marcha_section" style="background:#f9f9f9;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-top:8px">
+        <div class="row-space-between">
+          <h3 style="margin:0;font-weight:700">Marcha</h3>
+        </div>
+        <!-- Bloque: Fases -->
+        <div class="row mt-sm">
+          <div class="min-w-360" style="flex:1">
+            <h4 style="margin:0 0 8px;font-size:1rem">Fases</h4>
+            <div style="background:#fff;border-radius:8px;padding:10px;box-shadow:0 0 0 1px rgba(0,0,0,0.02)">
+              <table id="marcha_phases_table" style="width:100%;border-collapse:collapse;table-layout:fixed">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;padding:8px 6px;width:50%">Fase</th>
+                    <th style="text-align:center;padding:8px 6px;width:25%">Der</th>
+                    <th style="text-align:center;padding:8px 6px;width:25%">Izq</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- filas generadas por js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="flex-basis:360px;max-width:420px">
+            <h4 style="margin:0 0 8px;font-size:1rem">Descripción breve</h4>
+            <textarea id="marcha_desc" class="input" placeholder="Observaciones de la marcha (ej.: acortamiento de fase de apoyo derecho)" style="min-height:160px;border-radius:8px;background:#fff;border:1px solid #e6e6e6;padding:8px;resize:vertical;width:100%"></textarea>
+          </div>
+        </div>
+
+        <!-- Bloque: Constantes y Variantes -->
+        <div style="margin-top:12px">
+          <h4 style="margin:6px 0 8px;font-weight:700">Constantes y Determinantes (marca si está alterado)</h4>
+          <div id="marcha_constants" style="display:flex;flex-wrap:wrap;gap:8px">
+            <!-- botones generados por js -->
+          </div>
+          <div style="margin-top:8px;color:var(--muted);font-size:0.9rem">Pulsa sobre cada elemento para marcarlo como alterado. El color verde indica normal; el color rojo indica alteración.</div>
+        </div>
+      </section>
+
+      <!-- Escalas -->
+      <section class="section" id="pruebas_section" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3 style="margin:0;font-weight:700">Escalas</h3>
+        </div>
+        <div style="margin-top:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+          <!-- intro card removed as requested -->
+
+          <!-- Pruebas específicas: full-width block above the scales grid -->
+          <div style="grid-column:1/-1;border-top:1px solid #f0f0f0;padding-top:12px;">
+            <div style="background:#fff;border-radius:8px;padding:12px">
+              <h4 style="margin:0 0 8px;font-size:1rem">Pruebas específicas</h4>
+              <div style="font-size:0.95rem;color:var(--muted);margin-bottom:8px">Añade pruebas puntuales (ej.: Lasegue, Ortolani). Se guardan con la valoración. Esta sección ocupa toda la anchura para que quede claro dónde inicia y termina.</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <label style="grid-column:1/-1">Nombre de la prueba
+                  <input id="es_test_name" class="input" type="text" placeholder="Nombre de la prueba (ej.: Lasegue)" />
+                </label>
+                <label>¿Qué evalúa?
+                  <input id="es_test_eval" class="input" type="text" placeholder="Breve descripción de lo que evalúa" />
+                </label>
+                <label>Interpretación
+                  <select id="es_test_result" class="input">
+                    <option value="">-- Selecciona --</option>
+                    <option value="Positiva">Positiva</option>
+                    <option value="Negativa">Negativa</option>
+                  </select>
+                </label>
+              </div>
+              <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <button id="btn_save_test" class="btn btn-mint">Guardar prueba</button>
+                <button id="btn_add_test" class="btn btn-ghost">Guardar y agregar otra</button>
+                <div id="es_test_saved" style="color:var(--muted);margin-left:8px">Guarda la prueba para incluirla en la valoración.</div>
+              </div>
+              <div id="es_test_list" style="margin-top:10px"> <div style="color:var(--muted)">(No hay pruebas específicas guardadas)</div> </div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border-radius:8px;padding:10px">
+            <h4 style="margin:0 0 8px;font-size:1rem">SPPB</h4>
+            <label>Punto Balance (0–4)
+              <input id="sppb_balance" class="input" type="number" min="0" max="4" style="max-width:60px" />
+            </label>
+            <label>Punto Gait (0–4)
+              <input id="sppb_gait" class="input" type="number" min="0" max="4" style="max-width:60px" />
+            </label>
+            <label>Punto Chair (0–4)
+              <input id="sppb_chair" class="input" type="number" min="0" max="4" style="max-width:60px" />
+            </label>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <div style="display:flex;flex-direction:column;margin-left:8px">
+                <div id="esc_sppb_result" style="font-weight:700">—</div>
+                <div id="esc_sppb_interp" style="color:var(--muted);font-size:0.9rem;margin-top:6px">Interpretación: —</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border-radius:8px;padding:10px">
+            <h4 style="margin:0 0 8px;font-size:1rem">Tinetti</h4>
+            <label>Puntaje Gait (0–12)
+              <input id="tinetti_gait" class="input" type="number" min="0" max="12" style="max-width:60px" />
+            </label>
+            <label>Puntaje Balance (0–16)
+              <input id="tinetti_balance" class="input" type="number" min="0" max="16" style="max-width:60px" />
+            </label>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <div style="display:flex;flex-direction:column;margin-left:8px">
+                <div id="esc_tinetti_result" style="font-weight:700">—</div>
+                <div id="esc_tinetti_interp" style="color:var(--muted);font-size:0.9rem;margin-top:6px">Interpretación: —</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border-radius:8px;padding:10px">
+            <h4 style="margin:0 0 8px;font-size:1rem">FRAIL</h4>
+            <label>Puntaje FRAIL (0–5)
+              <input id="inp_frail" class="input" type="number" min="0" max="5" style="max-width:60px" />
+            </label>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <div id="esc_frail_result" style="font-weight:700;margin-left:8px">—</div>
+            </div>
+            <div id="esc_frail_interp" style="color:var(--muted);margin-top:6px">Interpretación: —</div>
+          </div>
+
+          <div style="background:#fff;border-radius:8px;padding:10px">
+            <h4 style="margin:0 0 8px;font-size:1rem">Downton (índice de riesgo de caídas)</h4>
+            <label>Puntaje Downton (0–11)
+              <input id="inp_downton" class="input" type="number" min="0" max="11" style="max-width:60px" />
+            </label>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <div id="esc_downton_result" style="font-weight:700;margin-left:8px">—</div>
+            </div>
+            <div id="esc_downton_interp" style="color:var(--muted);margin-top:6px">Interpretación: —</div>
+          </div>
+
+          <div style="background:#fff;border-radius:8px;padding:10px">
+            <h4 style="margin:0 0 8px;font-size:1rem">Katz (ADL)</h4>
+            <label>Puntaje Katz (0–6)
+              <input id="inp_katz" class="input" type="number" min="0" max="6" style="max-width:60px" />
+            </label>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <div id="esc_katz_result" style="font-weight:700;margin-left:8px">—</div>
+            </div>
+            <div id="esc_katz_interp" style="color:var(--muted);margin-top:6px">Interpretación: —</div>
+          </div>
+
+          <div style="background:#fff;border-radius:8px;padding:10px">
+            <h4 style="margin:0 0 8px;font-size:1rem">Lawton (IADL)</h4>
+            <label>Puntaje Lawton (0–8)
+              <input id="inp_lawton" class="input" type="number" min="0" max="8" style="max-width:60px" />
+            </label>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <div id="esc_lawton_result" style="font-weight:700;margin-left:8px">—</div>
+            </div>
+            <div id="esc_lawton_interp" style="color:var(--muted);margin-top:6px">Interpretación: —</div>
+          </div>
+
+          <div style="background:#fff;border-radius:8px;padding:10px;grid-column:1/-1">
+            <h4 style="margin:0 0 8px;font-size:1rem">Escala personalizada (entrada manual)</h4>
+            <label>Nombre de la escala
+              <input id="es_custom_name" class="input" type="text" placeholder="Nombre de la escala (ej.: MY_SCALE)" />
+            </label>
+            <label>Puntaje (manual)
+              <input id="es_custom_score" class="input" type="text" placeholder="Puntaje (se introduce manualmente)" />
+            </label>
+            <label>Interpretación (manual)
+              <textarea id="es_custom_interp" class="input" placeholder="Escribe la interpretación o conclusión de la escala" style="min-height:70px"></textarea>
+            </label>
+            <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+              <button id="btn_save_custom_scale" class="btn btn-mint">Guardar escala personalizada</button>
+              <button id="btn_add_custom_scale" class="btn btn-ghost">Guardar y agregar otra</button>
+              <div id="es_custom_saved" style="color:var(--muted);margin-left:8px">Guarda la escala para incluirla en la valoración.</div>
+            </div>
+            <div id="es_custom_list" style="margin-top:10px"></div>
+          </div>
+        </div>
+        <div style="margin-top:10px;color:var(--muted);font-size:0.9rem">Las escalas se guardan con la valoración como parte de `payload.escalas`.</div>
+      </section>
+
+      <section class="section">
+        <h3>Diagnóstico fisioterapéutico</h3>
+        <textarea class="input" id="val_diagnostico" style="min-height:120px"></textarea>
+      </section>
+
+      <section class="section">
+        <h3>Observaciones</h3>
+        <textarea class="input" id="val_observaciones" placeholder="Observaciones generales (opcional)" style="min-height:100px"></textarea>
+      </section>
+
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
+        <div id="val_msg" style="color:var(--muted)"></div>
+          <div>
+          <button class="btn btn-cancel" onclick="window.showView('view_valoraciones')">Cancelar</button>
+          <button class="btn btn-draft" id="btn_save_valoracion">Guardar como borrador</button>
+          <button class="btn btn-firmar" id="btn_sign_valoracion">Firmar</button>
+        </div>
+      </div>
+    </main>
+  </section>

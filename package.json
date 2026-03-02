@@ -1,0 +1,12 @@
+{
+  "name": "hsv-mobile",
+  "version": "1.0.0",
+  "description": "HSV Mobile - Aplicación PWA para valoraciones y planes",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 8000 -c-1"
+  },
+  "keywords": ["pwa", "mobile", "valoracion"],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#4A90E2">
+  <title>Mis Borradores - HSV Móvil</title>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <button class="back-btn" onclick="location.href='index.html'">←</button>
+
+  <div class="form-container">
+    <div class="form-header">
+      <h2>📂 Mis Borradores</h2>
+      <p class="text-muted">Gestiona tus valoraciones y planes guardados</p>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0.5rem;margin-bottom:1.5rem;">
+      <button class="btn btn-primary" id="tab-valoraciones" onclick="switchTab('valoraciones')" style="flex:1;">
+        Valoraciones <span id="count-val" class="badge" style="position:static;margin-left:0.5rem;width:auto;height:auto;padding:0.25rem 0.5rem;">0</span>
+      </button>
+      <button class="btn btn-secondary" id="tab-planes" onclick="switchTab('planes')" style="flex:1;">
+        Planes <span id="count-plan" class="badge" style="position:static;margin-left:0.5rem;width:auto;height:auto;padding:0.25rem 0.5rem;">0</span>
+      </button>
+    </div>
+
+    <!-- Lista de Valoraciones -->
+    <div id="list-valoraciones" class="list-container">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Lista de Planes -->
+    <div id="list-planes" class="list-container hidden">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Acciones -->
+    <div class="btn-actions" style="margin-top:2rem;">
+      <button class="btn btn-success" onclick="exportAll()">💾 Exportar Todo</button>
+      <button class="btn btn-secondary" onclick="importJSON()">📥 Importar JSON</button>
+    </div>
+  </div>
+
+  <script src="js/constants.js"></script>
+  <script src="js/export.js"></script>
+  <script>
+    let currentTab = 'valoraciones';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderList();
+    });
+
+    function switchTab(tab) {
+      currentTab = tab;
+      
+      // Update button styles
+      document.getElementById('tab-valoraciones').className = tab === 'valoraciones' ? 'btn btn-primary' : 'btn btn-secondary';
+      document.getElementById('tab-planes').className = tab === 'planes' ? 'btn btn-primary' : 'btn btn-secondary';
+      
+      // Show/hide lists
+      document.getElementById('list-valoraciones').className = tab === 'valoraciones' ? 'list-container' : 'list-container hidden';
+      document.getElementById('list-planes').className = tab === 'planes' ? 'list-container' : 'list-container hidden';
+    }
+
+    function renderList() {
+      const valoraciones = JSON.parse(localStorage.getItem('hsv_mobile_valoraciones') || '[]');
+      const planes = JSON.parse(localStorage.getItem('hsv_mobile_planes') || '[]');
+      
+      // Update counters
+      document.getElementById('count-val').textContent = valoraciones.length;
+      document.getElementById('count-plan').textContent = planes.length;
+      
+      // Render valoraciones
+      const valContainer = document.getElementById('list-valoraciones');
+      valContainer.innerHTML = '';
+      
+      if (valoraciones.length === 0) {
+        valContainer.innerHTML = '<div class="card text-center"><p class="text-muted">No hay valoraciones guardadas</p></div>';
+      } else {
+        valoraciones.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        valoraciones.forEach(val => {
+          valContainer.appendChild(createValoracionCard(val));
+        });
+      }
+      
+      // Render planes
+      const planContainer = document.getElementById('list-planes');
+      planContainer.innerHTML = '';
+      
+      if (planes.length === 0) {
+        planContainer.innerHTML = '<div class="card text-center"><p class="text-muted">No hay planes guardados</p></div>';
+      } else {
+        planes.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        planes.forEach(plan => {
+          planContainer.appendChild(createPlanCard(plan));
+        });
+      }
+    }
+
+    function createValoracionCard(val) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      
+      const header = document.createElement('div');
+      header.className = 'card-header';
+      
+      const left = document.createElement('div');
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      title.textContent = val.paciente;
+      
+      const meta = document.createElement('div');
+      meta.className = 'card-meta';
+      meta.textContent = `${formatDateLongES(val.fecha)} • ${val.tipo}`;
+      
+      left.appendChild(title);
+      left.appendChild(meta);
+      
+      const right = document.createElement('div');
+      right.style.textAlign = 'right';
+      right.style.fontSize = '0.85rem';
+      right.style.color = 'var(--muted)';
+      right.innerHTML = `<div>${val.responsable_prefix} ${val.responsable}</div>`;
+      
+      header.appendChild(left);
+      header.appendChild(right);
+      card.appendChild(header);
+      
+      // Actions
+      const actions = document.createElement('div');
+      actions.className = 'card-actions';
+      
+      const btnEdit = document.createElement('button');
+      btnEdit.className = 'btn btn-primary';
+      btnEdit.textContent = '✏️ Editar';
+      btnEdit.onclick = () => location.href = `valoracion.html?edit=${val.id}`;
+      
+      const btnExport = document.createElement('button');
+      btnExport.className = 'btn btn-secondary';
+      btnExport.textContent = '💾';
+      btnExport.onclick = () => exportSingle('valoracion', val.id);
+      
+      const btnDelete = document.createElement('button');
+      btnDelete.className = 'btn btn-danger';
+      btnDelete.textContent = '🗑️';
+      btnDelete.onclick = () => deleteItem('valoracion', val.id);
+      
+      actions.appendChild(btnEdit);
+      actions.appendChild(btnExport);
+      actions.appendChild(btnDelete);
+      card.appendChild(actions);
+      
+      return card;
+    }
+
+    function createPlanCard(plan) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      
+      const header = document.createElement('div');
+      header.className = 'card-header';
+      
+      const left = document.createElement('div');
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      title.textContent = plan.paciente;
+      
+      const meta = document.createElement('div');
+      meta.className = 'card-meta';
+      meta.textContent = `${formatDateLongES(plan.fecha)} • ${plan.tipo}`;
+      
+      left.appendChild(title);
+      left.appendChild(meta);
+      
+      const right = document.createElement('div');
+      right.style.textAlign = 'right';
+      right.style.fontSize = '0.85rem';
+      right.style.color = 'var(--muted)';
+      right.innerHTML = `<div>${plan.responsable_prefix} ${plan.responsable}</div>`;
+      
+      header.appendChild(left);
+      header.appendChild(right);
+      card.appendChild(header);
+      
+      // Actions
+      const actions = document.createElement('div');
+      actions.className = 'card-actions';
+      
+      const btnEdit = document.createElement('button');
+      btnEdit.className = 'btn btn-primary';
+      btnEdit.textContent = '✏️ Editar';
+      btnEdit.onclick = () => location.href = `plan.html?edit=${plan.id}`;
+      
+      const btnExport = document.createElement('button');
+      btnExport.className = 'btn btn-secondary';
+      btnExport.textContent = '💾';
+      btnExport.onclick = () => exportSingle('plan', plan.id);
+      
+      const btnDelete = document.createElement('button');
+      btnDelete.className = 'btn btn-danger';
+      btnDelete.textContent = '🗑️';
+      btnDelete.onclick = () => deleteItem('plan', plan.id);
+      
+      actions.appendChild(btnEdit);
+      actions.appendChild(btnExport);
+      actions.appendChild(btnDelete);
+      card.appendChild(actions);
+      
+      return card;
+    }
+
+    function deleteItem(tipo, id) {
+      if (!confirm('¿Estás seguro de eliminar este elemento?')) return;
+      
+      const key = tipo === 'valoracion' ? 'hsv_mobile_valoraciones' : 'hsv_mobile_planes';
+      const items = JSON.parse(localStorage.getItem(key) || '[]');
+      const filtered = items.filter(item => item.id !== id);
+      localStorage.setItem(key, JSON.stringify(filtered));
+      
+      showToast('Elemento eliminado', 'success');
+      renderList();
+    }
+  </script>
+</body>
+</html>

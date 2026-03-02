@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#d4c5f9">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="HSV Horarios">
+  <title>Horarios - HSV</title>
+  <link rel="manifest" href="manifest.json">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="css/horarios.css">
+  <style>
+    /* ===== PALETA PASTEL ===== */
+    :root {
+      --primary-soft: #d4c5f9;
+      --primary-light: #ede9fe;
+      --primary-accent: #c8b6ff;
+      --secondary-soft: #fbdfdb;
+      --secondary-light: #fff7f5;
+      --secondary-accent: #f8c8bb;
+      --accent-teal: #c3e7df;
+      --accent-yellow: #fef3c7;
+      --text-dark: #4a5568;
+      --text-light: #718096;
+      --border-soft: #f0e5ff;
+      --bg-soft: #fafbff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: white;
+      min-height: 100vh;
+      padding: 0;
+      margin: 0;
+    }
+
+    .horarios-container {
+      min-height: 100vh;
+      padding-bottom: 0;
+    }
+
+    .sub-header {
+      background: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+
+    .btn.btn-pink {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+
+    .btn.btn-pink:hover {
+      background: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .btn.btn-logout {
+      background: rgba(255, 255, 255, 0.3);
+      color: white;
+      font-size: 18px;
+      padding: 8px 12px;
+    }
+
+    .btn.btn-logout:hover {
+      background: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      padding: 8px 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      font-size: 0.9rem;
+    }
+
+    .user-badge img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .horarios-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    /* Selector de semana */
+    .week-selector {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .week-selector button {
+      background: #808080;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(128, 128, 128, 0.3);
+    }
+
+    .week-selector button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(128, 128, 128, 0.4);
+    }
+
+    .week-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      min-width: 200px;
+      text-align: center;
+    }
+
+    /* Botones de vista */
+    .view-toggle {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 13px;
+    }
+
+    .view-toggle.active {
+      background: #d4c5f9;
+      color: white;
+    }
+
+    /* Grid de horarios por día */
+    .horarios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .day-card {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+      border-left-width: 6px;
+    }
+
+    .day-card:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      transform: translateY(-4px);
+    }
+
+    .day-header {
+      background: #B783A7;
+      color: white;
+      padding: 16px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+
+    .day-date {
+      font-size: 0.85rem;
+      opacity: 0.85;
+      font-weight: 400;
+      display: block;
+      margin-top: 4px;
+    }
+
+    .day-content {
+      padding: 16px;
+      min-height: 200px;
+    }
+
+    .horario-item {
+      background: #faf8ff;
+      border-left: 3px solid #D2B5C9;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .horario-item.taller {
+      border-left-color: #fce4ec;
+      background: #fef9f7;
+    }
+
+    .horario-item.sesion {
+      border-left-color: #B783A7;
+      background: #faf8ff;
+    }
+
+    .horario-time {
+      font-weight: 700;
+      color: #3d2747;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .horario-item.taller .horario-time {
+      color: #8B3A62;
+    }
+
+    .horario-item.sesion .horario-time {
+      color: #5a3f52;
+    }
+
+    .horario-name {
+      font-weight: 600;
+      color: var(--text-dark);
+      margin: 6px 0 4px 0;
+    }
+
+    .horario-lugar {
+      font-size: 12px;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .horario-responsable {
+      font-size: 12px;
+      color: #999;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    .horario-apoyo {
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .horario-apoyos-list {
+      font-size: 11px;
+      color: #666;
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .horario-apoyo-tag {
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+    }
+
+    .empty-day {
+      color: var(--text-light);
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 14px;
+    }
+
+    /* Modal para agregar */
+    .modal-horario {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-horario.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      max-width: 500px;
+      width: 100%;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border-soft);
+      padding-bottom: 15px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      color: var(--primary-soft);
+      font-size: 1.5rem;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: var(--text-light);
+      transition: color 0.3s ease;
+    }
+
+    .modal-close:hover {
+      color: var(--text-dark);
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-dark);
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--border-soft);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.3s ease;
+      background: white;
+      color: var(--text-dark);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary-soft);
+      box-shadow: 0 0 0 3px rgba(212, 197, 249, 0.15);
+    }
+
+    .time-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .day-checkboxes {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--primary-soft);
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      cursor: pointer;
+      font-weight: 500;
+      color: var(--text-dark);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 30px;
+      border-top: 2px solid var(--border-soft);
+      padding-top: 20px;
+    }
+
+    .btn-cancel {
+      flex: 1;
+      padding: 12px;
+      background: var(--border-soft);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text-light);
+      transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+      background: var(--primary-light);
+      color: var(--text-dark);
+    }
+
+    .btn-save {
+      flex: 1;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--primary-soft) 0%, var(--primary-accent) 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(212, 197, 249, 0.2);
+    }
+
+    .btn-save:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(212, 197, 249, 0.3);
+    }
+
+    .btn-save:active {
+      transform: translateY(0);
+    }
+
+    .btn-delete {
+      flex: 1;
+      padding: 12px;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+    }
+
+    .btn-delete:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(255, 107, 107, 0.3);
+    }
+
+    .btn-delete:active {
+      transform: translateY(0);
+    }
+
+    /* Action buttons */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-add {
+      flex: 1;
+      min-width: 150px;
+      padding: 12px 20px;
+      background: white;
+      color: black;
+      border: 2px solid #808080;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-add:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-add.secondary {
+      background: white;
+      color: black;
+      border: 2px solid #808080;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-add.secondary:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .horarios-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .horarios-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .week-selector {
+        flex-direction: column;
+      }
+
+      .week-title {
+        min-width: 100%;
+        order: -1;
+      }
+
+      .week-selector button {
+        flex: 1;
+        min-width: 100px;
+      }
+
+      .day-card {
+        margin: 0;
+      }
+
+      .modal-content {
+        padding: 20px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .btn-add {
+        min-width: auto;
+      }
+    }
+
+    /* Navbar inferior */
+    .bottom-nav {
+      display: none;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 12px;
+      cursor: pointer;
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      background: none;
+      flex: 1;
+    }
+
+    .nav-item.active {
+      color: var(--primary-soft);
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .message {
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      display: none;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.success {
+      background: #e6fbf1;
+      color: #0d3b2c;
+      border-left: 4px solid var(--accent-teal);
+    }
+
+    .message.error {
+      background: #fef2f2;
+      color: #7c2d2d;
+      border-left: 4px solid var(--secondary-soft);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+    }
+
+    .spinner {
+      border: 3px solid var(--border-soft);
+      border-top: 3px solid var(--primary-soft);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Estilos para cuadrícula horaria */
+    .horario-grid {
+      display: grid;
+      grid-template-columns: 80px repeat(5, 1fr);
+      gap: 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
+    }
+
+    .horario-grid-header {
+      background: #B783A7;
+      color: white;
+      padding: 8px 4px;
+      font-weight: 700;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .horario-grid-time {
+      background: #f9f7fe;
+      padding: 8px 4px;
+      font-weight: 600;
+      text-align: center;
+      font-size: 0.85rem;
+      border-right: 1px solid #e5e7eb;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .horario-slot {
+      border: 1px solid #e5e7eb;
+      padding: 0;
+      min-height: 30px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+
+    .horario-slot:hover {
+      background: #f0f9ff;
+    }
+
+    .horario-slot.selected {
+      background: #B783A7;
+    }
+
+    .horario-slot.invalid {
+      background: #fee2e2;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <script>
+    // Limpiar sesiones vencidas de localStorage al cargar
+    (function() {
+      const stored = localStorage.getItem('horariosPersonalizados');
+      if (stored) {
+        try {
+          const horarios = JSON.parse(stored);
+          const hoy = new Date();
+          hoy.setHours(0, 0, 0, 0);
+          
+          let hasChanges = false;
+          
+          Object.keys(horarios).forEach(persona => {
+            if (horarios[persona].sesiones) {
+              horarios[persona].sesiones = horarios[persona].sesiones.filter(sesion => {
+                // Eliminar sesiones pausadas vencidas
+                if (sesion.pausada && sesion.pausadaPor === 'vacaciones' && sesion.pausadaHasta) {
+                  const fechaPausa = new Date(sesion.pausadaHasta);
+                  if (fechaPausa < hoy) {
+                    hasChanges = true;
+                    return false;
+                  }
+                }
+                
+                // Eliminar coberturas vencidas
+                if (sesion.esCoberturaTemp && sesion.fechasCobertureFin) {
+                  const fechaCobertura = new Date(sesion.fechasCobertureFin);
+                  if (fechaCobertura < hoy) {
+                    hasChanges = true;
+                    return false;
+                  }
+                }
+                
+                return true;
+              });
+            }
+          });
+          
+          if (hasChanges) {
+            localStorage.setItem('horariosPersonalizados', JSON.stringify(horarios));
+          }
+        } catch (e) {
+          console.error('Error limpiando localStorage:', e);
+        }
+      }
+    })();
+  </script>
+  <div class="horarios-container">
+    <header class="sub-header" style="background: white; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04); border-bottom: 1px solid #e5e7eb;">
+      <button class="btn btn-pink back" onclick="goBackToIndex()" style="background: white; color: #D2B5C9; border: 2px solid #D2B5C9; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s;">← Menú</button>
+      <div class="user-badge" style="display: flex; align-items: center; gap: 8px; background: white; padding: 8px 16px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <img id="badge-icon" src="" alt="Avatar" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+        <span id="badge-prefix" style="font-size: 0.75rem; font-weight: 700; color: #D2B5C9; text-transform: uppercase; line-height: 1; margin: 0;">—</span>
+        <span id="badge-name" style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark); line-height: 1; margin: 0;">—</span>
+      </div>
+      <button class="btn btn-logout" onclick="logout()" style="background: white; color: #D2B5C9; border: 2px solid #D2B5C9; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 18px; transition: all 0.3s;">🚪</button>
+    </header>
+
+    <div class="horarios-main" style="padding-top: 20px;">
+      <h1 style="text-align: center; color: var(--text-dark); margin-bottom: 10px; font-size: 1.8rem;">📅 Horarios</h1>
+      <p style="text-align: center; color: var(--text-light); margin-bottom: 20px;">Semana Lunes a Viernes • 09:30 a 13:30</p>
+
+      <div class="message" id="messageBox"></div>
+
+      <!-- Selector de pasante (solo para Tavata) -->
+      <div id="pasante-selector-container" style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: none;">
+        <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-dark);">Selecciona un pasante para editar su horario:</label>
+        <select id="pasante-selector" style="width: 100%; padding: 10px; border: 2px solid var(--border-soft); border-radius: 8px; font-size: 14px; cursor: pointer;">
+          <option value="">-- Selecciona pasante --</option>
+        </select>
+      </div>
+
+      <div class="action-buttons" id="action-buttons-container">
+        <button class="btn-add" onclick="openModalSesion()" id="btn-sesion">
+          <span>➕</span> Nueva Sesión
+        </button>
+        <button class="btn-add secondary" onclick="openModalTaller()" id="btn-taller">
+          <span>📚</span> Nuevo Taller
+        </button>
+        <button class="btn-add secondary" onclick="openModalVacaciones()" id="btn-vacaciones">
+          <span>🏖️</span> Establecer Vacaciones
+        </button>
+        <button class="btn-add secondary" onclick="openModalGestionarAusencias()" id="btn-ausencias">
+          <span>🚫</span> Gestionar Ausencias
+        </button>
+        <button class="btn-add secondary" onclick="openModalListadoUsuarias()" id="btn-listado-usuarias">
+          <span>📋</span> Listado por Usuaria
+        </button>
+        <button class="btn-add secondary" onclick="exportHorarioToPDF()" id="btn-exportar-pdf">
+          <span>📄</span> Exportar PDF
+        </button>
+        <button class="btn-add secondary" onclick="limpiarCache()" id="btn-limpiar-cache" style="background-color: #ff9800; border-color: #ff6f00;">
+          <span>🗑️</span> Limpiar Cache
+        </button>
+        <button class="btn-add" onclick="toggleVistaGlobal()" id="btn-vista-global" style="display: none;">
+          <span>👥</span> <span id="vista-global-text">Vista Global</span>
+        </button>
+      </div>
+
+      <div class="week-selector">
+        <button onclick="previousWeek()">← Semana Anterior</button>
+        <div class="week-title" id="weekTitle">Cargando...</div>
+        <button onclick="nextWeek()">Siguiente Semana →</button>
+      </div>
+
+      <!-- Selector de Vista: Semanal o Diaria -->
+      <div style="padding: 12px 20px; display: flex; gap: 12px; align-items: center; border-bottom: 1px solid #e5e7eb; background: #f9fafb; flex-wrap: wrap;">
+        <span style="font-weight: 600; color: #4a5568;">Vista:</span>
+        <button id="btn-vista-semanal" class="view-toggle active" onclick="cambiarVista('semanal')" style="background: #d4c5f9; color: white;">📅 Semanal</button>
+        <button id="btn-vista-diaria" class="view-toggle" onclick="cambiarVista('diaria')" style="background: #e5e7eb;">📆 Diaria</button>
+        
+        <!-- Selector de día (solo se muestra en vista diaria) -->
+        <select id="dia-selector" style="display: none; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer;" onchange="cambiarDiaSeleccionado(event)">
+          <option value="">-- Selecciona un día --</option>
+          <option value="Lunes">Lunes</option>
+          <option value="Martes">Martes</option>
+          <option value="Miércoles">Miércoles</option>
+          <option value="Jueves">Jueves</option>
+          <option value="Viernes">Viernes</option>
+        </select>
+      </div>
+
+      <div id="horarios-loading" class="loading">
+        <div class="spinner"></div>
+        <p>Cargando horarios...</p>
+      </div>
+
+      <div class="horarios-grid" id="horariosGrid" style="display: none;">
+        <!-- Se llena dinámicamente con JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Nueva Sesión -->
+  <div class="modal-horario" id="modalSesion">
+    <div class="modal-content" style="max-width: 1000px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header">
+        <h2>Nueva Sesión</h2>
+        <button class="modal-close" onclick="closeModalSesion()">✕</button>
+      </div>
+
+      <form id="formSesion" onsubmit="saveSesion(event)">
+        <!-- Datos básicos -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+          <div class="form-group">
+            <label for="sesion-responsable">Responsable (Pasante) *</label>
+            <select id="sesion-responsable" required disabled>
+              <option value="">-- Auto-establecido --</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="sesion-apoyo">Apoyo(s) (Practicante) - Puedes seleccionar varios</label>
+            <select id="sesion-apoyo" multiple size="4" style="height: auto; min-height: 80px;">
+            </select>
+            <small style="color: #666; font-size: 11px; margin-top: 4px; display: block;">💡 Mantén Ctrl (Cmd en Mac) para seleccionar múltiples</small>
+          </div>
+
+          <div class="form-group">
+            <label for="sesion-usuaria">Usuaria *</label>
+            <select id="sesion-usuaria" required onchange="autoFillHabitacion()">
+              <option value="">-- Selecciona usuaria --</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="sesion-habitacion">Habitación</label>
+            <input type="text" id="sesion-habitacion" readonly placeholder="Se auto-llena">
+          </div>
+
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label for="sesion-lugar">Lugar *</label>
+            <select id="sesion-lugar" required>
+              <option value="">-- Selecciona lugar --</option>
+              <option value="Habitación">Habitación</option>
+              <option value="Área de Fisioterapia">Área de Fisioterapia</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Cuadrícula horaria -->
+        <div class="form-group">
+          <label>Selecciona horarios y días (bloques de 30 minutos, 9:30 - 13:30) *</label>
+          <div id="sesion-horario-grid" style="overflow-x: auto; margin-top: 12px;">
+            <!-- Se llena con JavaScript -->
+          </div>
+          <input type="hidden" id="sesion-selected-slots" value="[]">
+        </div>
+
+        <div class="form-group">
+          <label for="sesion-notas">Notas</label>
+          <textarea id="sesion-notas" placeholder="Añade observaciones o notas..." rows="2"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeModalSesion()">Cancelar</button>
+          <button type="submit" class="btn-save">Guardar Sesión</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Nuevo Taller -->
+  <div class="modal-horario" id="modalTaller">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nuevo Taller</h2>
+        <button class="modal-close" onclick="closeModalTaller()">✕</button>
+      </div>
+
+      <form id="formTaller" onsubmit="saveTaller(event)">
+        <div class="form-group">
+          <label for="taller-nombre">Nombre del Taller *</label>
+          <select id="taller-nombre" required onchange="handleTallerChange()">
+            <option value="">-- Selecciona taller --</option>
+            <option value="Cuidado de manos">Cuidado de manos</option>
+            <option value="Mantente activa">Mantente activa</option>
+            <option value="Baile">Baile</option>
+            <option value="Movimiento">Movimiento</option>
+            <option value="Gimnasia cerebral">Gimnasia cerebral</option>
+            <option value="Alivio y relajación">Alivio y relajación</option>
+            <option value="Yoga">Yoga</option>
+            <option value="Meditación">Meditación</option>
+            <option value="otro">✏️ Otro (personalizado)</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="taller-custom-container" style="display: none;">
+          <label for="taller-nombre-custom">Nombre personalizado *</label>
+          <input type="text" id="taller-nombre-custom" placeholder="Ingresa el nombre del taller">
+        </div>
+
+        <div class="form-group">
+          <label for="taller-responsable">Mostrar a *</label>
+          <select id="taller-responsable" required>
+            <option value="">-- Selecciona quién verá este taller --</option>
+            <option value="todos">👥 Todos (Responsables + Apoyos)</option>
+            <option value="responsables">👤 Solo Responsables</option>
+            <option value="apoyos">📋 Solo Apoyos</option>
+            <optgroup label="Responsables Específicos">
+            </optgroup>
+            <optgroup label="Apoyos Específicos">
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="taller-lugar">Lugar *</label>
+          <select id="taller-lugar" required>
+            <option value="">-- Selecciona lugar --</option>
+            <option value="Área de Fisioterapia">Área de Fisioterapia</option>
+            <option value="Sala de talleres">Sala de talleres</option>
+            <option value="Comedor">Comedor</option>
+            <option value="Jardín">Jardín</option>
+            <option value="Salón multiusos">Salón multiusos</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Horario (HH:MM - HH:MM) *</label>
+          <div class="time-inputs">
+            <input type="time" id="taller-hora-inicio" required placeholder="Hora inicio">
+            <input type="time" id="taller-hora-fin" required placeholder="Hora fin">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Días *</label>
+          <div class="day-checkboxes">
+            <div class="checkbox-group">
+              <input type="checkbox" id="taller-day-lunes" value="Lunes">
+              <label for="taller-day-lunes">Lunes</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="taller-day-martes" value="Martes">
+              <label for="taller-day-martes">Martes</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="taller-day-miercoles" value="Miércoles">
+              <label for="taller-day-miercoles">Miércoles</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="taller-day-jueves" value="Jueves">
+              <label for="taller-day-jueves">Jueves</label>
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="taller-day-viernes" value="Viernes">
+              <label for="taller-day-viernes">Viernes</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="taller-descripcion">Descripción</label>
+          <textarea id="taller-descripcion" placeholder="Describe el taller..." rows="3"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeModalTaller()">Cancelar</button>
+          <button type="submit" class="btn-save">Guardar Taller</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Vacaciones -->
+  <div class="modal-horario" id="modalVacaciones">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Establecer Vacaciones</h2>
+        <button class="modal-close" onclick="closeModalVacaciones()">✕</button>
+      </div>
+
+      <form id="formVacaciones" onsubmit="saveVacaciones(event)">
+        <div class="form-group">
+          <label for="vacaciones-pasante">Pasante *</label>
+          <select id="vacaciones-pasante" required>
+            <option value="">-- Selecciona pasante --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="vacaciones-fecha-inicio">Fecha de inicio *</label>
+          <input type="date" id="vacaciones-fecha-inicio" required>
+        </div>
+
+        <div class="form-group">
+          <label for="vacaciones-fecha-fin">Fecha de fin *</label>
+          <input type="date" id="vacaciones-fecha-fin" required>
+        </div>
+
+        <div class="form-group">
+          <label for="vacaciones-notas">Notas (motivo, cobertura, etc.)</label>
+          <textarea id="vacaciones-notas" placeholder="Ej.: Cobertura por Dr. López; vacación anual; etc..." rows="3"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeModalVacaciones()">Cancelar</button>
+          <button type="submit" class="btn-save">Guardar Vacaciones</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Redistribución de Usuarias por Vacaciones -->
+  <div class="modal-horario" id="modalRedistribuirVacaciones">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Redistribuir Usuarias - Vacaciones</h2>
+        <button class="modal-close" onclick="closeModalRedistribuirVacaciones()">✕</button>
+      </div>
+
+      <div id="redistribuir-contenido" style="max-height: 600px; overflow-y: auto; padding: 10px 0;">
+        <!-- Se llenará dinámicamente -->
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeModalRedistribuirVacaciones()">Cerrar</button>
+        <button type="button" class="btn-save" id="btn-redistribuir-finalizar" onclick="finalizarRedistribucion()">Finalizar Redistribución</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Gestión de Ausencias de Usuarias -->
+  <div class="modal-horario" id="modalGestionarAusencias">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Gestionar Ausencias de Usuarias</h2>
+        <button class="modal-close" onclick="closeModalGestionarAusencias()">✕</button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+        <!-- Panel izquierdo: Agregar ausencia -->
+        <div>
+          <h3 style="margin-bottom: 12px; font-size: 16px; color: var(--text-dark);">Agregar Ausencia</h3>
+          <form id="formAusenciasUsuaria" onsubmit="saveAusenciaUsuaria(event)" style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="form-group">
+              <label for="ausencia-usuaria">Usuaria *</label>
+              <select id="ausencia-usuaria" required>
+                <option value="">-- Selecciona usuaria --</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ausencia-fecha-inicio">Fecha de Inicio *</label>
+              <input type="date" id="ausencia-fecha-inicio" required>
+            </div>
+
+            <div class="form-group">
+              <label for="ausencia-fecha-fin">Fecha de Fin *</label>
+              <input type="date" id="ausencia-fecha-fin" required>
+            </div>
+
+            <div class="form-group">
+              <label for="ausencia-motivo">Motivo *</label>
+              <select id="ausencia-motivo" required>
+                <option value="">-- Selecciona motivo --</option>
+                <option value="vacaciones">Vacaciones</option>
+                <option value="salida-temporal">Salida Temporal</option>
+                <option value="enfermedad">Enfermedad</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="ausencia-notas">Notas adicionales</label>
+              <textarea id="ausencia-notas" placeholder="Ej: Visitando a familia, en el doctor, etc..." rows="2"></textarea>
+            </div>
+
+            <button type="submit" class="btn-save" style="width: 100%;">Agregar Ausencia</button>
+          </form>
+        </div>
+
+        <!-- Panel derecho: Ver y eliminar ausencias -->
+        <div>
+          <h3 style="margin-bottom: 12px; font-size: 16px; color: var(--text-dark);">Ausencias Registradas</h3>
+          <div id="ausencias-lista" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
+            <!-- Se llena dinámicamente -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeModalGestionarAusencias()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Listado de Sesiones por Usuaria -->
+  <div class="modal-horario" id="modalListadoUsuarias">
+    <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header">
+        <h2>📋 Listado de Sesiones por Usuaria</h2>
+        <button class="modal-close" onclick="closeModalListadoUsuarias()">✕</button>
+      </div>
+      
+      <div style="padding: 16px;">
+        <p style="color: var(--text-light); margin-bottom: 16px; font-size: 14px;">
+          Vista completa de todas las sesiones programadas organizadas por usuaria.
+        </p>
+        
+        <!-- Filtro de búsqueda -->
+        <div style="margin-bottom: 16px;">
+          <input type="text" id="filtro-usuaria" placeholder="🔍 Buscar usuaria..." 
+                 oninput="filtrarListadoUsuarias()"
+                 style="width: 100%; padding: 10px 16px; border: 2px solid var(--border-soft); border-radius: 8px; font-size: 14px;">
+        </div>
+        
+        <!-- Contenedor del listado -->
+        <div id="listado-usuarias-container" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Se llena dinámicamente -->
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeModalListadoUsuarias()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Edición de Horario -->
+  <div class="modal-horario" id="modalEditarHorario">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Editar Horario</h2>
+        <button class="modal-close" onclick="closeModalEditarHorario()">✕</button>
+      </div>
+
+      <form id="formEditarHorario" onsubmit="saveEditarHorario(event)">
+        <div class="form-group">
+          <label for="editar-tipo">Tipo *</label>
+          <select id="editar-tipo" disabled>
+            <option value="sesion">Sesión</option>
+            <option value="taller">Taller</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="editar-nombre">Nombre/Descripción *</label>
+          <input type="text" id="editar-nombre" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editar-hora-inicio">Hora de Inicio *</label>
+          <input type="time" id="editar-hora-inicio" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editar-hora-fin">Hora de Fin *</label>
+          <input type="time" id="editar-hora-fin" required>
+        </div>
+
+        <div class="form-group">
+          <label for="editar-responsable">Responsable/Pasante *</label>
+          <select id="editar-responsable" required>
+            <option value="">-- Selecciona responsable --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="editar-lugar">Lugar</label>
+          <input type="text" id="editar-lugar" placeholder="Ej: Habitación, Área de Fisioterapia...">
+        </div>
+
+        <div class="form-group">
+          <label for="editar-habitacion">Habitación</label>
+          <input type="text" id="editar-habitacion" placeholder="Ej: 102, 205...">
+        </div>
+
+        <div class="form-group">
+          <label for="editar-apoyo">Apoyo(s)/Practicante(s) - Puedes seleccionar varios</label>
+          <select id="editar-apoyo" multiple size="4" style="height: auto; min-height: 80px;">
+          </select>
+          <small style="color: #666; font-size: 11px; margin-top: 4px; display: block;">💡 Mantén Ctrl (Cmd en Mac) para seleccionar múltiples</small>
+        </div>
+
+        <div class="form-group">
+          <label for="editar-notas">Notas</label>
+          <textarea id="editar-notas" placeholder="Notas adicionales..." rows="2"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" onclick="closeModalEditarHorario()">Cancelar</button>
+          <button type="button" class="btn-delete" id="btn-eliminar-horario" style="display: none;">Eliminar</button>
+          <button type="submit" class="btn-save">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <a href="index.html" class="nav-item">
+      <div class="nav-icon">📊</div>
+      <div>Valoraciones</div>
+    </a>
+    <a href="planes.html" class="nav-item">
+      <div class="nav-icon">📋</div>
+      <div>Planes</div>
+    </a>
+    <a href="horarios.html" class="nav-item active">
+      <div class="nav-icon">📅</div>
+      <div>Horarios</div>
+    </a>
+    <a href="seguimiento.html" class="nav-item">
+      <div class="nav-icon">📈</div>
+      <div>Seguimiento</div>
+    </a>
+  </div>
+
+  <script src="js/horarios.js"></script>
+  <script src="js/config.js"></script>
+  <script>
+    // ===== GESTIÓN DE AUTENTICACIÓN, PERMISOS Y HORARIOS PERSONALIZADOS =====
+    
+    // Pasantes (responsables con permisos limitados)
+    const PASANTES = [
+      'Tavata Alexa Basurto Ramírez',
+      'Gloria Iraís Espinosa Peralta',
+      'Jorge Eduardo Rodríguez Romero',
+      'Andrea Ofelia Carrillo Valdés',
+      'Alejandra María Contreras Cruz',
+      'Gabriel Rodríguez Hernández',
+      'Leslie Amellali Santillán García',
+      'Francisco Nava Chávez',
+      'Estefanía Zanabria'
+    ];
+
+    // Apoyos (practicantes)
+    const APOYOS = [
+      'Paola Saraí Olivares Pérez',
+      'Sebastián'
+    ];
+
+    // Array de usuarias (pacientes) - mismo que en index.html
+    // Lista de usuarias - MOVIDA A js/horarios.js
+    /*const USUARIAS = [
+      { "nombre": "Virginia Vargas Acevedo", "habitacion": "2" },
+      { "nombre": "Angélica Martínez Osornio", "habitacion": "4" },
+      { "nombre": "María Eugenia Romo García", "habitacion": "5" },
+      { "nombre": "María Isabel Tellez Velázquez", "habitacion": "6" },
+      { "nombre": "María Gloria Aguilar Morín", "habitacion": "7" },
+      { "nombre": "Ana Rosa Alemon Tovar", "habitacion": "8" },
+      { "nombre": "Fidelina Quezada Pérez", "habitacion": "9" },
+      { "nombre": "Beatriz Margarita Barajas y Zazueta", "habitacion": "11" },
+      { "nombre": "Martha Sanchez Hernández", "habitacion": "12" },
+      { "nombre": "Maria Guillermina Sierra y Estéves", "habitacion": "105" },
+      { "nombre": "Norma Patricia Guadalupe Maravoto Guerrero", "habitacion": "107" },
+      { "nombre": "María Elena Cortés Pardo", "habitacion": "107" },
+      { "nombre": "Beatriz Carvajal Villegas", "habitacion": "108" },
+      { "nombre": "Velia Torres Camacho", "habitacion": "108" },
+      { "nombre": "Guadalupe Ramírez Rodríguez", "habitacion": "109" },
+      { "nombre": "María del Carmen Rosario Anguiano Carey", "habitacion": "109" },
+      { "nombre": "Paula Martínez Larios", "habitacion": "111" },
+      { "nombre": "Bertha Ochoa Hoyos", "habitacion": "117" },
+      { "nombre": "Teodora Hilda Margarita García Hernández", "habitacion": "118" },
+      { "nombre": "Margarita Medina Godínez", "habitacion": "119" },
+      { "nombre": "Sonia Buzon Ramírez", "habitacion": "120" },
+      { "nombre": "Virginia Barba Casillas", "habitacion": "121" },
+      { "nombre": "María Eugenia Vázquez e Ibarra", "habitacion": "122" },
+      { "nombre": "Lucia Pérez Hernández", "habitacion": "123" },
+      { "nombre": "Alicia Sandoval Guerrero", "habitacion": "124" },
+      { "nombre": "Irma Rosado Palomar", "habitacion": "125" },
+      { "nombre": "Salvador González", "habitacion": "204" },
+      { "nombre": "Ma. de Lourdes Ramírez Martínez", "habitacion": "205" },
+      { "nombre": "María Antinea López Monroy", "habitacion": "206" },
+      { "nombre": "María Victoria Ruiz Moran", "habitacion": "207" },
+      { "nombre": "María Elena Mancera y Aguayo", "habitacion": "208" },
+      { "nombre": "María de la Peña Cardona", "habitacion": "209" },
+      { "nombre": "Aura Paz Martha Graciela Luz Cravioto", "habitacion": "210" },
+      { "nombre": "María Elena Muñoz Lara", "habitacion": "211" },
+      { "nombre": "Virginia Reyes Velázquez", "habitacion": "213" },
+      { "nombre": "Teresa Gutiérrez Zamorano", "habitacion": "214" },
+      { "nombre": "Eva Gutiérrez y Sotelo", "habitacion": "216" },
+      { "nombre": "María Concepción Medina y Nicolau", "habitacion": "217" },
+      { "nombre": "Aurora Benítez Avila", "habitacion": "218" },
+      { "nombre": "Aida Santos Rosas", "habitacion": "220" },
+      { "nombre": "María del Carmen Sánchez Vazquez", "habitacion": "222" },
+      { "nombre": "Rosa María D'arce Arzate", "habitacion": "223" },
+      { "nombre": "Elena Yolanda Guevara y Gómez", "habitacion": "301" },
+      { "nombre": "Teodora Graciela García Carbajal", "habitacion": "302" },
+      { "nombre": "Herminia Hernández Rodríguez", "habitacion": "303" },
+      { "nombre": "Dolores Domínguez y Magaña Peon", "habitacion": "305" },
+      { "nombre": "Angelica Magdalena Osorio Lugo", "habitacion": "306" },
+      { "nombre": "Martha Aguilera Carrillo", "habitacion": "308" },
+      { "nombre": "María Amador Moreno", "habitacion": "310" },
+      { "nombre": "Nora Patricia Rivas Borja", "habitacion": "312" },
+      { "nombre": "Juana Mesquite", "habitacion": "313" },
+      { "nombre": "María Eugenia Solano Sainos", "habitacion": "314" },
+      { "nombre": "María Guadalupe Cristina Castillo López", "habitacion": "319" },
+      { "nombre": "María Guadalupe Gasca Boyer", "habitacion": "320" },
+      { "nombre": "María Mendoza Alvarez", "habitacion": "322" },
+      { "nombre": "Enedina Martínez Ochoa", "habitacion": "323" },
+      { "nombre": "Ma Isabel Silva Ramírez", "habitacion": "324" },
+      { "nombre": "Silvia Margarita Méndez Berrueta", "habitacion": "318" },
+      { "nombre": "María del Rosario García Alcalá", "habitacion": "330" },
+      { "nombre": "Nidia María Donde Diego", "habitacion": "215" },
+      { "nombre": "Yolanda Barajas del Castillo", "habitacion": "333" },
+      { "nombre": "Estela Cuellar y Márquez", "habitacion": "334" },
+      { "nombre": "Estefana Sánchez de Anda", "habitacion": "5to Piso" },
+      { "nombre": "Ma. Jesús Razo Madrigal", "habitacion": "5to Piso" },
+      { "nombre": "María Magdalena García Alcalá", "habitacion": "5to Piso" },
+      { "nombre": "Ma. del Carmen Rivera Soria", "habitacion": "5to Piso" },
+      { "nombre": "Sor Eva", "habitacion": "5to Piso" },
+      { "nombre": "Blanca Estela", "habitacion": "No aplica" },
+      { "nombre": "Juana", "habitacion": "No aplica" },
+      { "nombre": "Georgina \"Coquis\" Ayala", "habitacion": "No aplica" },
+      { "nombre": "Bertha Solano", "habitacion": "320" }
+    ];*/
+
+    // Iconos de responsables
+    // Iconos de responsables - MOVIDO A js/horarios.js
+    /*const RESPONSABLE_ICONS = {
+      'Tavata Alexa Basurto Ramírez': 'icons/AlexaI.png',
+      'Gloria Iraís Espinosa Peralta': 'icons/GloriaI.png',
+      'Joanna Stefania Martínez García': 'icons/JoannaI.png',
+      'Alejandra Reyna Lorenzo Rojo': 'icons/AleI.png',
+      'Jorge Eduardo Rodríguez Romero': 'icons/JorgeI.png'
+    };*/
+
+    // Variable global para el horario del pasante seleccionado
+    let horariosPersonalizados = {};
+    let pasanteActual = null;
+
+    // Cargar horarios personalizados del localStorage
+    function cargarHorariosPersonalizados() {
+      const stored = localStorage.getItem('horariosPersonalizados');
+      if (stored) {
+        horariosPersonalizados = JSON.parse(stored);
+      }
+    }
+
+    // Guardar horarios personalizados en localStorage
+    function guardarHorariosPersonalizados() {
+      localStorage.setItem('horariosPersonalizados', JSON.stringify(horariosPersonalizados));
+      // Aquí irá la lógica de notificación al pasante
+      notificarCambiosAlPasante(pasanteActual);
+    }
+
+    // Notificar cambios al pasante (simulado - en producción sería con Firebase/WebSocket)
+    function notificarCambiosAlPasante(nombrePasante) {
+      console.log(`📢 Notificando a ${nombrePasante} sobre cambios en su horario...`);
+      // TODO: Integrar con Firebase Cloud Messaging o WebSocket
+    }
+
+    // Verificar sesión al cargar
+    window.addEventListener('load', function() {
+      cargarHorariosPersonalizados();
+      initializeHorarios();
+    });
+
+    function initializeHorarios() {
+      const responsable_name = sessionStorage.getItem('responsable_name');
+      const responsable_prefijo = sessionStorage.getItem('responsable_prefijo');
+      
+      if (!responsable_name) {
+        alert('Por favor inicia sesión primero');
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Actualizar badge
+      updateBadge(responsable_name, responsable_prefijo);
+
+      // Verificar si es Tavata (administrador)
+      const isTavata = responsable_name === 'Tavata Alexa Basurto Ramírez';
+      
+      if (isTavata) {
+        // Mostrar selector de pasantes
+        mostrarSelectorPasantes();
+        document.getElementById('action-buttons-container').style.display = 'flex';
+      } else {
+        // Mostrar solo horario del pasante actual
+        pasanteActual = responsable_name;
+        document.getElementById('pasante-selector-container').style.display = 'none';
+        document.getElementById('action-buttons-container').style.display = 'none';
+      }
+    }
+
+    function mostrarSelectorPasantes() {
+      const container = document.getElementById('pasante-selector-container');
+      const selector = document.getElementById('pasante-selector');
+      
+      container.style.display = 'block';
+      
+      // Limpiar opciones anteriores
+      selector.innerHTML = '<option value="">-- Selecciona pasante o apoyo --</option>';
+      
+      // Agregar pasantes
+      selector.innerHTML += '<optgroup label="Pasantes">';
+      PASANTES.forEach(pasante => {
+        const option = document.createElement('option');
+        option.value = pasante;
+        option.textContent = pasante;
+        selector.appendChild(option);
+      });
+      
+      // Agregar apoyos
+      const apoyoGroup = document.createElement('optgroup');
+      apoyoGroup.label = 'Apoyos (Practicantes)';
+      APOYOS.forEach(apoyo => {
+        const option = document.createElement('option');
+        option.value = apoyo;
+        option.textContent = apoyo;
+        apoyoGroup.appendChild(option);
+      });
+      selector.appendChild(apoyoGroup);
+      
+      // Evento de cambio
+      selector.addEventListener('change', function() {
+        pasanteActual = this.value;
+        if (pasanteActual) {
+          renderHorarios();
+        }
+      });
+    }
+
+    // Función updateBadge - MOVIDA A js/horarios.js
+    /*function updateBadge(name, prefijo) {
+      const badgeName = document.getElementById('badge-name');
+      const badgePrefix = document.getElementById('badge-prefix');
+      const badgeIcon = document.getElementById('badge-icon');
+
+      if (badgeName) {
+        // Extraer nombre corto (primer nombre + primera letra del segundo apellido)
+        const parts = name.split(' ');
+        const shortName = parts.length >= 2 ? `${parts[0]} ${parts[parts.length - 1][0]}.` : parts[0];
+        badgeName.textContent = shortName;
+      }
+
+      if (badgePrefix) {
+        badgePrefix.textContent = prefijo || 'LFT';
+      }
+
+      if (badgeIcon && RESPONSABLE_ICONS[name]) {
+        badgeIcon.src = RESPONSABLE_ICONS[name];
+      }
+    }*/
+
+    function goBackToIndex() {
+      window.location.href = 'index.html';
+    }
+
+    function logout() {
+      if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        sessionStorage.clear();
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
+</body>
+</html>

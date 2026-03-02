@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Goniometría</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Test de Goniometría</h1>
+  
+  <div class="debug">
+    <h3>Controles</h3>
+    <button onclick="testConstants()">1. Verificar Constantes</button>
+    <button onclick="testFunctions()">2. Verificar Funciones</button>
+    <button onclick="testDOM()">3. Verificar DOM</button>
+    <button onclick="testRender()">4. Ejecutar Render</button>
+  </div>
+  
+  <div class="debug" id="output">
+    <strong>Resultados:</strong>
+    <pre id="results"></pre>
+  </div>
+  
+  <hr>
+  
+  <!-- Elementos necesarios para goniometría -->
+  <div id="goni_segments"></div>
+  <button id="btn_apply_goni_selection">Aplicar Selección</button>
+  <div id="goni_list"></div>
+  
+  <!-- Scripts originales -->
+  <script src="js/constants.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/valoracion.js"></script>
+  
+  <script>
+    const log = (msg) => {
+      const pre = document.getElementById('results');
+      pre.textContent += msg + '\n';
+      console.log(msg);
+    };
+    
+    function testConstants() {
+      log('\n=== TEST CONSTANTES ===');
+      log('typeof window.HSV_Valoracion: ' + typeof window.HSV_Valoracion);
+      
+      if (window.HSV_Valoracion) {
+        log('Funciones disponibles:');
+        for (let key in window.HSV_Valoracion) {
+          log('  - ' + key + ': ' + typeof window.HSV_Valoracion[key]);
+        }
+      }
+    }
+    
+    function testFunctions() {
+      log('\n=== TEST FUNCIONES ===');
+      
+      if (window.HSV_Valoracion) {
+        const funcs = ['renderSegmentSelectors', 'renderGoniTables', 'renderDanielsTable'];
+        funcs.forEach(fname => {
+          if (typeof window.HSV_Valoracion[fname] === 'function') {
+            log('✓ ' + fname + ' existe');
+          } else {
+            log('✗ ' + fname + ' NO existe');
+          }
+        });
+      } else {
+        log('✗ window.HSV_Valoracion no existe');
+      }
+    }
+    
+    function testDOM() {
+      log('\n=== TEST DOM ===');
+      const ids = ['goni_segments', 'btn_apply_goni_selection', 'goni_list'];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        log(id + ': ' + (el ? '✓ existe' : '✗ NO existe'));
+      });
+    }
+    
+    function testRender() {
+      log('\n=== TEST RENDER ===');
+      
+      if (!window.HSV_Valoracion) {
+        log('✗ HSV_Valoracion no disponible');
+        return;
+      }
+      
+      try {
+        log('Ejecutando renderSegmentSelectors...');
+        window.HSV_Valoracion.renderSegmentSelectors();
+        log('✓ renderSegmentSelectors OK');
+        
+        const container = document.getElementById('goni_segments');
+        log('Botones creados: ' + (container ? container.children.length : 0));
+        
+        log('\nEjecutando renderGoniTables...');
+        window.HSV_Valoracion.renderGoniTables();
+        log('✓ renderGoniTables OK');
+        
+        const list = document.getElementById('goni_list');
+        log('Contenido de goni_list: ' + (list ? list.innerHTML.substring(0, 100) : 'vacío'));
+      } catch(e) {
+        log('✗ ERROR: ' + e.message);
+        log('Stack: ' + e.stack);
+      }
+    }
+    
+    // Auto-ejecutar al cargar
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        log('=== CARGADO ===');
+        testConstants();
+      }, 500);
+    });
+  </script>
+</body>
+</html>

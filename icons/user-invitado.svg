@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Círculo de fondo -->
+  <circle cx="50" cy="50" r="48" fill="#f6d3dc" stroke="#e8b5c3" stroke-width="2"/>
+  
+  <!-- Cuerpo/silueta sin rostro -->
+  <g fill="#d4a3b3" opacity="0.9">
+    <!-- Cabeza (círculo sin rasgos) -->
+    <circle cx="50" cy="35" r="16"/>
+    
+    <!-- Cuello y hombros -->
+    <path d="M 34 51 Q 34 48 36 48 L 64 48 Q 66 48 66 51 L 66 60 Q 66 65 64 68 L 36 68 Q 34 65 34 60 Z"/>
+    
+    <!-- Torso -->
+    <path d="M 36 68 L 32 95 Q 32 98 35 98 L 65 98 Q 68 98 68 95 L 64 68 Z"/>
+  </g>
+  
+  <!-- Sombra suave para dar profundidad -->
+  <ellipse cx="50" cy="36" rx="14" ry="3" fill="#c28fa3" opacity="0.3"/>
+</svg>

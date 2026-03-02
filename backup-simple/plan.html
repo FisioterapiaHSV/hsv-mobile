@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#4A90E2">
+  <title>Nuevo Plan - HSV Móvil</title>
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <button class="back-btn" onclick="location.href='index.html'">←</button>
+
+  <div class="form-container">
+    <div class="form-header">
+      <h2>📅 Nuevo Plan de Tratamiento</h2>
+      <p class="text-muted">Completa los campos para crear un plan</p>
+    </div>
+
+    <!-- Información básica -->
+    <div class="form-section">
+      <h3>Información General</h3>
+      
+      <div class="form-group">
+        <label for="paciente">Nombre del Paciente *</label>
+        <input type="text" id="paciente" required placeholder="Nombre completo">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fecha">Fecha Programada *</label>
+          <input type="date" id="fecha" required>
+        </div>
+        <div class="form-group">
+          <label for="tipo">Tipo de Plan *</label>
+          <select id="tipo" required>
+            <option value="">Seleccionar...</option>
+            <option value="Crónico">Crónico</option>
+            <option value="Agudo">Agudo</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="hora_start">Hora Inicio Programada</label>
+          <input type="time" id="hora_start">
+        </div>
+        <div class="form-group">
+          <label for="hora_end">Hora Fin Programada</label>
+          <input type="time" id="hora_end">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="responsable">Responsable *</label>
+          <select id="responsable" required>
+            <option value="">Seleccionar...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="apoyo">Apoyo (Opcional)</label>
+          <select id="apoyo">
+            <option value="">Sin apoyo</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Objetivos -->
+    <div class="form-section">
+      <h3>Objetivos del Plan</h3>
+      <div id="objetivos_container" class="mb-2"></div>
+      <div style="display:flex;gap:0.5rem;">
+        <input type="text" id="new_objetivo" placeholder="Agregar objetivo..." style="flex:1;padding:0.75rem;border:2px solid var(--border);border-radius:8px;">
+        <button class="btn btn-secondary" onclick="addObjetivo()">+</button>
+      </div>
+    </div>
+
+    <!-- Intervenciones/Actividades -->
+    <div class="form-section">
+      <h3>Intervenciones y Actividades</h3>
+      <div id="actividades_container" class="mb-2"></div>
+      <div style="display:flex;gap:0.5rem;">
+        <input type="text" id="new_actividad" placeholder="Agregar actividad/intervención..." style="flex:1;padding:0.75rem;border:2px solid var(--border);border-radius:8px;">
+        <button class="btn btn-secondary" onclick="addActividad()">+</button>
+      </div>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="form-section">
+      <h3>Observaciones Adicionales</h3>
+      <div class="form-group">
+        <label for="observaciones">Observaciones (Opcional)</label>
+        <textarea id="observaciones" placeholder="Notas adicionales sobre el plan..." style="min-height:100px;"></textarea>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="btn-actions">
+      <button class="btn btn-secondary" onclick="clearForm()">🗑️ Limpiar</button>
+      <button class="btn btn-primary" onclick="guardarBorrador()">💾 Guardar Borrador</button>
+    </div>
+  </div>
+
+  <script src="js/constants.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/mobile-plan.js"></script>
+</body>
+</html>
