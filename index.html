@@ -2109,9 +2109,34 @@
     
     // Cargar pasantes dinámicamente desde localStorage
     function getPasantesData() {
+      // Mapeo de iconos por nombre (para actualizar datos guardados)
+      const iconosCorrectos = {
+        'Tavata Alexa': 'icons/AlexaI.png',
+        'Gloria Iraís': 'icons/GloriaI.png',
+        'Jorge Eduardo': 'icons/JorgeI.png',
+        'Andrea Ofelia': 'icons/OfeliaI.png',
+        'Alejandra María': 'icons/AlejandraMariaI.png',
+        'Gabriel': 'icons/GabrielI.png',
+        'Leslie Amellali': 'icons/AmellaliI.png',
+        'Francisco': 'icons/FranciscoI.png',
+        'Estefanía': 'icons/EstefaniaI.png'
+      };
+      
       const saved = localStorage.getItem('hsv_pasantes');
       if (saved) {
         let pasantes = JSON.parse(saved);
+        // Actualizar iconos si están como default
+        pasantes = pasantes.map(p => {
+          if (!p.icono || p.icono === 'icons/default.png') {
+            for (const [nombre, icono] of Object.entries(iconosCorrectos)) {
+              if (p.nombre.includes(nombre)) {
+                p.icono = icono;
+                break;
+              }
+            }
+          }
+          return p;
+        });
         localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
         return pasantes;
       }
