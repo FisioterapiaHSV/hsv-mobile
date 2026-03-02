@@ -1,7 +1,7 @@
 {
-  "name": "HSV Valoraciones y Planes Móvil",
-  "short_name": "HSV Móvil",
-  "description": "Aplicación móvil para crear valoraciones y planes de tratamiento - Hogar San Vicente",
+  "name": "Fisioterapia Hogar San Vicente",
+  "short_name": "Fisioterapia HSV",
+  "description": "Aplicación de fisioterapia para valoraciones y planes de tratamiento - Hogar San Vicente",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
