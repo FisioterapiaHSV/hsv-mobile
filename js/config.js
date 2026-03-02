@@ -1197,12 +1197,12 @@ Código actual: ${codigoActual}
         { nombre: 'Tavata Alexa Basurto Ramírez', prefijo: 'LFT', password: '1234', icono: 'icons/AlexaI.png' },
         { nombre: 'Gloria Iraís Espinosa Peralta', prefijo: 'PSS', password: '1111', icono: 'icons/GloriaI.png' },
         { nombre: 'Jorge Eduardo Rodríguez Romero', prefijo: 'PSS', password: '2222', icono: 'icons/JorgeI.png' },
-        { nombre: 'Andrea Ofelia Carrillo Valdés', prefijo: 'PSS', password: '3333', icono: 'icons/default.png' },
-        { nombre: 'Alejandra María Contreras Cruz', prefijo: 'PSS', password: '4444', icono: 'icons/default.png' },
-        { nombre: 'Gabriel Rodríguez Hernández', prefijo: 'PSS', password: '5555', icono: 'icons/default.png' },
-        { nombre: 'Leslie Amellali Santillán García', prefijo: 'PSS', password: '6666', icono: 'icons/default.png' },
-        { nombre: 'Francisco Nava Chávez', prefijo: 'PSS', password: '7777', icono: 'icons/default.png' },
-        { nombre: 'Estefanía Zanabria', prefijo: 'PSS', password: '8888', icono: 'icons/default.png' }
+        { nombre: 'Andrea Ofelia Carrillo Valdés', prefijo: 'PSS', password: '3333', icono: 'icons/OfeliaI.png' },
+        { nombre: 'Alejandra María Contreras Cruz', prefijo: 'PSS', password: '4444', icono: 'icons/AlejandraMariaI.png' },
+        { nombre: 'Gabriel Rodríguez Hernández', prefijo: 'PSS', password: '5555', icono: 'icons/GabrielI.png' },
+        { nombre: 'Leslie Amellali Santillán García', prefijo: 'PSS', password: '6666', icono: 'icons/AmellaliI.png' },
+        { nombre: 'Francisco Nava Chávez', prefijo: 'PSS', password: '7777', icono: 'icons/FranciscoI.png' },
+        { nombre: 'Estefanía Zanabria', prefijo: 'PSS', password: '8888', icono: 'icons/EstefaniaI.png' }
       ];
       savePasantesData();
     }

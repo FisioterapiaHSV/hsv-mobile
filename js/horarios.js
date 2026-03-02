@@ -113,12 +113,12 @@ const RESPONSABLE_ICONS = {
   'Tavata Alexa Basurto Ramírez': 'icons/AlexaI.png',
   'Gloria Iraís Espinosa Peralta': 'icons/GloriaI.png',
   'Jorge Eduardo Rodríguez Romero': 'icons/JorgeI.png',
-  'Andrea Ofelia Carrillo Valdés': 'icons/default.png',
-  'Alejandra María Contreras Cruz': 'icons/default.png',
-  'Gabriel Rodríguez Hernández': 'icons/default.png',
-  'Leslie Amellali Santillán García': 'icons/default.png',
-  'Francisco Nava Chávez': 'icons/default.png',
-  'Estefanía Zanabria': 'icons/default.png'
+  'Andrea Ofelia Carrillo Valdés': 'icons/OfeliaI.png',
+  'Alejandra María Contreras Cruz': 'icons/AlejandraMariaI.png',
+  'Gabriel Rodríguez Hernández': 'icons/GabrielI.png',
+  'Leslie Amellali Santillán García': 'icons/AmellaliI.png',
+  'Francisco Nava Chávez': 'icons/FranciscoI.png',
+  'Estefanía Zanabria': 'icons/EstefaniaI.png'
 };
 
 // 📌 LISTA DE USUARIAS - Se carga desde localStorage (si existe) o usa valores por defecto
