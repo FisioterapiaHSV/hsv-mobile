@@ -1219,10 +1219,10 @@ function createHorarioItem(horario, dateObj = null) {
   }
   
   if (!isDisabled) {
-    // NUEVO: Si es sesión de apoyo (pasante apoyando a otro), usar color rosa
-    if (horario.esApoyo) {
-      backgroundColor = '#fce7f3'; // Rosa claro
-      borderColor = '#ec4899'; // Rosa
+    // Si es sesión de apoyo (pasante apoyando a otro), usar color del responsable original
+    if (horario.esApoyo && horario.responsableOriginal && PASANTE_COLORS[horario.responsableOriginal]) {
+      backgroundColor = PASANTE_COLORS[horario.responsableOriginal].light;
+      borderColor = PASANTE_COLORS[horario.responsableOriginal].bg;
     } else if (esCoberturaTemp && horario.responsableOriginal && PASANTE_COLORS[horario.responsableOriginal]) {
       // Si es una cobertura temporal, usar el color del pasante ORIGINAL
       backgroundColor = PASANTE_COLORS[horario.responsableOriginal].light;
