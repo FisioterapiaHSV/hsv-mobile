@@ -902,7 +902,25 @@ function createDayCard(dayName, date, dateObj, pasante = null, weekRange = null)
     
     // Agregar items de sesión Y mostrar huecos libres entre ellas
     dayHorarios.forEach((horario, index) => {
+      // Detectar solapamiento con otras sesiones
+      const tieneConflicto = detectarSolapamiento(dayHorarios, horario);
+      
       const item = createHorarioItem(horario, dateObj);
+      
+      // Si hay conflicto, agregar indicador visual
+      if (tieneConflicto) {
+        item.style.borderLeft = '4px solid #f59e0b';
+        item.style.position = 'relative';
+        const warningBadge = document.createElement('div');
+        warningBadge.innerHTML = '⚠️';
+        warningBadge.style.position = 'absolute';
+        warningBadge.style.top = '4px';
+        warningBadge.style.right = '4px';
+        warningBadge.style.fontSize = '16px';
+        warningBadge.title = 'Conflicto de horario: esta sesión se solapa con otra';
+        item.appendChild(warningBadge);
+      }
+      
       content.appendChild(item);
       
       // Verificar si hay hueco libre con la siguiente sesión
@@ -1020,6 +1038,29 @@ function getHorariosForDay(dayName, dateObj, pasante = null, weekRange = null) {
         });
       });
     }
+    
+    // NUEVO: Buscar sesiones donde este pasante es apoyo de OTRO pasante
+    // Estas sesiones aparecerán en color rosa
+    RESPONSABLES_LISTA.forEach((otroPasante) => {
+      if (otroPasante === pasanteTarget) return; // Saltar el mismo pasante
+      
+      const horariosDelOtro = horariosPersonalizados[otroPasante] || { sesiones: [], talleres: [] };
+      (horariosDelOtro.sesiones || []).forEach((sesion) => {
+        if (sesion.dias && sesion.dias.includes(dayName) && !sesion.pausada) {
+          // Verificar si el pasante actual está en los apoyos
+          const apoyos = sesion.apoyos || (sesion.apoyo ? [sesion.apoyo] : []);
+          if (apoyos.includes(pasanteTarget)) {
+            horarios.push({
+              ...sesion,
+              type: 'sesion',
+              esApoyo: true, // Marcar como sesión de apoyo
+              responsableOriginal: otroPasante,
+              colorApoyo: '#ec4899' // Rosa
+            });
+          }
+        }
+      });
+    });
   } else {
     // Si no hay pasante seleccionado, usar los datos generales
     // Sesiones
@@ -1039,8 +1080,18 @@ function getHorariosForDay(dayName, dateObj, pasante = null, weekRange = null) {
       // Verificar si este taller se muestra para el pasante seleccionado
       let mostrarTaller = false;
       
-      // Si no hay pasante seleccionado, mostrar solo talleres para "todos"
-      if (!pasanteTarget) {
+      // Nuevo formato: array de responsables
+      if (taller.responsables && taller.responsables.length > 0) {
+        // Si no hay pasante seleccionado, mostrar
+        if (!pasanteTarget) {
+          mostrarTaller = true;
+        } else {
+          // Mostrar si el pasante está en la lista de responsables
+          mostrarTaller = taller.responsables.includes(pasanteTarget);
+        }
+      }
+      // Formato antiguo: un solo responsable (para compatibilidad)
+      else if (!pasanteTarget) {
         mostrarTaller = !taller.responsable || taller.responsable === 'todos';
       } else if (!taller.responsable || taller.responsable === 'todos') {
         // Si no tiene asignación o es 'todos', mostrar a todos
@@ -1168,12 +1219,16 @@ function createHorarioItem(horario, dateObj = null) {
   }
   
   if (!isDisabled) {
-    if (esCoberturaTemp && horario.responsableOriginal && PASANTE_COLORS[horario.responsableOriginal]) {
+    // NUEVO: Si es sesión de apoyo (pasante apoyando a otro), usar color rosa
+    if (horario.esApoyo) {
+      backgroundColor = '#fce7f3'; // Rosa claro
+      borderColor = '#ec4899'; // Rosa
+    } else if (esCoberturaTemp && horario.responsableOriginal && PASANTE_COLORS[horario.responsableOriginal]) {
       // Si es una cobertura temporal, usar el color del pasante ORIGINAL
       backgroundColor = PASANTE_COLORS[horario.responsableOriginal].light;
       borderColor = PASANTE_COLORS[horario.responsableOriginal].bg;
     } else if (horario.isApoyo && horario.apoyoColor) {
-      // Si es un apoyo, usar el color del pasante al que apoya
+      // Si es un apoyo (practicante), usar el color del pasante al que apoya
       if (PASANTE_COLORS[horario.apoyoColor]) {
         backgroundColor = PASANTE_COLORS[horario.apoyoColor].light;
         borderColor = PASANTE_COLORS[horario.apoyoColor].bg;
@@ -1213,11 +1268,18 @@ function createHorarioItem(horario, dateObj = null) {
 
   const timeRange = `${horario.horaInicio || '00:00'} - ${horario.horaFin || '00:00'}`;
 
+  // Determinar el icono según el tipo
+  let icono = isDisabled ? '🚫 ' : '👤 ';
+  if (horario.esApoyo) {
+    icono = '🩷 '; // Corazón rosa para sesiones donde es apoyo
+  }
+
   let html = `
     <div class="horario-time" style="${isDisabled ? 'color: #999;' : ''}">${timeRange}</div>
     <div class="horario-name" style="${isDisabled ? 'color: #999;' : ''}">
-      ${isDisabled ? '🚫 ' : '👤 '}
+      ${icono}
       <strong>${horario.nombre || horario.nombreTaller}</strong>
+      ${horario.esApoyo ? '<span style="font-size: 10px; color: #ec4899; font-weight: 600;"> (APOYO)</span>' : ''}
     </div>
   `;
 
@@ -1229,7 +1291,13 @@ function createHorarioItem(horario, dateObj = null) {
     html += `<div class="horario-lugar" style="${isDisabled ? 'color: #999;' : ''}">📍 ${horario.lugar}</div>`;
   }
 
-  if (horario.responsable) {
+  // Mostrar responsables (puede ser uno o múltiples para talleres)
+  if (horario.responsables && horario.responsables.length > 0) {
+    // Múltiples responsables (talleres)
+    const nombresCortos = horario.responsables.map(r => getNombreCorto(r)).join(', ');
+    const label = horario.responsables.length > 1 ? 'Imparten' : 'Imparte';
+    html += `<div class="horario-responsable" style="${isDisabled ? 'color: #999;' : ''}">${label}: ${nombresCortos}</div>`;
+  } else if (horario.responsable) {
     // No mostrar línea de responsable si es un apoyo en cobertura temporal
     // (se mostrará en la línea de apoyo en su lugar)
     if (horario.esApoyoEnCobertura) {
@@ -1435,7 +1503,44 @@ function openModalTaller() {
   }
 
   document.getElementById('modalTaller').classList.add('active');
-  loadResponsables('taller-responsable');
+  loadTallerResponsablesCheckboxes();
+}
+
+/**
+ * Carga los checkboxes de responsables para el modal de taller
+ */
+function loadTallerResponsablesCheckboxes() {
+  const container = document.getElementById('taller-responsables-checkboxes');
+  if (!container) return;
+  
+  const pasantes = getResponsablesLista();
+  
+  let html = '';
+  pasantes.forEach((pasante, index) => {
+    const nombreCorto = pasante.split(' ').slice(0, 2).join(' ');
+    const colors = PASANTE_COLORS[pasante] || { bg: '#6b7280', light: '#f3f4f6' };
+    
+    html += `
+      <label style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: ${colors.light}; border-radius: 6px; cursor: pointer; border: 2px solid transparent;" class="taller-pasante-checkbox">
+        <input type="checkbox" name="taller-responsables" value="${pasante}" data-index="${index}">
+        <span style="font-size: 13px;">${nombreCorto}</span>
+      </label>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+/**
+ * Toggle todos los pasantes para el taller
+ */
+function toggleTallerTodos() {
+  const todosCheck = document.getElementById('taller-todos');
+  const checkboxes = document.querySelectorAll('input[name="taller-responsables"]');
+  
+  checkboxes.forEach(cb => {
+    cb.checked = todosCheck.checked;
+  });
 }
 
 /**
@@ -1726,10 +1831,12 @@ function saveTaller(event) {
     return;
   }
 
-  const responsable = document.getElementById('taller-responsable').value;
+  // Obtener responsables seleccionados (checkboxes)
+  const checkboxes = document.querySelectorAll('input[name="taller-responsables"]:checked');
+  const responsablesSeleccionados = Array.from(checkboxes).map(cb => cb.value);
   
-  if (!responsable) {
-    showMessage('❌ Por favor selecciona quién verá este taller (Todos, Solo Responsables, Solo Apoyos, o una persona específica)', 'error');
+  if (responsablesSeleccionados.length === 0) {
+    showMessage('❌ Por favor selecciona al menos un pasante que imparta/vea este taller', 'error');
     return;
   }
   
@@ -1762,7 +1869,7 @@ function saveTaller(event) {
   const taller = {
     id: Date.now(),
     nombreTaller: nombre,
-    responsable,
+    responsables: responsablesSeleccionados,
     lugar,
     horaInicio,
     horaFin,
@@ -1890,6 +1997,12 @@ function initPage() {
   const btnVistaGlobal = document.getElementById('btn-vista-global');
   if (btnVistaGlobal) {
     btnVistaGlobal.style.display = isTavata ? 'flex' : 'none';
+  }
+  
+  // Mostrar botón de horarios libres solo para Tavata
+  const btnHorariosLibres = document.getElementById('btn-horarios-libres');
+  if (btnHorariosLibres) {
+    btnHorariosLibres.style.display = isTavata ? 'flex' : 'none';
   }
 }
 
@@ -2080,63 +2193,136 @@ function renderVistaGlobal() {
 
   setTimeout(() => {
     grid.innerHTML = '';
-    grid.style.gridTemplateColumns = 'repeat(5, 1fr)'; // 5 días x 5 pasantes
-
-    // Renderizar una columna por cada pasante
+    
+    // Crear tabla para alinear los días correctamente
+    const table = document.createElement('div');
+    table.style.display = 'grid';
+    table.style.gridTemplateColumns = `80px repeat(${RESPONSABLES_LISTA.length}, 1fr)`;
+    table.style.gap = '8px';
+    table.style.width = '100%';
+    table.style.overflowX = 'auto';
+    
+    // Fila de encabezados (vacío + nombres de pasantes)
+    const headerEmpty = document.createElement('div');
+    headerEmpty.style.fontWeight = '700';
+    headerEmpty.style.padding = '8px';
+    table.appendChild(headerEmpty);
+    
     RESPONSABLES_LISTA.forEach((pasante) => {
-      const pasanteSection = document.createElement('div');
-      pasanteSection.style.display = 'flex';
-      pasanteSection.style.flexDirection = 'column';
-      pasanteSection.style.gap = '12px';
-
-      // Encabezado con nombre del pasante
       const pasanteHeader = document.createElement('div');
       pasanteHeader.style.fontWeight = '700';
-      pasanteHeader.style.padding = '12px';
+      pasanteHeader.style.padding = '8px';
       pasanteHeader.style.borderRadius = '8px';
       pasanteHeader.style.textAlign = 'center';
       pasanteHeader.style.color = 'white';
-      pasanteHeader.style.fontSize = '13px';
+      pasanteHeader.style.fontSize = '11px';
       if (PASANTE_COLORS[pasante]) {
         pasanteHeader.style.backgroundColor = PASANTE_COLORS[pasante].bg;
       }
-      pasanteHeader.textContent = pasante.split(' ')[0]; // Solo el primer nombre
-      pasanteSection.appendChild(pasanteHeader);
-
-      // Tarjetas de días para este pasante
-      weekDays.forEach((date) => {
-        const dayName = getDayName(date);
-        const formattedDate = formatDate(date);
-        const dayCard = createDayCard(dayName, formattedDate, date, pasante);
-        
-        // Reducir tamaño para vista global
-        dayCard.style.minHeight = '200px';
-        dayCard.style.fontSize = '12px';
-        dayCard.querySelector('.day-header').style.fontSize = '11px';
-        
-        pasanteSection.appendChild(dayCard);
-      });
-
-      grid.appendChild(pasanteSection);
+      pasanteHeader.textContent = pasante.split(' ')[0];
+      table.appendChild(pasanteHeader);
     });
-
+    
+    // Filas de días (día + celdas de cada pasante)
+    weekDays.forEach((date) => {
+      const dayName = getDayName(date);
+      const formattedDate = formatDate(date);
+      
+      // Celda del día
+      const dayLabel = document.createElement('div');
+      dayLabel.style.fontWeight = '600';
+      dayLabel.style.fontSize = '11px';
+      dayLabel.style.padding = '8px 4px';
+      dayLabel.style.display = 'flex';
+      dayLabel.style.flexDirection = 'column';
+      dayLabel.style.justifyContent = 'flex-start';
+      dayLabel.style.alignItems = 'center';
+      dayLabel.style.borderRight = '2px solid #e5e7eb';
+      dayLabel.innerHTML = `<span>${dayName.substring(0, 3)}</span><span style="font-size:9px;color:#666;">${formattedDate}</span>`;
+      table.appendChild(dayLabel);
+      
+      // Celdas para cada pasante en este día
+      RESPONSABLES_LISTA.forEach((pasante) => {
+        const cell = document.createElement('div');
+        cell.style.minHeight = '120px';
+        cell.style.padding = '6px';
+        cell.style.borderRadius = '6px';
+        cell.style.fontSize = '10px';
+        cell.style.overflow = 'hidden';
+        
+        if (PASANTE_COLORS[pasante]) {
+          cell.style.backgroundColor = PASANTE_COLORS[pasante].light;
+          cell.style.borderLeft = `3px solid ${PASANTE_COLORS[pasante].bg}`;
+        } else {
+          cell.style.backgroundColor = '#f9fafb';
+          cell.style.borderLeft = '3px solid #e5e7eb';
+        }
+        
+        // Obtener horarios para este día y pasante
+        const dayHorarios = getHorariosForDay(dayName, date, pasante, null);
+        
+        if (dayHorarios.length === 0) {
+          cell.innerHTML = '<div style="color:#9ca3af;text-align:center;padding:8px;">Libre</div>';
+        } else {
+          dayHorarios.forEach((horario) => {
+            const miniItem = document.createElement('div');
+            miniItem.style.padding = '4px';
+            miniItem.style.marginBottom = '4px';
+            miniItem.style.borderRadius = '4px';
+            miniItem.style.backgroundColor = 'rgba(255,255,255,0.7)';
+            miniItem.style.fontSize = '9px';
+            miniItem.style.lineHeight = '1.3';
+            
+            // Detectar si es apoyo (color rosa)
+            if (horario.esApoyo) {
+              miniItem.style.backgroundColor = '#fce7f3';
+              miniItem.style.borderLeft = '2px solid #ec4899';
+            }
+            
+            // Detectar solapamiento
+            const tieneConflicto = detectarSolapamiento(dayHorarios, horario);
+            if (tieneConflicto) {
+              miniItem.style.backgroundColor = '#fef3c7';
+              miniItem.style.borderLeft = '2px solid #f59e0b';
+              miniItem.innerHTML = `⚠️ `;
+            }
+            
+            miniItem.innerHTML += `<strong>${horario.horaInicio}-${horario.horaFin}</strong><br>${(horario.nombre || horario.nombreTaller || '').substring(0, 15)}`;
+            cell.appendChild(miniItem);
+          });
+        }
+        
+        table.appendChild(cell);
+      });
+    });
+    
+    grid.appendChild(table);
+    
     loading.style.display = 'none';
-    grid.style.display = 'flex';
-    grid.style.flexDirection = 'row';
-    grid.style.gap = '16px';
-    grid.style.overflowX = 'auto';
-    grid.style.paddingBottom = '20px';
+    grid.style.display = 'block';
   }, 300);
 }
 
 /**
- * Obtiene la habitación de una usuaria basada en su nombre
+ * Detecta si un horario se solapa con otros en la misma lista
  */
-function getHabitacionFromUsuaria(nombreUsuaria) {
-  if (typeof USUARIAS === 'undefined') return '';
+function detectarSolapamiento(horarios, horarioActual) {
+  const [hIni, mIni] = (horarioActual.horaInicio || '00:00').split(':').map(Number);
+  const [hFin, mFin] = (horarioActual.horaFin || '00:00').split(':').map(Number);
+  const inicioActual = hIni * 60 + mIni;
+  const finActual = hFin * 60 + mFin;
   
-  const usuaria = USUARIAS.find(u => u.nombre === nombreUsuaria);
-  return usuaria ? usuaria.habitacion : '';
+  return horarios.some(otro => {
+    if (otro.id === horarioActual.id) return false;
+    
+    const [hOtroIni, mOtroIni] = (otro.horaInicio || '00:00').split(':').map(Number);
+    const [hOtroFin, mOtroFin] = (otro.horaFin || '00:00').split(':').map(Number);
+    const inicioOtro = hOtroIni * 60 + mOtroIni;
+    const finOtro = hOtroFin * 60 + mOtroFin;
+    
+    // Hay solapamiento si: inicio1 < fin2 AND inicio2 < fin1
+    return inicioActual < finOtro && inicioOtro < finActual;
+  });
 }
 
 /**
@@ -2239,22 +2425,48 @@ function loadPasantesInSelect(selectId) {
 
 /**
  * Carga apoyos en un select específico
- * Ahora soporta selección múltiple, por lo que no agregamos opción vacía
+ * Ahora soporta selección múltiple con practicantes y otros pasantes
  */
 function loadApoyosInSelect(selectId) {
   const select = document.getElementById(selectId);
   if (!select) return;
 
-  // Limpiar todas las opciones (ya que ahora es múltiple)
+  // Limpiar todas las opciones
   select.innerHTML = '';
-
+  
+  // Agregar grupo de practicantes
+  const groupPracticantes = document.createElement('optgroup');
+  groupPracticantes.label = '👥 Practicantes';
+  
   if (typeof APOYOS_LISTA !== 'undefined') {
     APOYOS_LISTA.forEach(apoyo => {
       const option = document.createElement('option');
       option.value = apoyo;
       option.textContent = apoyo;
-      select.appendChild(option);
+      groupPracticantes.appendChild(option);
     });
+  }
+  select.appendChild(groupPracticantes);
+  
+  // Agregar grupo de otros pasantes (excepto el responsable actual de la sesión)
+  const groupPasantes = document.createElement('optgroup');
+  groupPasantes.label = '🩷 Otros Pasantes (aparecerá en rosa en su horario)';
+  
+  const responsableActual = sessionStorage.getItem('responsable_name') || '';
+  
+  RESPONSABLES_LISTA.forEach(pasante => {
+    // No incluir al pasante actual como opción de apoyo
+    if (pasante !== responsableActual) {
+      const option = document.createElement('option');
+      option.value = pasante;
+      option.textContent = getNombreCorto(pasante) + ' (PSS)';
+      option.setAttribute('data-es-pasante', 'true');
+      groupPasantes.appendChild(option);
+    }
+  });
+  
+  if (groupPasantes.children.length > 0) {
+    select.appendChild(groupPasantes);
   }
 }
 
@@ -3458,6 +3670,180 @@ function filtrarListadoUsuarias() {
       card.style.display = 'none';
     }
   });
+}
+
+/**
+ * Muestra el modal de horarios libres
+ */
+function mostrarHorariosLibres() {
+  const modal = document.getElementById('modalHorariosLibres');
+  if (modal) {
+    modal.style.display = 'flex';
+    renderHorariosLibres('todos');
+  }
+}
+
+/**
+ * Cierra el modal de horarios libres
+ */
+function closeModalHorariosLibres() {
+  const modal = document.getElementById('modalHorariosLibres');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+/**
+ * Filtra los horarios libres por día
+ */
+function filtrarHorariosLibres(dia) {
+  // Actualizar botones activos
+  document.querySelectorAll('.btn-filtro-dia').forEach(btn => {
+    if (btn.getAttribute('data-dia') === dia) {
+      btn.style.background = '#d4c5f9';
+      btn.style.color = 'white';
+      btn.classList.add('active');
+    } else {
+      btn.style.background = '#e5e7eb';
+      btn.style.color = '#374151';
+      btn.classList.remove('active');
+    }
+  });
+  
+  renderHorariosLibres(dia);
+}
+
+/**
+ * Renderiza los horarios libres de todos los pasantes
+ */
+function renderHorariosLibres(filtrarDia) {
+  const container = document.getElementById('horarios-libres-container');
+  if (!container) return;
+  
+  const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+  const horaInicioDia = '09:30';
+  const horaFinDia = '13:30';
+  
+  // Convertir horas a minutos para cálculos
+  const minutosInicio = horaAMinutos(horaInicioDia);
+  const minutosFin = horaAMinutos(horaFinDia);
+  
+  let html = '';
+  
+  // Para cada pasante
+  RESPONSABLES_LISTA.forEach(pasante => {
+    const colors = PASANTE_COLORS[pasante] || { bg: '#6b7280', light: '#f3f4f6' };
+    const nombreCorto = getNombreCorto(pasante);
+    
+    let diasHTML = '';
+    let tieneLibres = false;
+    
+    diasSemana.forEach(dia => {
+      if (filtrarDia !== 'todos' && filtrarDia !== dia) return;
+      
+      // Obtener sesiones del pasante para este día
+      const sesiones = getHorariosForDay(dia, new Date(), pasante, null);
+      
+      // Calcular huecos libres
+      const libres = calcularHuecosLibres(sesiones, minutosInicio, minutosFin);
+      
+      if (libres.length > 0) {
+        tieneLibres = true;
+        diasHTML += `
+          <div style="margin-bottom: 8px;">
+            <span style="font-weight: 600; color: #374151; font-size: 13px;">${dia}:</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">
+              ${libres.map(hueco => `
+                <span style="background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;">
+                  ⏰ ${minutosAHora(hueco.inicio)} - ${minutosAHora(hueco.fin)}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+    });
+    
+    if (!tieneLibres && filtrarDia === 'todos') {
+      diasHTML = '<p style="color: #9ca3af; font-style: italic; font-size: 13px;">Sin horarios libres esta semana</p>';
+    } else if (!tieneLibres) {
+      diasHTML = `<p style="color: #9ca3af; font-style: italic; font-size: 13px;">Sin horarios libres el ${filtrarDia}</p>`;
+    }
+    
+    html += `
+      <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+        <div style="background: ${colors.bg}; padding: 10px 16px; display: flex; align-items: center; gap: 10px;">
+          <span style="color: ${colors.textColor || 'white'}; font-weight: 600; font-size: 14px;">
+            ${nombreCorto}
+          </span>
+        </div>
+        <div style="padding: 12px 16px;">
+          ${diasHTML}
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+/**
+ * Convierte hora "HH:MM" a minutos
+ */
+function horaAMinutos(hora) {
+  const [h, m] = hora.split(':').map(Number);
+  return h * 60 + m;
+}
+
+/**
+ * Convierte minutos a hora "HH:MM"
+ */
+function minutosAHora(minutos) {
+  const h = Math.floor(minutos / 60);
+  const m = minutos % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+/**
+ * Calcula los huecos libres entre sesiones
+ */
+function calcularHuecosLibres(sesiones, minutosInicio, minutosFin) {
+  const libres = [];
+  
+  if (sesiones.length === 0) {
+    // Todo el día está libre
+    libres.push({ inicio: minutosInicio, fin: minutosFin });
+    return libres;
+  }
+  
+  // Ordenar sesiones por hora de inicio
+  const sesionesOrdenadas = [...sesiones].sort((a, b) => {
+    return horaAMinutos(a.horaInicio || '00:00') - horaAMinutos(b.horaInicio || '00:00');
+  });
+  
+  let ultimoFin = minutosInicio;
+  
+  sesionesOrdenadas.forEach(sesion => {
+    const inicio = horaAMinutos(sesion.horaInicio || '00:00');
+    const fin = horaAMinutos(sesion.horaFin || '00:00');
+    
+    // Si hay hueco antes de esta sesión
+    if (inicio > ultimoFin) {
+      libres.push({ inicio: ultimoFin, fin: inicio });
+    }
+    
+    // Actualizar último fin
+    if (fin > ultimoFin) {
+      ultimoFin = fin;
+    }
+  });
+  
+  // Hueco al final del día
+  if (ultimoFin < minutosFin) {
+    libres.push({ inicio: ultimoFin, fin: minutosFin });
+  }
+  
+  return libres;
 }
 
 /**

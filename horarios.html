@@ -808,6 +808,9 @@
         <button class="btn-add" onclick="toggleVistaGlobal()" id="btn-vista-global" style="display: none;">
           <span>👥</span> <span id="vista-global-text">Vista Global</span>
         </button>
+        <button class="btn-add secondary" onclick="mostrarHorariosLibres()" id="btn-horarios-libres" style="display: none; background-color: #10b981;">
+          <span>🕐</span> Horarios Libres
+        </button>
       </div>
 
       <div class="week-selector">
@@ -863,10 +866,14 @@
           </div>
 
           <div class="form-group">
-            <label for="sesion-apoyo">Apoyo(s) (Practicante) - Puedes seleccionar varios</label>
-            <select id="sesion-apoyo" multiple size="4" style="height: auto; min-height: 80px;">
+            <label for="sesion-apoyo">Apoyo(s) - Puedes seleccionar varios</label>
+            <select id="sesion-apoyo" multiple size="5" style="height: auto; min-height: 100px;">
+              <optgroup label="Practicantes" id="apoyo-practicantes">
+              </optgroup>
+              <optgroup label="Otros Pasantes" id="apoyo-pasantes">
+              </optgroup>
             </select>
-            <small style="color: #666; font-size: 11px; margin-top: 4px; display: block;">💡 Mantén Ctrl (Cmd en Mac) para seleccionar múltiples</small>
+            <small style="color: #666; font-size: 11px; margin-top: 4px; display: block;">💡 Mantén Ctrl (Cmd en Mac) para seleccionar múltiples. Si seleccionas un pasante, la sesión aparecerá en su horario en rosa.</small>
           </div>
 
           <div class="form-group">
@@ -944,17 +951,18 @@
         </div>
 
         <div class="form-group">
-          <label for="taller-responsable">Mostrar a *</label>
-          <select id="taller-responsable" required>
-            <option value="">-- Selecciona quién verá este taller --</option>
-            <option value="todos">👥 Todos (Responsables + Apoyos)</option>
-            <option value="responsables">👤 Solo Responsables</option>
-            <option value="apoyos">📋 Solo Apoyos</option>
-            <optgroup label="Responsables Específicos">
-            </optgroup>
-            <optgroup label="Apoyos Específicos">
-            </optgroup>
-          </select>
+          <label>Imparten / Ven este taller *</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb;">
+            <div style="width: 100%; margin-bottom: 8px;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" id="taller-todos" onchange="toggleTallerTodos()">
+                <span style="font-weight: 600;">👥 Todos los pasantes</span>
+              </label>
+            </div>
+            <div id="taller-responsables-checkboxes" style="display: flex; flex-wrap: wrap; gap: 8px; width: 100%;">
+              <!-- Se llena dinámicamente -->
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -965,7 +973,7 @@
             <option value="Sala de talleres">Sala de talleres</option>
             <option value="Comedor">Comedor</option>
             <option value="Jardín">Jardín</option>
-            <option value="Salón multiusos">Salón multiusos</option>
+            <option value="Sala de Primer Piso">Sala de Primer Piso</option>
           </select>
         </div>
 
@@ -1167,6 +1175,41 @@
 
       <div class="modal-actions">
         <button type="button" class="btn-cancel" onclick="closeModalListadoUsuarias()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Horarios Libres -->
+  <div class="modal-horario" id="modalHorariosLibres">
+    <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header">
+        <h2>🕐 Horarios Libres de Pasantes</h2>
+        <button class="modal-close" onclick="closeModalHorariosLibres()">✕</button>
+      </div>
+      
+      <div style="padding: 16px;">
+        <p style="color: var(--text-light); margin-bottom: 16px; font-size: 14px;">
+          Muestra los horarios disponibles de cada pasante por día de la semana.
+        </p>
+        
+        <!-- Filtro por día -->
+        <div style="margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap;">
+          <button onclick="filtrarHorariosLibres('todos')" class="btn-filtro-dia active" data-dia="todos" style="padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; background: #d4c5f9; color: white;">Todos</button>
+          <button onclick="filtrarHorariosLibres('Lunes')" class="btn-filtro-dia" data-dia="Lunes" style="padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; background: #e5e7eb;">Lunes</button>
+          <button onclick="filtrarHorariosLibres('Martes')" class="btn-filtro-dia" data-dia="Martes" style="padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; background: #e5e7eb;">Martes</button>
+          <button onclick="filtrarHorariosLibres('Miércoles')" class="btn-filtro-dia" data-dia="Miércoles" style="padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; background: #e5e7eb;">Miércoles</button>
+          <button onclick="filtrarHorariosLibres('Jueves')" class="btn-filtro-dia" data-dia="Jueves" style="padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; background: #e5e7eb;">Jueves</button>
+          <button onclick="filtrarHorariosLibres('Viernes')" class="btn-filtro-dia" data-dia="Viernes" style="padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; background: #e5e7eb;">Viernes</button>
+        </div>
+        
+        <!-- Contenedor del listado -->
+        <div id="horarios-libres-container" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Se llena dinámicamente -->
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeModalHorariosLibres()">Cerrar</button>
       </div>
     </div>
   </div>
