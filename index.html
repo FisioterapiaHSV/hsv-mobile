@@ -1059,8 +1059,8 @@
       <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
         <div id="val_msg" style="color:var(--muted)"></div>
           <div>
-          <button class="btn btn-cancel" onclick="window.showView('view-menu')">Cancelar</button>
-          <button class="btn btn-draft" id="btn_save_valoracion">Guardar como borrador</button>
+          <button class="btn btn-cancel" onclick="window.showView('view_main')">Cancelar</button>
+          <button class="btn btn-draft" id="btn_save_valoracion" onclick="if(window._valoracion && window._valoracion.saveDraft){ window._valoracion.saveDraft(); window._valoracion.renderList(); window.showView('view_main'); }">Guardar como borrador</button>
           <button class="btn btn-firmar" id="btn_sign_valoracion">Firmar</button>
         </div>
       </div>
