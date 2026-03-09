@@ -309,7 +309,8 @@ function getResponsablesLista() {
     'Andrea Ofelia Carrillo Valdés',
     'Leslie Amellali Santillán García',
     'Estefanía Zanabria',
-    'Francisco Nava Chávez'
+    'Francisco Nava Chávez',
+    'Camille Dor Dufour'
   ];
 }
 
@@ -326,7 +327,8 @@ function getApoyosLista() {
     'Andrea Ofelia Carrillo Valdés',
     'Leslie Amellali Santillán García',
     'Estefanía Zanabria',
-    'Francisco Nava Chávez'
+    'Francisco Nava Chávez',
+    'Camille Dor Dufour'
   ];
 }
 
