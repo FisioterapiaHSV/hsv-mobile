@@ -1032,7 +1032,9 @@ function getHorariosForDay(dayName, dateObj, pasante = null, weekRange = null) {
       (horariosDelOtro.sesiones || []).forEach((sesion) => {
         if (sesion.dias && sesion.dias.includes(dayName) && !sesion.pausada) {
           // Verificar si el pasante actual está en los apoyos (array o campo simple)
-          const apoyos = sesion.apoyos || (sesion.apoyo ? [sesion.apoyo] : []);
+          // Filtrar valores vacíos del array de apoyos
+          const apoyosRaw = sesion.apoyos || (sesion.apoyo ? [sesion.apoyo] : []);
+          const apoyos = apoyosRaw.filter(a => a && a.trim() !== '');
           if (apoyos.includes(pasanteTarget)) {
             horarios.push({
               ...sesion,
@@ -1299,9 +1301,13 @@ function createHorarioItem(horario, dateObj = null) {
     }
   }
 
-  if (horario.apoyo || (horario.apoyos && horario.apoyos.length > 0)) {
+  // Filtrar valores vacíos del array de apoyos
+  const apoyosValidos = (horario.apoyos || []).filter(a => a && a.trim() !== '');
+  const tieneApoyo = horario.apoyo && horario.apoyo.trim() !== '';
+  
+  if (tieneApoyo || apoyosValidos.length > 0) {
     // Manejar múltiples apoyos
-    const apoyosList = horario.apoyos && horario.apoyos.length > 0 ? horario.apoyos : [horario.apoyo];
+    const apoyosList = apoyosValidos.length > 0 ? apoyosValidos : [horario.apoyo];
     
     if (apoyosList.length === 1 && apoyosList[0]) {
       let textoApoyo = `Apoyo: ${apoyosList[0]}`;
