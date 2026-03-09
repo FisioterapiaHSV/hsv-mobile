@@ -1275,13 +1275,13 @@
     const saveBtn = document.getElementById('btn_save_valoracion'); 
     if(saveBtn && !saveBtn.dataset.initialized) {
       saveBtn.dataset.initialized = 'true';
-      saveBtn.addEventListener('click', ()=>{ saveDraft(); renderList(); window.showView('view_main'); });
+      saveBtn.addEventListener('click', ()=>{ saveDraft(); renderList(); window.showView('view-menu'); });
     }
     
     const signBtn = document.getElementById('btn_sign_valoracion'); 
     if(signBtn && !signBtn.dataset.initialized) {
       signBtn.dataset.initialized = 'true';
-      signBtn.addEventListener('click', ()=>{ signAndSave(); renderList(); window.showView('view_main'); });
+      signBtn.addEventListener('click', ()=>{ signAndSave(); renderList(); window.showView('view-menu'); });
     }
     
     // Bind pruebas específicas buttons to global safe handlers
