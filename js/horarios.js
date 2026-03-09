@@ -337,10 +337,13 @@ function getApoyosLista() {
 // ===== MIGRACIÓN INMEDIATA: Limpiar duplicados de localStorage =====
 (function() {
   // Nombres a eliminar de hsv_pasantes (duplicados o EF que no van en login)
-  const nombresAEliminarPasantes = ['Sebastián', 'Sebastian', 'Camille', 'Sebastián Camacho Silva', 'Camille Dor Dufour'];
+  const nombresAEliminarPasantes = [
+    'Sebastián', 'Sebastian', 'Camille', 'Paola', 'Paola Saraí',
+    'Sebastián Camacho Silva', 'Camille Dor Dufour', 'Paola Saraí Olivares Pérez'
+  ];
   
-  // Nombres a eliminar de hsv_apoyos (duplicados cortos)
-  const nombresAEliminarApoyos = ['Sebastián', 'Sebastian', 'Camille', 'Paola Saraí Olivares Pérez'];
+  // Nombres cortos a eliminar de hsv_apoyos
+  const nombresAEliminarApoyos = ['Sebastián', 'Sebastian', 'Camille', 'Paola', 'Paola Saraí'];
   
   // Actualizar hsv_pasantes - quitar EF (solo LFT y PSS en login)
   const savedPasantes = localStorage.getItem('hsv_pasantes');
@@ -348,7 +351,11 @@ function getApoyosLista() {
     try {
       let pasantes = JSON.parse(savedPasantes);
       const antes = pasantes.length;
-      pasantes = pasantes.filter(p => !nombresAEliminarPasantes.includes(p.nombre));
+      pasantes = pasantes.filter(p => {
+        if (nombresAEliminarPasantes.includes(p.nombre)) return false;
+        if (p.prefijo === 'EF') return false;
+        return true;
+      });
       if (pasantes.length !== antes) {
         localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
         console.log('✅ Eliminados ' + (antes - pasantes.length) + ' EF/duplicados de pasantes');
@@ -373,6 +380,7 @@ function getApoyosLista() {
       
       // Agregar nombres completos si no existen
       const personasNuevas = [
+        { nombre: 'Paola Saraí Olivares Pérez', rol: 'EF' },
         { nombre: 'Sebastián Camacho Silva', rol: 'EF' },
         { nombre: 'Camille Dor Dufour', rol: 'EF' }
       ];

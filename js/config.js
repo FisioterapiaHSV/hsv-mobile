@@ -1212,13 +1212,14 @@ Código actual: ${codigoActual}
     if (savedApoyos) {
       let apoyosTemp = JSON.parse(savedApoyos);
       // Eliminar nombres cortos/duplicados
-      const nombresAEliminar = ['Sebastián', 'Sebastian', 'Camille', 'Paola Saraí Olivares Pérez'];
+      const nombresAEliminar = ['Sebastián', 'Sebastian', 'Camille', 'Paola', 'Paola Saraí'];
       apoyosTemp = apoyosTemp.filter(a => !nombresAEliminar.includes(a.nombre));
       APOYOS_DATA = apoyosTemp;
       saveApoyosData();
     } else {
-      // Valores por defecto - solo EF actuales
+      // Valores por defecto - todos los EF actuales
       APOYOS_DATA = [
+        { nombre: 'Paola Saraí Olivares Pérez', rol: 'EF' },
         { nombre: 'Sebastián Camacho Silva', rol: 'EF' },
         { nombre: 'Camille Dor Dufour', rol: 'EF' }
       ];

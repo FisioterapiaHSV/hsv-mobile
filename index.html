@@ -2121,23 +2121,30 @@
         'Estefanía': 'icons/EstefaniaI.png'
       };
       
-      // Nombres a eliminar del login (EF no son pasantes)
+      // Nombres a eliminar del login (EF/apoyos no son pasantes)
       const nombresAEliminar = [
         'Sebastián', 'Sebastian', 'Camille',
-        'Sebastián Camacho Silva', 'Camille Dor Dufour'
+        'Sebastián Camacho Silva', 'Camille Dor Dufour',
+        'Paola', 'Paola Saraí', 'Paola Saraí Olivares Pérez'
       ];
       
       const saved = localStorage.getItem('hsv_pasantes');
       if (saved) {
         let pasantes = JSON.parse(saved);
         
-        // Eliminar EF y duplicados - ellos no van en login
+        // Eliminar EF y duplicados - ellos no van en login (solo LFT y PSS)
         const antesLength = pasantes.length;
-        pasantes = pasantes.filter(p => !nombresAEliminar.includes(p.nombre));
+        pasantes = pasantes.filter(p => {
+          // Eliminar si está en la lista negra
+          if (nombresAEliminar.includes(p.nombre)) return false;
+          // Eliminar si tiene prefijo EF (son apoyos)
+          if (p.prefijo === 'EF') return false;
+          return true;
+        });
         if (pasantes.length !== antesLength) {
           console.log('[Login] Eliminados ' + (antesLength - pasantes.length) + ' EF/duplicados de hsv_pasantes');
-          localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
         }
+        localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
         
         // Actualizar iconos si están como default
         pasantes = pasantes.map(p => {
@@ -2391,8 +2398,9 @@
           localStorage.setItem('hsv_apoyos', JSON.stringify(apoyosData));
           apoyosList = apoyosData.map(a => a.nombre);
         } else {
-          // Valores por defecto
+          // Valores por defecto - todos los EF/apoyos
           apoyosList = [
+            'Paola Saraí Olivares Pérez',
             'Sebastián Camacho Silva',
             'Camille Dor Dufour'
           ];
