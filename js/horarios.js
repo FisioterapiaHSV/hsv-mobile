@@ -310,7 +310,8 @@ function getResponsablesLista() {
     'Leslie Amellali Santillán García',
     'Estefanía Zanabria',
     'Francisco Nava Chávez',
-    'Camille Dor Dufour'
+    'Camille Dor Dufour',
+    'Sebastián Camacho Silva'
   ];
 }
 
@@ -328,7 +329,8 @@ function getApoyosLista() {
     'Leslie Amellali Santillán García',
     'Estefanía Zanabria',
     'Francisco Nava Chávez',
-    'Camille Dor Dufour'
+    'Camille Dor Dufour',
+    'Sebastián Camacho Silva'
   ];
 }
 
