@@ -305,12 +305,11 @@ function getResponsablesLista() {
     'Tavata Alexa Basurto Ramírez',
     'Gloria Iraís Espinosa Peralta',
     'Jorge Eduardo Rodríguez Romero',
-    'Andrea Ofelia Carrillo Valdés',
-    'Alejandra María Contreras Cruz',
     'Gabriel Rodríguez Hernández',
+    'Andrea Ofelia Carrillo Valdés',
     'Leslie Amellali Santillán García',
-    'Francisco Nava Chávez',
-    'Estefanía Zanabria'
+    'Estefanía Zanabria',
+    'Francisco Nava Chávez'
   ];
 }
 
@@ -321,8 +320,13 @@ function getApoyosLista() {
   }
   // Valores por defecto
   return [
-    'Paola Saraí Olivares Pérez',
-    'Sebastián'
+    'Gloria Iraís Espinosa Peralta',
+    'Jorge Eduardo Rodríguez Romero',
+    'Gabriel Rodríguez Hernández',
+    'Andrea Ofelia Carrillo Valdés',
+    'Leslie Amellali Santillán García',
+    'Estefanía Zanabria',
+    'Francisco Nava Chávez'
   ];
 }
 

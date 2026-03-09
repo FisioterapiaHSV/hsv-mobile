@@ -305,25 +305,27 @@ const PERSONAL = {
   ],
   
   // Practicantes (con PIN solo para login, NO pueden firmar)
-  // PSS: Pasante (Jorge, Gloria, Joanna, Ale)
-  // EF: Estudiante Fisioterapia (Paola, Daniela, Claudia, Liz)
+  // PSS: Pasante de Servicio Social
+  // EF: Estudiante Fisioterapia
   practicantes: [
-    { nombre: 'Jorge Eduardo Rodríguez Romero', prefix: 'PSS', pin: '567890', genero: 'M', rol: 'PSS' },
     { nombre: 'Gloria Iraís Espinosa Peralta', prefix: 'PSS', pin: '234567', genero: 'F', rol: 'PSS' },
-    { nombre: 'Joanna Stefania Martínez García', prefix: 'PSS', pin: '345678', genero: 'F', rol: 'PSS' },
-    { nombre: 'Alejandra Reyna Lorenzo Rojo', prefix: 'PSS', pin: '456789', genero: 'F', rol: 'PSS' },
-    { nombre: 'Paola Saraí Olivares Pérez', prefix: 'EF', pin: '111111', genero: 'F', rol: 'EF' },
-    { nombre: 'Daniela Fernanda García Jiménez', prefix: 'EF', pin: '333333', genero: 'F', rol: 'EF' },
-    { nombre: 'Claudia Reyna Sanchez', prefix: 'EF', pin: '444444', genero: 'F', rol: 'EF' },
-    { nombre: 'Lizbeth Itzel Montes Ocampo', prefix: 'EF', pin: '222222', genero: 'F', rol: 'EF' },
+    { nombre: 'Jorge Eduardo Rodríguez Romero', prefix: 'PSS', pin: '567890', genero: 'M', rol: 'PSS' },
+    { nombre: 'Gabriel Rodríguez Hernández', prefix: 'PSS', pin: '345678', genero: 'M', rol: 'PSS' },
+    { nombre: 'Andrea Ofelia Carrillo Valdés', prefix: 'PSS', pin: '456789', genero: 'F', rol: 'PSS' },
+    { nombre: 'Leslie Amellali Santillán García', prefix: 'PSS', pin: '111111', genero: 'F', rol: 'PSS' },
+    { nombre: 'Estefanía Zanabria', prefix: 'PSS', pin: '222222', genero: 'F', rol: 'PSS' },
+    { nombre: 'Francisco Nava Chávez', prefix: 'PSS', pin: '333333', genero: 'M', rol: 'PSS' },
   ],
   
   // Apoyo (sin PIN, solo para asignación en reportes)
   apoyo: [
-    { nombre: 'Paola Saraí Olivares Pérez', prefix: 'EF' },
-    { nombre: 'Lizbeth Itzel Montes Ocampo', prefix: 'EF' },
-    { nombre: 'Daniela Fernanda García Jiménez', prefix: 'EF' },
-    { nombre: 'Claudia Reyna Sanchez', prefix: 'EF' },
+    { nombre: 'Gloria Iraís Espinosa Peralta', prefix: 'PSS' },
+    { nombre: 'Jorge Eduardo Rodríguez Romero', prefix: 'PSS' },
+    { nombre: 'Gabriel Rodríguez Hernández', prefix: 'PSS' },
+    { nombre: 'Andrea Ofelia Carrillo Valdés', prefix: 'PSS' },
+    { nombre: 'Leslie Amellali Santillán García', prefix: 'PSS' },
+    { nombre: 'Estefanía Zanabria', prefix: 'PSS' },
+    { nombre: 'Francisco Nava Chávez', prefix: 'PSS' },
     { nombre: 'Ninguno', prefix: '' },
   ],
 };

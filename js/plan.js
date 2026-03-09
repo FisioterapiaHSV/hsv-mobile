@@ -9,14 +9,23 @@
     window.APP_PERSONAL.responsables.forEach(person => {
       RESPONSABLE_PINS[person.nombre] = person.pin;
     });
+    // Also add practicantes
+    if (window.APP_PERSONAL.practicantes) {
+      window.APP_PERSONAL.practicantes.forEach(person => {
+        RESPONSABLE_PINS[person.nombre] = person.pin;
+      });
+    }
   } else {
     // Fallback if constants not loaded
     RESPONSABLE_PINS = {
-      'Tavata Alexa Basurto Ramírez': '1234',
-      'Gloria Iraís Espinosa Peralta': '2345',
-      'Joanna Stefania Martínez García': '3456',
-      'Alejandra Reyna Lorenzo Rojo': '4567',
-      'Jorge Eduardo Rodríguez Romero': '5678'
+      'Tavata Alexa Basurto Ramírez': '123456',
+      'Gloria Iraís Espinosa Peralta': '234567',
+      'Jorge Eduardo Rodríguez Romero': '567890',
+      'Gabriel Rodríguez Hernández': '345678',
+      'Andrea Ofelia Carrillo Valdés': '456789',
+      'Leslie Amellali Santillán García': '111111',
+      'Estefanía Zanabria': '222222',
+      'Francisco Nava Chávez': '333333'
     };
   }
   
