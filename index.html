@@ -2119,15 +2119,28 @@
         'Gabriel': 'icons/GabrielI.png',
         'Leslie Amellali': 'icons/AmellaliI.png',
         'Francisco': 'icons/FranciscoI.png',
-        'Estefanía': 'icons/EstefaniaI.png'
+        'Estefanía': 'icons/EstefaniaI.png',
+        'Sebastián': 'icons/SebastianI.png',
+        'Camille': 'icons/CamilleI.png'
       };
+      
+      // Nombres cortos a eliminar (duplicados)
+      const nombresAEliminar = ['Sebastián', 'Sebastian', 'Camille'];
       
       const saved = localStorage.getItem('hsv_pasantes');
       if (saved) {
         let pasantes = JSON.parse(saved);
+        
+        // Eliminar nombres cortos/duplicados
+        const antesLength = pasantes.length;
+        pasantes = pasantes.filter(p => !nombresAEliminar.includes(p.nombre));
+        if (pasantes.length !== antesLength) {
+          console.log('[Login] Eliminados nombres duplicados de hsv_pasantes');
+        }
+        
         // Actualizar iconos si están como default
         pasantes = pasantes.map(p => {
-          if (!p.icono || p.icono === 'icons/default.png') {
+          if (!p.icono || p.icono === 'icons/default.png' || p.icono === 'icons/DirectorioI.png') {
             for (const [nombre, icono] of Object.entries(iconosCorrectos)) {
               if (p.nombre.includes(nombre)) {
                 p.icono = icono;
@@ -2146,11 +2159,12 @@
         { nombre: 'Gloria Iraís Espinosa Peralta', prefijo: 'PSS', password: '1111', icono: 'icons/GloriaI.png' },
         { nombre: 'Jorge Eduardo Rodríguez Romero', prefijo: 'PSS', password: '2222', icono: 'icons/JorgeI.png' },
         { nombre: 'Andrea Ofelia Carrillo Valdés', prefijo: 'PSS', password: '3333', icono: 'icons/OfeliaI.png' },
-        { nombre: 'Alejandra María Contreras Cruz', prefijo: 'PSS', password: '4444', icono: 'icons/AlejandraMariaI.png' },
         { nombre: 'Gabriel Rodríguez Hernández', prefijo: 'PSS', password: '5555', icono: 'icons/GabrielI.png' },
         { nombre: 'Leslie Amellali Santillán García', prefijo: 'PSS', password: '6666', icono: 'icons/AmellaliI.png' },
         { nombre: 'Francisco Nava Chávez', prefijo: 'PSS', password: '7777', icono: 'icons/FranciscoI.png' },
-        { nombre: 'Estefanía Zanabria', prefijo: 'PSS', password: '8888', icono: 'icons/EstefaniaI.png' }
+        { nombre: 'Estefanía Zanabria', prefijo: 'PSS', password: '8888', icono: 'icons/EstefaniaI.png' },
+        { nombre: 'Sebastián Camacho Silva', prefijo: 'EF', password: '9999', icono: 'icons/SebastianI.png' },
+        { nombre: 'Camille Dor Dufour', prefijo: 'EF', password: '0000', icono: 'icons/CamilleI.png' }
       ];
     }
 
