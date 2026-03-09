@@ -334,6 +334,52 @@ function getApoyosLista() {
   ];
 }
 
+// ===== MIGRACIÓN INMEDIATA: Agregar personas nuevas a localStorage =====
+(function() {
+  const personasNuevas = [
+    { nombre: 'Sebastián Camacho Silva' },
+    { nombre: 'Camille Dor Dufour' }
+  ];
+  
+  // Actualizar hsv_pasantes
+  const savedPasantes = localStorage.getItem('hsv_pasantes');
+  if (savedPasantes) {
+    try {
+      const pasantes = JSON.parse(savedPasantes);
+      let cambios = false;
+      personasNuevas.forEach(persona => {
+        if (!pasantes.some(p => p.nombre === persona.nombre)) {
+          pasantes.push(persona);
+          cambios = true;
+        }
+      });
+      if (cambios) {
+        localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
+        console.log('✅ Personas nuevas agregadas a pasantes');
+      }
+    } catch(e) { console.warn('Error migrando pasantes', e); }
+  }
+  
+  // Actualizar hsv_apoyos
+  const savedApoyos = localStorage.getItem('hsv_apoyos');
+  if (savedApoyos) {
+    try {
+      const apoyos = JSON.parse(savedApoyos);
+      let cambios = false;
+      personasNuevas.forEach(persona => {
+        if (!apoyos.some(a => a.nombre === persona.nombre)) {
+          apoyos.push(persona);
+          cambios = true;
+        }
+      });
+      if (cambios) {
+        localStorage.setItem('hsv_apoyos', JSON.stringify(apoyos));
+        console.log('✅ Personas nuevas agregadas a apoyos');
+      }
+    } catch(e) { console.warn('Error migrando apoyos', e); }
+  }
+})();
+
 // Variables para compatibilidad (se actualizan dinámicamente)
 let RESPONSABLES_LISTA = getResponsablesLista();
 let APOYOS_LISTA = getApoyosLista();
