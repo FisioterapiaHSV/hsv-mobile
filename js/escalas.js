@@ -410,8 +410,11 @@
 
   // Initialize scales data from currentVal (if available)
   function loadScalesData() {
-    if (window._valoracion && window._valoracion.currentVal && window._valoracion.currentVal.escalas) {
-      allScalesData = JSON.parse(JSON.stringify(window._valoracion.currentVal.escalas || {}));
+    if (window._valoracion && window._valoracion.currentVal) {
+      // Buscar en escalasEstandarizadas (nombre correcto) o escalas (por compatibilidad)
+      const savedData = window._valoracion.currentVal.escalasEstandarizadas || window._valoracion.currentVal.escalas || {};
+      allScalesData = JSON.parse(JSON.stringify(savedData));
+      console.log('✓ Escalas cargadas:', allScalesData);
     } else {
       allScalesData = {};
     }
@@ -1023,11 +1026,12 @@
     allScalesData[currentScale] = currentScaleData;
     saveAllScalesToStorage();
 
-    // También intentar llamar a saveDraft si existe en el context global
+    // También llamar a saveDraft para persistir los cambios en localStorage
     try {
-      if (typeof saveDraft === 'function') {
+      if (window._valoracion && typeof window._valoracion.saveDraft === 'function') {
         setTimeout(() => {
-          saveDraft();
+          window._valoracion.saveDraft();
+          console.log('✓ Valoración guardada automáticamente después de completar escala');
         }, 200);
       }
     } catch (e) {

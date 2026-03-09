@@ -1350,7 +1350,10 @@
     editValoracion,
     deleteValoracion,
     signValoracion,
-    clearValoracionForm
+    clearValoracionForm,
+    saveDraft,
+    get currentVal() { return currentVal; },
+    set currentVal(v) { currentVal = v; }
   };
   // TABLET: Exponer funciones de inicialización globalmente
   window.HSV_Valoracion = {
