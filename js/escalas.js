@@ -408,6 +408,24 @@
   let currentScaleData = {};
   let allScalesData = {};
 
+  // Función helper para determinar el color según la interpretación
+  function getInterpretationColor(interpretation) {
+    if (!interpretation) return '#666666';
+    const texto = interpretation.toLowerCase();
+    // Verde: bajo riesgo, normal, independiente, robusta
+    if (texto.includes('bajo') || texto.includes('normal') || texto.includes('independiente') || 
+        texto.includes('independencia') || texto.includes('robusta') || texto.includes('función normal')) {
+      return '#2e7d32'; // Verde
+    }
+    // Rojo: alto riesgo, grave, severa, frágil, total
+    if (texto.includes('alto') || texto.includes('grave') || texto.includes('severa') || 
+        texto.includes('severo') || texto.includes('frágil') || texto.includes('total')) {
+      return '#d32f2f'; // Rojo
+    }
+    // Amarillo: moderado, leve, pre-frágil
+    return '#f9a825'; // Amarillo
+  }
+
   // Initialize scales data from currentVal (if available)
   function loadScalesData() {
     if (window._valoracion && window._valoracion.currentVal) {
@@ -433,17 +451,31 @@
       const scaleData = allScalesData[key] || { completed: false, responses: {} };
       const status = scaleData.completed ? '✓ Completada' : '⚪ No completada';
       const statusColor = scaleData.completed ? '#2e7d32' : '#999999';
-      let scoreHtml = '';
+      let resultHtml = '';
 
       if (scaleData.completed && scaleData.total !== null && scaleData.total !== undefined) {
-        scoreHtml = `<div style="margin-top:4px;color:${statusColor};font-size:0.85rem"><strong>Total:</strong> ${scaleData.total}/${escDef.totalMax}</div>`;
+        // Obtener interpretación (guardada o calcular)
+        const interpretation = scaleData.interpretation || 
+          (scaleData.scores && scaleData.scores.interpretation) || 
+          (escDef.interpretation ? escDef.interpretation(scaleData.total) : '');
+        const interpColor = getInterpretationColor(interpretation);
+        
+        // Determinar el máximo según la escala
+        const maxScore = key === 'SPPB' ? 12 : escDef.totalMax;
+        
+        resultHtml = `
+          <div style="margin-top:8px;padding:8px;background:#f5f5f5;border-radius:6px">
+            <div style="font-size:0.9rem;color:#333"><strong>Puntaje:</strong> ${scaleData.total}/${maxScore}</div>
+            <div style="margin-top:4px;font-size:0.9rem;font-weight:600;color:${interpColor};padding:4px 8px;background:${interpColor}15;border-radius:4px;display:inline-block">${interpretation}</div>
+          </div>
+        `;
       }
 
       html += `
-        <div style="border:1px solid #c3e7df;border-radius:8px;padding:12px;background:white;cursor:pointer;transition:all 0.2s" onclick="window.HSV_Escalas.openScale('${key}')">
+        <div style="border:1px solid ${scaleData.completed ? '#c3e7df' : '#e0e0e0'};border-radius:8px;padding:12px;background:white;cursor:pointer;transition:all 0.2s" onclick="window.HSV_Escalas.openScale('${key}')">
           <div style="font-weight:600;color:var(--text-dark);margin-bottom:4px">${escDef.name}</div>
           <div style="color:${statusColor};font-size:0.9rem;font-weight:500">${status}</div>
-          ${scoreHtml}
+          ${resultHtml}
         </div>
       `;
     });
