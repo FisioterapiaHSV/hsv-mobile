@@ -2316,11 +2316,22 @@ function renderVistaGlobal() {
             const lugar = horario.lugar ? `📍 ${horario.lugar}` : '';
             const apoyoTag = horario.esApoyo ? '<span style="color:#ec4899;font-weight:600;">(APOYO)</span>' : '';
             
+            // Verificar si la sesión tiene apoyos asignados (filtrar vacíos)
+            const apoyosAsignados = (horario.apoyos || []).filter(a => a && a.trim() !== '');
+            const tieneApoyoSimple = horario.apoyo && horario.apoyo.trim() !== '';
+            let apoyosInfo = '';
+            if (apoyosAsignados.length > 0 || tieneApoyoSimple) {
+              const listaApoyos = apoyosAsignados.length > 0 ? apoyosAsignados : [horario.apoyo];
+              const nombresCortos = listaApoyos.map(a => a.split(' ')[0]).join(', ');
+              apoyosInfo = `<br><span style="color:#ec4899;font-size:9px;">❤️ ${nombresCortos}</span>`;
+            }
+            
             miniItem.innerHTML = `
               ${conflictoHTML}<strong>${horario.horaInicio}-${horario.horaFin}</strong> ${apoyoTag}<br>
               <span style="font-weight:600;">${nombre}</span>
               ${habitacion ? `<br><span style="color:#666;">${habitacion}</span>` : ''}
               ${lugar ? `<br><span style="color:#666;">${lugar}</span>` : ''}
+              ${apoyosInfo}
             `;
             cell.appendChild(miniItem);
           });
