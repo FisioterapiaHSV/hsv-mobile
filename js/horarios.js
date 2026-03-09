@@ -1711,9 +1711,11 @@ function saveSesion(event) {
   const habitacion = document.getElementById('sesion-habitacion').value;
   const responsable = document.getElementById('sesion-responsable').value;
   
-  // Obtener apoyos seleccionados (múltiples)
+  // Obtener apoyos seleccionados (múltiples) - filtrar valores vacíos
   const apoyoSelect = document.getElementById('sesion-apoyo');
-  const apoyos = Array.from(apoyoSelect.selectedOptions).map(opt => opt.value);
+  const apoyos = Array.from(apoyoSelect.selectedOptions)
+    .map(opt => opt.value)
+    .filter(v => v && v.trim() !== ''); // Filtrar vacíos
   
   const lugar = document.getElementById('sesion-lugar').value;
   const notas = document.getElementById('sesion-notas').value;
@@ -2516,9 +2518,11 @@ function saveEditarHorario(event) {
   const horaFin = document.getElementById('editar-hora-fin').value;
   const nuevoResponsable = document.getElementById('editar-responsable').value;
   
-  // Obtener apoyos seleccionados (múltiples)
+  // Obtener apoyos seleccionados (múltiples) - filtrar valores vacíos
   const apoyoSelect = document.getElementById('editar-apoyo');
-  const apoyosSeleccionados = Array.from(apoyoSelect.selectedOptions).map(opt => opt.value);
+  const apoyosSeleccionados = Array.from(apoyoSelect.selectedOptions)
+    .map(opt => opt.value)
+    .filter(v => v && v.trim() !== ''); // Filtrar vacíos
   
   const lugar = document.getElementById('editar-lugar').value;
   const habitacion = document.getElementById('editar-habitacion').value;
@@ -2539,7 +2543,7 @@ function saveEditarHorario(event) {
   horario.horaFin = horaFin;
   horario.responsable = nuevoResponsable;
   
-  // Actualizar apoyos (múltiples)
+  // Actualizar apoyos (múltiples) - limpiar si no hay seleccionados
   horario.apoyos = apoyosSeleccionados;
   horario.apoyo = apoyosSeleccionados.length > 0 ? apoyosSeleccionados[0] : null; // Mantener compatibilidad
   horario.lugar = lugar;
