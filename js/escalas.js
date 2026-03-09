@@ -1026,13 +1026,11 @@
     allScalesData[currentScale] = currentScaleData;
     saveAllScalesToStorage();
 
-    // También llamar a saveDraft para persistir los cambios en localStorage
+    // Guardar la valoración inmediatamente
     try {
       if (window._valoracion && typeof window._valoracion.saveDraft === 'function') {
-        setTimeout(() => {
-          window._valoracion.saveDraft();
-          console.log('✓ Valoración guardada automáticamente después de completar escala');
-        }, 200);
+        window._valoracion.saveDraft();
+        console.log('✓ Valoración guardada automáticamente después de completar escala');
       }
     } catch (e) {
       console.warn('No se pudo guardar automáticamente', e);
@@ -1040,8 +1038,11 @@
 
     alert(`✓ Escala ${ESCALAS_DEFS[currentScale].name} completada exitosamente.\nPuntaje: ${currentScaleData.total}/${currentScale === 'SPPB' ? '12' : ESCALAS_DEFS[currentScale].totalMax}`);
 
-    // Re-render form to show completion state
-    renderScaleForm();
+    // Cerrar modal y regresar a la valoración
+    closeScaleModal();
+    
+    // Re-renderizar lista de escalas para mostrar estado completado
+    renderScalesList();
   }
 
   // Reset scale for editing
@@ -1071,6 +1072,21 @@
     console.log('✓ Todos los datos de escalas sincronizados');
   }
 
+  // Función para cerrar la vista de escala y regresar a la valoración
+  function closeScaleModal() {
+    // Regresar a la vista de valoración
+    if (typeof window.showView === 'function') {
+      window.showView('view_addvaloracion');
+    }
+    // Scroll hacia la sección de escalas
+    setTimeout(() => {
+      const escalasSection = document.getElementById('escalas_list');
+      if (escalasSection) {
+        escalasSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  }
+
   // Public interface
   window.HSV_Escalas = {
     init: function() {
@@ -1083,6 +1099,7 @@
     updateStructuredResponse,
     confirmScale,
     resetScale,
+    closeScaleModal,
     loadScalesData,
     resetAllScales: function() {
       // Reset all scales data when starting a new valoración
