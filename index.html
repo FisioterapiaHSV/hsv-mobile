@@ -2115,40 +2115,19 @@
         'Gloria Iraís': 'icons/GloriaI.png',
         'Jorge Eduardo': 'icons/JorgeI.png',
         'Andrea Ofelia': 'icons/OfeliaI.png',
+        'Alejandra María': 'icons/AlejandraMariaI.png',
         'Gabriel': 'icons/GabrielI.png',
         'Leslie Amellali': 'icons/AmellaliI.png',
         'Francisco': 'icons/FranciscoI.png',
         'Estefanía': 'icons/EstefaniaI.png'
       };
       
-      // Nombres a eliminar del login (EF/apoyos no son pasantes)
-      const nombresAEliminar = [
-        'Sebastián', 'Sebastian', 'Camille',
-        'Sebastián Camacho Silva', 'Camille Dor Dufour',
-        'Paola', 'Paola Saraí', 'Paola Saraí Olivares Pérez'
-      ];
-      
       const saved = localStorage.getItem('hsv_pasantes');
       if (saved) {
         let pasantes = JSON.parse(saved);
-        
-        // Eliminar EF y duplicados - ellos no van en login (solo LFT y PSS)
-        const antesLength = pasantes.length;
-        pasantes = pasantes.filter(p => {
-          // Eliminar si está en la lista negra
-          if (nombresAEliminar.includes(p.nombre)) return false;
-          // Eliminar si tiene prefijo EF (son apoyos)
-          if (p.prefijo === 'EF') return false;
-          return true;
-        });
-        if (pasantes.length !== antesLength) {
-          console.log('[Login] Eliminados ' + (antesLength - pasantes.length) + ' EF/duplicados de hsv_pasantes');
-        }
-        localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
-        
         // Actualizar iconos si están como default
         pasantes = pasantes.map(p => {
-          if (!p.icono || p.icono === 'icons/default.png' || p.icono === 'icons/DirectorioI.png') {
+          if (!p.icono || p.icono === 'icons/default.png') {
             for (const [nombre, icono] of Object.entries(iconosCorrectos)) {
               if (p.nombre.includes(nombre)) {
                 p.icono = icono;
@@ -2161,12 +2140,13 @@
         localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
         return pasantes;
       }
-      // Datos por defecto (solo LFT y PSS - los EF están en hsv_apoyos)
+      // Datos por defecto
       return [
         { nombre: 'Tavata Alexa Basurto Ramírez', prefijo: 'LFT', password: '1234', icono: 'icons/AlexaI.png' },
         { nombre: 'Gloria Iraís Espinosa Peralta', prefijo: 'PSS', password: '1111', icono: 'icons/GloriaI.png' },
         { nombre: 'Jorge Eduardo Rodríguez Romero', prefijo: 'PSS', password: '2222', icono: 'icons/JorgeI.png' },
         { nombre: 'Andrea Ofelia Carrillo Valdés', prefijo: 'PSS', password: '3333', icono: 'icons/OfeliaI.png' },
+        { nombre: 'Alejandra María Contreras Cruz', prefijo: 'PSS', password: '4444', icono: 'icons/AlejandraMariaI.png' },
         { nombre: 'Gabriel Rodríguez Hernández', prefijo: 'PSS', password: '5555', icono: 'icons/GabrielI.png' },
         { nombre: 'Leslie Amellali Santillán García', prefijo: 'PSS', password: '6666', icono: 'icons/AmellaliI.png' },
         { nombre: 'Francisco Nava Chávez', prefijo: 'PSS', password: '7777', icono: 'icons/FranciscoI.png' },
@@ -2388,21 +2368,14 @@
         const savedApoyos = localStorage.getItem('hsv_apoyos');
         let apoyosList = [];
         
-        // Nombres cortos a eliminar (duplicados)
-        const nombresAEliminar = ['Sebastián', 'Sebastian', 'Camille'];
-        
         if (savedApoyos) {
-          let apoyosData = JSON.parse(savedApoyos);
-          // Eliminar duplicados (nombres cortos)
-          apoyosData = apoyosData.filter(a => !nombresAEliminar.includes(a.nombre));
-          localStorage.setItem('hsv_apoyos', JSON.stringify(apoyosData));
+          const apoyosData = JSON.parse(savedApoyos);
           apoyosList = apoyosData.map(a => a.nombre);
         } else {
-          // Valores por defecto - todos los EF/apoyos
+          // Valores por defecto
           apoyosList = [
             'Paola Saraí Olivares Pérez',
-            'Sebastián Camacho Silva',
-            'Camille Dor Dufour'
+            'Sebastián'
           ];
         }
         

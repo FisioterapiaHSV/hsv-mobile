@@ -309,9 +309,7 @@ function getResponsablesLista() {
     'Andrea Ofelia Carrillo Valdés',
     'Leslie Amellali Santillán García',
     'Estefanía Zanabria',
-    'Francisco Nava Chávez',
-    'Camille Dor Dufour',
-    'Sebastián Camacho Silva'
+    'Francisco Nava Chávez'
   ];
 }
 
@@ -328,75 +326,9 @@ function getApoyosLista() {
     'Andrea Ofelia Carrillo Valdés',
     'Leslie Amellali Santillán García',
     'Estefanía Zanabria',
-    'Francisco Nava Chávez',
-    'Camille Dor Dufour',
-    'Sebastián Camacho Silva'
+    'Francisco Nava Chávez'
   ];
 }
-
-// ===== MIGRACIÓN INMEDIATA: Limpiar duplicados de localStorage =====
-(function() {
-  // Nombres a eliminar de hsv_pasantes (duplicados o EF que no van en login)
-  const nombresAEliminarPasantes = [
-    'Sebastián', 'Sebastian', 'Camille', 'Paola', 'Paola Saraí',
-    'Sebastián Camacho Silva', 'Camille Dor Dufour', 'Paola Saraí Olivares Pérez'
-  ];
-  
-  // Nombres cortos a eliminar de hsv_apoyos
-  const nombresAEliminarApoyos = ['Sebastián', 'Sebastian', 'Camille', 'Paola', 'Paola Saraí'];
-  
-  // Actualizar hsv_pasantes - quitar EF (solo LFT y PSS en login)
-  const savedPasantes = localStorage.getItem('hsv_pasantes');
-  if (savedPasantes) {
-    try {
-      let pasantes = JSON.parse(savedPasantes);
-      const antes = pasantes.length;
-      pasantes = pasantes.filter(p => {
-        if (nombresAEliminarPasantes.includes(p.nombre)) return false;
-        if (p.prefijo === 'EF') return false;
-        return true;
-      });
-      if (pasantes.length !== antes) {
-        localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
-        console.log('✅ Eliminados ' + (antes - pasantes.length) + ' EF/duplicados de pasantes');
-      }
-    } catch(e) { console.warn('Error migrando pasantes', e); }
-  }
-  
-  // Actualizar hsv_apoyos - quitar duplicados y agregar completos
-  const savedApoyos = localStorage.getItem('hsv_apoyos');
-  if (savedApoyos) {
-    try {
-      let apoyos = JSON.parse(savedApoyos);
-      let cambios = false;
-      
-      // Eliminar nombres cortos/duplicados
-      const antes = apoyos.length;
-      apoyos = apoyos.filter(a => !nombresAEliminarApoyos.includes(a.nombre));
-      if (apoyos.length !== antes) {
-        cambios = true;
-        console.log('✅ Eliminados nombres duplicados de apoyos');
-      }
-      
-      // Agregar nombres completos si no existen
-      const personasNuevas = [
-        { nombre: 'Paola Saraí Olivares Pérez', rol: 'EF' },
-        { nombre: 'Sebastián Camacho Silva', rol: 'EF' },
-        { nombre: 'Camille Dor Dufour', rol: 'EF' }
-      ];
-      personasNuevas.forEach(persona => {
-        if (!apoyos.some(a => a.nombre === persona.nombre)) {
-          apoyos.push(persona);
-          cambios = true;
-        }
-      });
-      if (cambios) {
-        localStorage.setItem('hsv_apoyos', JSON.stringify(apoyos));
-        console.log('✅ Apoyos actualizados');
-      }
-    } catch(e) { console.warn('Error migrando apoyos', e); }
-  }
-})();
 
 // Variables para compatibilidad (se actualizan dinámicamente)
 let RESPONSABLES_LISTA = getResponsablesLista();
@@ -537,112 +469,6 @@ function cargarHorariosPersonalizados() {
       });
     }
   });
-  
-  // Migración automática: actualizar nombres antiguos a nombres completos
-  migrarNombresAntiguos();
-}
-
-/**
- * Migra nombres antiguos a nombres completos sin perder datos
- */
-function migrarNombresAntiguos() {
-  const migraciones = {
-    'Sebastián': 'Sebastián Camacho Silva',
-    'Andrea': 'Andrea Ofelia Carrillo Valdés',
-    'Leslie': 'Leslie Amellali Santillán García',
-    'Paola': 'Paola Saraí Olivares Pérez'
-  };
-  
-  let huboCambios = false;
-  
-  Object.keys(horariosPersonalizados).forEach(persona => {
-    const horarios = horariosPersonalizados[persona];
-    
-    // Migrar en sesiones
-    if (horarios.sesiones) {
-      horarios.sesiones.forEach(sesion => {
-        // Migrar apoyo (string)
-        if (sesion.apoyo && migraciones[sesion.apoyo]) {
-          sesion.apoyo = migraciones[sesion.apoyo];
-          huboCambios = true;
-        }
-        // Migrar apoyos (array)
-        if (sesion.apoyos && Array.isArray(sesion.apoyos)) {
-          sesion.apoyos = sesion.apoyos.map(a => migraciones[a] || a);
-          huboCambios = true;
-        }
-      });
-    }
-    
-    // Migrar en talleres
-    if (horarios.talleres) {
-      horarios.talleres.forEach(taller => {
-        if (taller.responsables && Array.isArray(taller.responsables)) {
-          taller.responsables = taller.responsables.map(r => migraciones[r] || r);
-          huboCambios = true;
-        }
-      });
-    }
-  });
-  
-  if (huboCambios) {
-    localStorage.setItem('horariosPersonalizados', JSON.stringify(horariosPersonalizados));
-    console.log('✅ Nombres migrados automáticamente');
-  }
-  
-  // Agregar personas nuevas a las listas de pasantes/apoyos en localStorage
-  agregarPersonasNuevas();
-}
-
-/**
- * Agrega personas nuevas a las listas guardadas en localStorage sin borrar las existentes
- */
-function agregarPersonasNuevas() {
-  const personasNuevas = [
-    { nombre: 'Sebastián Camacho Silva' },
-    { nombre: 'Camille Dor Dufour' }
-  ];
-  
-  // Actualizar hsv_pasantes
-  let pasantesActualizados = false;
-  const savedPasantes = localStorage.getItem('hsv_pasantes');
-  if (savedPasantes) {
-    const pasantes = JSON.parse(savedPasantes);
-    personasNuevas.forEach(persona => {
-      const existe = pasantes.some(p => p.nombre === persona.nombre);
-      if (!existe) {
-        pasantes.push(persona);
-        pasantesActualizados = true;
-        console.log('✅ Agregado a pasantes:', persona.nombre);
-      }
-    });
-    if (pasantesActualizados) {
-      localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
-    }
-  }
-  
-  // Actualizar hsv_apoyos
-  let apoyosActualizados = false;
-  const savedApoyos = localStorage.getItem('hsv_apoyos');
-  if (savedApoyos) {
-    const apoyos = JSON.parse(savedApoyos);
-    personasNuevas.forEach(persona => {
-      const existe = apoyos.some(a => a.nombre === persona.nombre);
-      if (!existe) {
-        apoyos.push(persona);
-        apoyosActualizados = true;
-        console.log('✅ Agregado a apoyos:', persona.nombre);
-      }
-    });
-    if (apoyosActualizados) {
-      localStorage.setItem('hsv_apoyos', JSON.stringify(apoyos));
-    }
-  }
-  
-  // Refrescar las listas en memoria
-  if (pasantesActualizados || apoyosActualizados) {
-    refreshListas();
-  }
 }
 
 /**
@@ -708,35 +534,28 @@ function mostrarSelectorPasantes() {
   container.style.display = 'block';
   
   // Limpiar opciones anteriores
-  selector.innerHTML = '<option value="">-- Selecciona persona --</option>';
+  selector.innerHTML = '<option value="">-- Selecciona pasante, apoyo o coordinadora --</option>';
   
-  // Definir quiénes son practicantes EF (no pasantes)
-  const practicantesEF = ['Sebastián Camacho Silva', 'Camille Dor Dufour'];
-  
-  // Agregar Coordinadora primero
-  let coordHtml = '<optgroup label="Coordinadora">';
-  coordHtml += `<option value="Tavata Alexa Basurto Ramírez">👑 Tavata Alexa Basurto Ramírez</option>`;
-  coordHtml += '</optgroup>';
-  
-  // Agregar pasantes PSS (excluyendo coordinadora y practicantes EF)
-  let pasantesHtml = '<optgroup label="Pasantes (PSS)">';
+  // Agregar pasantes del array RESPONSABLES_LISTA (incluyendo a Tavata como Coordinadora)
+  let pasantesHtml = '<optgroup label="Pasantes">';
   RESPONSABLES_LISTA.forEach(pasante => {
-    if (pasante !== 'Tavata Alexa Basurto Ramírez' && !practicantesEF.includes(pasante)) {
+    if (pasante === 'Tavata Alexa Basurto Ramírez') {
+      // Mostrar a Tavata como Coordinadora
+      pasantesHtml += `<option value="${pasante}">👑 ${pasante} (Coordinadora)</option>`;
+    } else {
       pasantesHtml += `<option value="${pasante}">${pasante}</option>`;
     }
   });
   pasantesHtml += '</optgroup>';
   
-  // Agregar practicantes EF
-  let practicantesHtml = '<optgroup label="Practicantes (EF)">';
-  RESPONSABLES_LISTA.forEach(persona => {
-    if (practicantesEF.includes(persona)) {
-      practicantesHtml += `<option value="${persona}">${persona}</option>`;
-    }
+  // Agregar apoyos del array APOYOS_LISTA
+  let apoyosHtml = '<optgroup label="Apoyos (Practicantes)">';
+  APOYOS_LISTA.forEach(apoyo => {
+    apoyosHtml += `<option value="${apoyo}">${apoyo}</option>`;
   });
-  practicantesHtml += '</optgroup>';
+  apoyosHtml += '</optgroup>';
   
-  selector.innerHTML += coordHtml + pasantesHtml + practicantesHtml;
+  selector.innerHTML += pasantesHtml + apoyosHtml;
   
   // Evento de cambio
   selector.addEventListener('change', function() {
@@ -1204,7 +1023,27 @@ function getHorariosForDay(dayName, dateObj, pasante = null, weekRange = null) {
       }
     });
 
-    // Buscar sesiones donde este pasante es apoyo de OTRO pasante
+    // Si el usuario actual es un apoyo (practicante), agregar sesiones donde es apoyo
+    if (isApoyo(pasanteTarget)) {
+      // Buscar sesiones en todos los pasantes donde este apoyo aparece
+      RESPONSABLES_LISTA.forEach((pasanteResponsable) => {
+        const horariosDelPasanteResp = horariosPersonalizados[pasanteResponsable] || { sesiones: [], talleres: [] };
+        (horariosDelPasanteResp.sesiones || []).forEach((sesion) => {
+          // No mostrar sesiones pausadas (están de vacaciones)
+          // El apoyo solo verá la sesión en el horario de quien la está cubriendo
+          if (sesion.dias && sesion.dias.includes(dayName) && sesion.apoyo === pasanteTarget && !sesion.pausada) {
+            horarios.push({
+              ...sesion,
+              type: 'sesion',
+              apoyoColor: pasanteResponsable, // Guardar de quién es el pasante para el color
+              isApoyo: true
+            });
+          }
+        });
+      });
+    }
+    
+    // NUEVO: Buscar sesiones donde este pasante es apoyo de OTRO pasante
     // Estas sesiones aparecerán en color rosa
     RESPONSABLES_LISTA.forEach((otroPasante) => {
       if (otroPasante === pasanteTarget) return; // Saltar el mismo pasante
@@ -2102,72 +1941,93 @@ function showMessage(text, type = 'success') {
  * Inicializa la página
  */
 function initPage() {
-  // 📌 Cargar lista de usuarias actualizada desde config
-  cargarUsuarias();
-  
-  updateWeekTitle();
-  
-  // Cargar horarios personalizados desde localStorage
-  cargarHorariosPersonalizados();
-  
-  // Cargar datos de talleres desde localStorage
-  cargarHorariosData();
-  
-  // Limpiar coberturas temporales que ya vencieron
-  limpiarCoberturasvencidas();
-  
-  // Inicializar interfaz según el usuario
-  const responsable_name = sessionStorage.getItem('responsable_name');
-  const responsable_prefijo = sessionStorage.getItem('responsable_prefijo');
-  
-  if (!responsable_name) {
-    alert('Por favor inicia sesión primero');
-    window.location.href = 'index.html';
-    return;
-  }
-
-  // Actualizar badge del usuario
-  if (typeof updateBadge === 'function') {
-    updateBadge(responsable_name, responsable_prefijo);
-  }
-
-  // Verificar si es Tavata (Coordinadora)
-  const isTavata = responsable_name === 'Tavata Alexa Basurto Ramírez';
-  
-  if (isTavata) {
-    // Mostrar selector de pasantes para Tavata (puede seleccionar a otros o su propio horario como Coordinadora)
-    mostrarSelectorPasantes();
-    const actionButtons = document.getElementById('action-buttons-container');
-    if (actionButtons) {
-      actionButtons.style.display = 'flex';
+  try {
+    console.log('🚀 initPage() iniciando...');
+    
+    // 📌 Cargar lista de usuarias actualizada desde config
+    cargarUsuarias();
+    console.log('✅ cargarUsuarias() completado');
+    
+    updateWeekTitle();
+    console.log('✅ updateWeekTitle() completado');
+    
+    // Cargar horarios personalizados desde localStorage
+    cargarHorariosPersonalizados();
+    console.log('✅ cargarHorariosPersonalizados() completado');
+    
+    // Cargar datos de talleres desde localStorage
+    cargarHorariosData();
+    console.log('✅ cargarHorariosData() completado');
+    
+    // Limpiar coberturas temporales que ya vencieron
+    limpiarCoberturasvencidas();
+    console.log('✅ limpiarCoberturasvencidas() completado');
+    
+    // Inicializar interfaz según el usuario
+    const responsable_name = sessionStorage.getItem('responsable_name');
+    const responsable_prefijo = sessionStorage.getItem('responsable_prefijo');
+    console.log('👤 Usuario:', responsable_name, responsable_prefijo);
+    
+    if (!responsable_name) {
+      alert('Por favor inicia sesión primero');
+      window.location.href = 'index.html';
+      return;
     }
-    // Tavata puede consultar su propio horario
-    // Se permite que seleccione en el selector
-  } else {
-    // Para pasantes normales, mostrar su propio horario
-    pasanteActual = responsable_name;
-    const selectorContainer = document.getElementById('pasante-selector-container');
-    if (selectorContainer) {
-      selectorContainer.style.display = 'none';
-    }
-    const actionButtons = document.getElementById('action-buttons-container');
-    if (actionButtons) {
-      actionButtons.style.display = 'none';
-    }
-  }
-  
-  renderHorarios();
 
-  // Mostrar botón de vista global solo para Tavata
-  const btnVistaGlobal = document.getElementById('btn-vista-global');
-  if (btnVistaGlobal) {
-    btnVistaGlobal.style.display = isTavata ? 'flex' : 'none';
-  }
-  
-  // Mostrar botón de horarios libres solo para Tavata
-  const btnHorariosLibres = document.getElementById('btn-horarios-libres');
-  if (btnHorariosLibres) {
-    btnHorariosLibres.style.display = isTavata ? 'flex' : 'none';
+    // Actualizar badge del usuario
+    if (typeof updateBadge === 'function') {
+      updateBadge(responsable_name, responsable_prefijo);
+    }
+    console.log('✅ updateBadge() completado');
+
+    // Verificar si es Tavata (Coordinadora)
+    const isTavata = responsable_name === 'Tavata Alexa Basurto Ramírez';
+    console.log('👑 isTavata:', isTavata);
+    
+    if (isTavata) {
+      // Mostrar selector de pasantes para Tavata (puede seleccionar a otros o su propio horario como Coordinadora)
+      console.log('📋 Llamando mostrarSelectorPasantes()...');
+      mostrarSelectorPasantes();
+      console.log('✅ mostrarSelectorPasantes() completado');
+      const actionButtons = document.getElementById('action-buttons-container');
+      if (actionButtons) {
+        actionButtons.style.display = 'flex';
+      }
+      // Tavata puede consultar su propio horario
+      // Se permite que seleccione en el selector
+    } else {
+      // Para pasantes normales, mostrar su propio horario
+      pasanteActual = responsable_name;
+      const selectorContainer = document.getElementById('pasante-selector-container');
+      if (selectorContainer) {
+        selectorContainer.style.display = 'none';
+      }
+      const actionButtons = document.getElementById('action-buttons-container');
+      if (actionButtons) {
+        actionButtons.style.display = 'none';
+      }
+    }
+    
+    console.log('📊 Llamando renderHorarios()...');
+    renderHorarios();
+    console.log('✅ renderHorarios() completado');
+
+    // Mostrar botón de vista global solo para Tavata
+    const btnVistaGlobal = document.getElementById('btn-vista-global');
+    if (btnVistaGlobal) {
+      btnVistaGlobal.style.display = isTavata ? 'flex' : 'none';
+    }
+    
+    // Mostrar botón de horarios libres solo para Tavata
+    const btnHorariosLibres = document.getElementById('btn-horarios-libres');
+    if (btnHorariosLibres) {
+      btnHorariosLibres.style.display = isTavata ? 'flex' : 'none';
+    }
+    
+    console.log('✅ initPage() completado exitosamente');
+  } catch (error) {
+    console.error('❌ Error en initPage():', error);
+    alert('Error al cargar horarios: ' + error.message);
   }
 }
 

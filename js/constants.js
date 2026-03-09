@@ -315,8 +315,6 @@ const PERSONAL = {
     { nombre: 'Leslie Amellali Santillán García', prefix: 'PSS', pin: '111111', genero: 'F', rol: 'PSS' },
     { nombre: 'Estefanía Zanabria', prefix: 'PSS', pin: '222222', genero: 'F', rol: 'PSS' },
     { nombre: 'Francisco Nava Chávez', prefix: 'PSS', pin: '333333', genero: 'M', rol: 'PSS' },
-    { nombre: 'Camille Dor Dufour', prefix: 'EF', pin: '444444', genero: 'F', rol: 'EF' },
-    { nombre: 'Sebastián Camacho Silva', prefix: 'EF', pin: '555555', genero: 'M', rol: 'EF' },
   ],
   
   // Apoyo (sin PIN, solo para asignación en reportes)
@@ -328,8 +326,6 @@ const PERSONAL = {
     { nombre: 'Leslie Amellali Santillán García', prefix: 'PSS' },
     { nombre: 'Estefanía Zanabria', prefix: 'PSS' },
     { nombre: 'Francisco Nava Chávez', prefix: 'PSS' },
-    { nombre: 'Camille Dor Dufour', prefix: 'EF' },
-    { nombre: 'Sebastián Camacho Silva', prefix: 'EF' },
     { nombre: 'Ninguno', prefix: '' },
   ],
 };
