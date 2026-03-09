@@ -690,28 +690,35 @@ function mostrarSelectorPasantes() {
   container.style.display = 'block';
   
   // Limpiar opciones anteriores
-  selector.innerHTML = '<option value="">-- Selecciona pasante, apoyo o coordinadora --</option>';
+  selector.innerHTML = '<option value="">-- Selecciona persona --</option>';
   
-  // Agregar pasantes del array RESPONSABLES_LISTA (incluyendo a Tavata como Coordinadora)
-  let pasantesHtml = '<optgroup label="Pasantes">';
+  // Definir quiénes son practicantes EF (no pasantes)
+  const practicantesEF = ['Sebastián Camacho Silva', 'Camille Dor Dufour'];
+  
+  // Agregar Coordinadora primero
+  let coordHtml = '<optgroup label="Coordinadora">';
+  coordHtml += `<option value="Tavata Alexa Basurto Ramírez">👑 Tavata Alexa Basurto Ramírez</option>`;
+  coordHtml += '</optgroup>';
+  
+  // Agregar pasantes PSS (excluyendo coordinadora y practicantes EF)
+  let pasantesHtml = '<optgroup label="Pasantes (PSS)">';
   RESPONSABLES_LISTA.forEach(pasante => {
-    if (pasante === 'Tavata Alexa Basurto Ramírez') {
-      // Mostrar a Tavata como Coordinadora
-      pasantesHtml += `<option value="${pasante}">👑 ${pasante} (Coordinadora)</option>`;
-    } else {
+    if (pasante !== 'Tavata Alexa Basurto Ramírez' && !practicantesEF.includes(pasante)) {
       pasantesHtml += `<option value="${pasante}">${pasante}</option>`;
     }
   });
   pasantesHtml += '</optgroup>';
   
-  // Agregar apoyos del array APOYOS_LISTA
-  let apoyosHtml = '<optgroup label="Apoyos (Practicantes)">';
-  APOYOS_LISTA.forEach(apoyo => {
-    apoyosHtml += `<option value="${apoyo}">${apoyo}</option>`;
+  // Agregar practicantes EF
+  let practicantesHtml = '<optgroup label="Practicantes (EF)">';
+  RESPONSABLES_LISTA.forEach(persona => {
+    if (practicantesEF.includes(persona)) {
+      practicantesHtml += `<option value="${persona}">${persona}</option>`;
+    }
   });
-  apoyosHtml += '</optgroup>';
+  practicantesHtml += '</optgroup>';
   
-  selector.innerHTML += pasantesHtml + apoyosHtml;
+  selector.innerHTML += coordHtml + pasantesHtml + practicantesHtml;
   
   // Evento de cambio
   selector.addEventListener('change', function() {
