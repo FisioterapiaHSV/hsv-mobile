@@ -2115,27 +2115,28 @@
         'Gloria Iraís': 'icons/GloriaI.png',
         'Jorge Eduardo': 'icons/JorgeI.png',
         'Andrea Ofelia': 'icons/OfeliaI.png',
-        'Alejandra María': 'icons/AlejandraMariaI.png',
         'Gabriel': 'icons/GabrielI.png',
         'Leslie Amellali': 'icons/AmellaliI.png',
         'Francisco': 'icons/FranciscoI.png',
-        'Estefanía': 'icons/EstefaniaI.png',
-        'Sebastián': 'icons/SebastianI.png',
-        'Camille': 'icons/CamilleI.png'
+        'Estefanía': 'icons/EstefaniaI.png'
       };
       
-      // Nombres cortos a eliminar (duplicados)
-      const nombresAEliminar = ['Sebastián', 'Sebastian', 'Camille'];
+      // Nombres a eliminar del login (EF no son pasantes)
+      const nombresAEliminar = [
+        'Sebastián', 'Sebastian', 'Camille',
+        'Sebastián Camacho Silva', 'Camille Dor Dufour'
+      ];
       
       const saved = localStorage.getItem('hsv_pasantes');
       if (saved) {
         let pasantes = JSON.parse(saved);
         
-        // Eliminar nombres cortos/duplicados
+        // Eliminar EF y duplicados - ellos no van en login
         const antesLength = pasantes.length;
         pasantes = pasantes.filter(p => !nombresAEliminar.includes(p.nombre));
         if (pasantes.length !== antesLength) {
-          console.log('[Login] Eliminados nombres duplicados de hsv_pasantes');
+          console.log('[Login] Eliminados ' + (antesLength - pasantes.length) + ' EF/duplicados de hsv_pasantes');
+          localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
         }
         
         // Actualizar iconos si están como default
