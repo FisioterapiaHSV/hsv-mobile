@@ -182,7 +182,11 @@
       const d = document.createElement('div'); d.className='card'; d.style.marginBottom='8px';
       // header: type + date on left, responsible/apoyo/status on right
       const hdr = document.createElement('div'); hdr.style.display='flex'; hdr.style.justifyContent='space-between'; hdr.style.alignItems='center';
-      const left = document.createElement('div'); const title = document.createElement('strong'); title.textContent = 'Valoración'; left.appendChild(title);
+      const left = document.createElement('div'); const title = document.createElement('strong'); 
+      // Mostrar nombre de paciente en el título
+      const pacienteName = v.paciente && v.paciente !== 'patient_default' ? v.paciente : pid;
+      title.textContent = 'Valoración - ' + pacienteName; 
+      left.appendChild(title);
       const dateLabel = document.createElement('div'); dateLabel.style.color='var(--muted)'; dateLabel.style.fontSize='0.9rem'; dateLabel.style.marginTop='4px'; dateLabel.textContent = formatDateLongES(v.fecha) || formatDateLongES(v.updatedAt||v.createdAt) || '';
       left.appendChild(dateLabel);
       // show hora (start - end) if present
@@ -208,50 +212,6 @@
 
       // Previously we displayed a small goniometría summary in the list cards.
       // Per UI change, do not show goniometría inside the compact list cards to keep them concise.
-
-      // actions
-      const actions = document.createElement('div'); actions.style.display='flex'; actions.style.gap='8px'; actions.style.justifyContent='flex-end'; actions.style.marginTop='8px';
-      if(v.status === 'Firmada'){
-        const btnView = document.createElement('button'); btnView.className='btn btn-view'; btnView.textContent = 'Ver resumen de la valoración'; btnView.addEventListener('click', ()=>{ viewValoracion(v.id); }); actions.appendChild(btnView);
-      } else {
-        const btnEdit = document.createElement('button'); btnEdit.className='btn btn-edit'; btnEdit.textContent='Editar'; btnEdit.addEventListener('click', ()=>{ editValoracion(v.id); });
-        const btnSign = document.createElement('button'); btnSign.className='btn btn-sign'; btnSign.textContent='Firmar'; btnSign.addEventListener('click', ()=>{ signValoracion(v.id); });
-        const btnDel = document.createElement('button'); btnDel.className='btn btn-del'; btnDel.textContent='Eliminar'; btnDel.addEventListener('click', ()=>{ deleteValoracion(v.id); });
-        actions.appendChild(btnEdit); actions.appendChild(btnSign); actions.appendChild(btnDel);
-      }
-      d.appendChild(actions);
-      container.appendChild(d);
-    });
-    list.forEach(v=>{
-      const d = document.createElement('div'); d.className='card'; d.style.marginBottom='8px';
-      // header: type + date on left, responsible/apoyo/status on right
-      const hdr = document.createElement('div'); hdr.style.display='flex'; hdr.style.justifyContent='space-between'; hdr.style.alignItems='center';
-  const left = document.createElement('div'); const title = document.createElement('strong'); title.textContent = 'Valoración'; left.appendChild(title);
-  const dateLabel = document.createElement('div'); dateLabel.style.color='var(--muted)'; dateLabel.style.fontSize='0.9rem'; dateLabel.style.marginTop='4px'; dateLabel.textContent = formatDateLongES(v.fecha) || formatDateLongES(v.updatedAt||v.createdAt) || '';
-  left.appendChild(dateLabel);
-  // show hora (start - end) if present
-  const timeLabel = document.createElement('div'); timeLabel.style.color='var(--muted)'; timeLabel.style.fontSize='0.9rem'; timeLabel.style.marginTop='2px';
-  const hs = v.hora_start || ''; const he = v.hora_end || ''; timeLabel.textContent = hs ? ('Hora: ' + hs + (he ? (' - ' + he) : '')) : '';
-  if(timeLabel.textContent) left.appendChild(timeLabel);
-  // show explicit tipo below the date/time
-  const tipoLabel = document.createElement('div'); tipoLabel.style.color='var(--muted)'; tipoLabel.style.fontSize='0.95rem'; tipoLabel.style.marginTop='4px'; tipoLabel.textContent = 'Tipo de valoración: ' + (v.tipo || '—'); left.appendChild(tipoLabel);
-      const right = document.createElement('div'); right.style.fontSize='0.9rem'; right.style.color='var(--muted)'; right.style.textAlign='right';
-  const resp = document.createElement('div');
-  // include prefix (PSS/LFT/EF) when available and label as Responsable:
-  const respPrefix = v.responsable_prefix || v.responsablePrefix || (window.getResponsablePrefix ? window.getResponsablePrefix(v.responsable) : '');
-  const respName = respPrefix ? (respPrefix + ' ' + (v.responsable || '')) : (v.responsable || '');
-  resp.textContent = respName ? ('Responsable: ' + respName) : '';
-  const apoyo = document.createElement('div');
-  const apoyoPrefix = v.apoyo_prefix || v.apoyoPrefix || (window.getApoyoPrefix ? window.getApoyoPrefix(v.apoyo) : '');
-  apoyo.textContent = v.apoyo ? ('Apoyo: ' + (apoyoPrefix ? (apoyoPrefix + ' ' + v.apoyo) : v.apoyo)) : '';
-      const estado = document.createElement('div'); estado.textContent = v.status ? ('Estado: ' + v.status) : '';
-      right.appendChild(resp); if(apoyo.textContent) right.appendChild(apoyo); if(estado.textContent) right.appendChild(estado);
-      hdr.appendChild(left); hdr.appendChild(right); d.appendChild(hdr);
-
-      const body = document.createElement('div'); body.style.marginTop='8px'; body.style.whiteSpace='pre-wrap'; body.innerHTML = escapeHtml(v.summary||v.detalle||''); d.appendChild(body);
-
-  // Previously we displayed a small goniometría summary in the list cards.
-  // Per UI change, do not show goniometría inside the compact list cards to keep them concise.
 
       // actions
       const actions = document.createElement('div'); actions.style.display='flex'; actions.style.gap='8px'; actions.style.justifyContent='flex-end'; actions.style.marginTop='8px';
