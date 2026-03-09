@@ -2293,7 +2293,7 @@ function renderVistaGlobal() {
             
             // Mostrar información completa
             const nombre = horario.nombre || horario.nombreTaller || '';
-            const habitacion = horario.habitacion ? `🚪 Hab. ${horario.habitacion}` : '';
+            const habitacion = horario.habitacion ? `Hab. ${horario.habitacion}` : '';
             const lugar = horario.lugar ? `📍 ${horario.lugar}` : '';
             const apoyoTag = horario.esApoyo ? '<span style="color:#ec4899;font-weight:600;">(APOYO)</span>' : '';
             
