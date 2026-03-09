@@ -1215,7 +1215,7 @@ Código actual: ${codigoActual}
       // Valores por defecto
       APOYOS_DATA = [
         { nombre: 'Paola Saraí Olivares Pérez', rol: 'EF' },
-        { nombre: 'Sebastián', rol: 'EF' }
+        { nombre: 'Sebastián Camacho Silva', rol: 'EF' }
       ];
       saveApoyosData();
     }
