@@ -334,46 +334,29 @@ function getApoyosLista() {
   ];
 }
 
-// ===== MIGRACIÓN INMEDIATA: Limpiar duplicados y agregar personas nuevas =====
+// ===== MIGRACIÓN INMEDIATA: Limpiar duplicados de localStorage =====
 (function() {
-  const personasNuevas = [
-    { nombre: 'Sebastián Camacho Silva' },
-    { nombre: 'Camille Dor Dufour' }
-  ];
+  // Nombres a eliminar de hsv_pasantes (duplicados o EF que no van en login)
+  const nombresAEliminarPasantes = ['Sebastián', 'Sebastian', 'Camille', 'Sebastián Camacho Silva', 'Camille Dor Dufour'];
   
-  // Nombres a eliminar (duplicados o nombres cortos)
-  const nombresAEliminar = ['Sebastián', 'Sebastian', 'Camille'];
+  // Nombres a eliminar de hsv_apoyos (duplicados cortos)
+  const nombresAEliminarApoyos = ['Sebastián', 'Sebastian', 'Camille', 'Paola Saraí Olivares Pérez'];
   
-  // Actualizar hsv_pasantes
+  // Actualizar hsv_pasantes - quitar EF (solo LFT y PSS en login)
   const savedPasantes = localStorage.getItem('hsv_pasantes');
   if (savedPasantes) {
     try {
       let pasantes = JSON.parse(savedPasantes);
-      let cambios = false;
-      
-      // Eliminar nombres cortos/duplicados
       const antes = pasantes.length;
-      pasantes = pasantes.filter(p => !nombresAEliminar.includes(p.nombre));
+      pasantes = pasantes.filter(p => !nombresAEliminarPasantes.includes(p.nombre));
       if (pasantes.length !== antes) {
-        cambios = true;
-        console.log('✅ Eliminados nombres duplicados de pasantes');
-      }
-      
-      // Agregar nombres completos si no existen
-      personasNuevas.forEach(persona => {
-        if (!pasantes.some(p => p.nombre === persona.nombre)) {
-          pasantes.push(persona);
-          cambios = true;
-        }
-      });
-      if (cambios) {
         localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
-        console.log('✅ Pasantes actualizados');
+        console.log('✅ Eliminados ' + (antes - pasantes.length) + ' EF/duplicados de pasantes');
       }
     } catch(e) { console.warn('Error migrando pasantes', e); }
   }
   
-  // Actualizar hsv_apoyos
+  // Actualizar hsv_apoyos - quitar duplicados y agregar completos
   const savedApoyos = localStorage.getItem('hsv_apoyos');
   if (savedApoyos) {
     try {
@@ -382,13 +365,17 @@ function getApoyosLista() {
       
       // Eliminar nombres cortos/duplicados
       const antes = apoyos.length;
-      apoyos = apoyos.filter(a => !nombresAEliminar.includes(a.nombre));
+      apoyos = apoyos.filter(a => !nombresAEliminarApoyos.includes(a.nombre));
       if (apoyos.length !== antes) {
         cambios = true;
         console.log('✅ Eliminados nombres duplicados de apoyos');
       }
       
       // Agregar nombres completos si no existen
+      const personasNuevas = [
+        { nombre: 'Sebastián Camacho Silva', rol: 'EF' },
+        { nombre: 'Camille Dor Dufour', rol: 'EF' }
+      ];
       personasNuevas.forEach(persona => {
         if (!apoyos.some(a => a.nombre === persona.nombre)) {
           apoyos.push(persona);

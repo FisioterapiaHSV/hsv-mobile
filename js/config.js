@@ -1210,12 +1210,17 @@ Código actual: ${codigoActual}
     // Cargar apoyos
     const savedApoyos = localStorage.getItem('hsv_apoyos');
     if (savedApoyos) {
-      APOYOS_DATA = JSON.parse(savedApoyos);
+      let apoyosTemp = JSON.parse(savedApoyos);
+      // Eliminar nombres cortos/duplicados
+      const nombresAEliminar = ['Sebastián', 'Sebastian', 'Camille', 'Paola Saraí Olivares Pérez'];
+      apoyosTemp = apoyosTemp.filter(a => !nombresAEliminar.includes(a.nombre));
+      APOYOS_DATA = apoyosTemp;
+      saveApoyosData();
     } else {
-      // Valores por defecto
+      // Valores por defecto - solo EF actuales
       APOYOS_DATA = [
-        { nombre: 'Paola Saraí Olivares Pérez', rol: 'EF' },
-        { nombre: 'Sebastián Camacho Silva', rol: 'EF' }
+        { nombre: 'Sebastián Camacho Silva', rol: 'EF' },
+        { nombre: 'Camille Dor Dufour', rol: 'EF' }
       ];
       saveApoyosData();
     }

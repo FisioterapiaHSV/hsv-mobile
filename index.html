@@ -2153,7 +2153,7 @@
         localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
         return pasantes;
       }
-      // Datos por defecto
+      // Datos por defecto (solo LFT y PSS - los EF están en hsv_apoyos)
       return [
         { nombre: 'Tavata Alexa Basurto Ramírez', prefijo: 'LFT', password: '1234', icono: 'icons/AlexaI.png' },
         { nombre: 'Gloria Iraís Espinosa Peralta', prefijo: 'PSS', password: '1111', icono: 'icons/GloriaI.png' },
@@ -2162,9 +2162,7 @@
         { nombre: 'Gabriel Rodríguez Hernández', prefijo: 'PSS', password: '5555', icono: 'icons/GabrielI.png' },
         { nombre: 'Leslie Amellali Santillán García', prefijo: 'PSS', password: '6666', icono: 'icons/AmellaliI.png' },
         { nombre: 'Francisco Nava Chávez', prefijo: 'PSS', password: '7777', icono: 'icons/FranciscoI.png' },
-        { nombre: 'Estefanía Zanabria', prefijo: 'PSS', password: '8888', icono: 'icons/EstefaniaI.png' },
-        { nombre: 'Sebastián Camacho Silva', prefijo: 'EF', password: '9999', icono: 'icons/SebastianI.png' },
-        { nombre: 'Camille Dor Dufour', prefijo: 'EF', password: '0000', icono: 'icons/CamilleI.png' }
+        { nombre: 'Estefanía Zanabria', prefijo: 'PSS', password: '8888', icono: 'icons/EstefaniaI.png' }
       ];
     }
 
@@ -2382,14 +2380,20 @@
         const savedApoyos = localStorage.getItem('hsv_apoyos');
         let apoyosList = [];
         
+        // Nombres cortos a eliminar (duplicados)
+        const nombresAEliminar = ['Sebastián', 'Sebastian', 'Camille'];
+        
         if (savedApoyos) {
-          const apoyosData = JSON.parse(savedApoyos);
+          let apoyosData = JSON.parse(savedApoyos);
+          // Eliminar duplicados (nombres cortos)
+          apoyosData = apoyosData.filter(a => !nombresAEliminar.includes(a.nombre));
+          localStorage.setItem('hsv_apoyos', JSON.stringify(apoyosData));
           apoyosList = apoyosData.map(a => a.nombre);
         } else {
           // Valores por defecto
           apoyosList = [
-            'Paola Saraí Olivares Pérez',
-            'Sebastián Camacho Silva'
+            'Sebastián Camacho Silva',
+            'Camille Dor Dufour'
           ];
         }
         
