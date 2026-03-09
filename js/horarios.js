@@ -1023,27 +1023,7 @@ function getHorariosForDay(dayName, dateObj, pasante = null, weekRange = null) {
       }
     });
 
-    // Si el usuario actual es un apoyo (practicante), agregar sesiones donde es apoyo
-    if (isApoyo(pasanteTarget)) {
-      // Buscar sesiones en todos los pasantes donde este apoyo aparece
-      RESPONSABLES_LISTA.forEach((pasanteResponsable) => {
-        const horariosDelPasanteResp = horariosPersonalizados[pasanteResponsable] || { sesiones: [], talleres: [] };
-        (horariosDelPasanteResp.sesiones || []).forEach((sesion) => {
-          // No mostrar sesiones pausadas (están de vacaciones)
-          // El apoyo solo verá la sesión en el horario de quien la está cubriendo
-          if (sesion.dias && sesion.dias.includes(dayName) && sesion.apoyo === pasanteTarget && !sesion.pausada) {
-            horarios.push({
-              ...sesion,
-              type: 'sesion',
-              apoyoColor: pasanteResponsable, // Guardar de quién es el pasante para el color
-              isApoyo: true
-            });
-          }
-        });
-      });
-    }
-    
-    // NUEVO: Buscar sesiones donde este pasante es apoyo de OTRO pasante
+    // Buscar sesiones donde este pasante es apoyo de OTRO pasante
     // Estas sesiones aparecerán en color rosa
     RESPONSABLES_LISTA.forEach((otroPasante) => {
       if (otroPasante === pasanteTarget) return; // Saltar el mismo pasante
