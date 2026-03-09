@@ -469,6 +469,58 @@ function cargarHorariosPersonalizados() {
       });
     }
   });
+  
+  // Migración automática: actualizar nombres antiguos a nombres completos
+  migrarNombresAntiguos();
+}
+
+/**
+ * Migra nombres antiguos a nombres completos sin perder datos
+ */
+function migrarNombresAntiguos() {
+  const migraciones = {
+    'Sebastián': 'Sebastián Camacho Silva',
+    'Andrea': 'Andrea Ofelia Carrillo Valdés',
+    'Leslie': 'Leslie Amellali Santillán García',
+    'Paola': 'Paola Saraí Olivares Pérez'
+  };
+  
+  let huboCambios = false;
+  
+  Object.keys(horariosPersonalizados).forEach(persona => {
+    const horarios = horariosPersonalizados[persona];
+    
+    // Migrar en sesiones
+    if (horarios.sesiones) {
+      horarios.sesiones.forEach(sesion => {
+        // Migrar apoyo (string)
+        if (sesion.apoyo && migraciones[sesion.apoyo]) {
+          sesion.apoyo = migraciones[sesion.apoyo];
+          huboCambios = true;
+        }
+        // Migrar apoyos (array)
+        if (sesion.apoyos && Array.isArray(sesion.apoyos)) {
+          sesion.apoyos = sesion.apoyos.map(a => migraciones[a] || a);
+          huboCambios = true;
+        }
+      });
+    }
+    
+    // Migrar en talleres
+    if (horarios.talleres) {
+      horarios.talleres.forEach(taller => {
+        if (taller.responsables && Array.isArray(taller.responsables)) {
+          taller.responsables = taller.responsables.map(r => migraciones[r] || r);
+          huboCambios = true;
+        }
+      });
+    }
+  });
+  
+  if (huboCambios) {
+    localStorage.setItem('horariosPersonalizados', JSON.stringify(horariosPersonalizados));
+    console.log('✅ Nombres migrados automáticamente');
+  }
 }
 
 /**
