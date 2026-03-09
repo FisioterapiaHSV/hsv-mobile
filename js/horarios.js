@@ -1268,11 +1268,11 @@ function createHorarioItem(horario, dateObj = null) {
   `;
 
   if (horario.habitacion) {
-    html += `<div class="horario-habitacion" style="${isDisabled ? 'color: #999;' : 'color: #2d3748;'}">🚪 Hab. ${horario.habitacion}</div>`;
+    html += `<div class="horario-habitacion" style="${isDisabled ? 'color: #999;' : 'color: #2d3748;'}">Hab. ${horario.habitacion}</div>`;
   }
 
   if (horario.lugar) {
-    html += `<div class="horario-lugar" style="${isDisabled ? 'color: #999;' : ''}">📍 ${horario.lugar}</div>`;
+    html += `<div class="horario-lugar" style="${isDisabled ? 'color: #999;' : ''}">${horario.lugar}</div>`;
   }
 
   // Mostrar responsables (puede ser uno o múltiples para talleres)
