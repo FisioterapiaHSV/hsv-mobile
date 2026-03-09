@@ -2222,7 +2222,7 @@ function renderVistaGlobal() {
       if (PASANTE_COLORS[pasante]) {
         pasanteHeader.style.backgroundColor = PASANTE_COLORS[pasante].bg;
       }
-      pasanteHeader.textContent = pasante.split(' ')[0];
+      pasanteHeader.textContent = getNombreDisplay(pasante);
       table.appendChild(pasanteHeader);
     });
     
@@ -3063,7 +3063,7 @@ function crearBotonOpcion(sesion, opcion, index, esCompartido) {
   btn.type = 'button';
   const colorPasante = PASANTE_COLORS[opcion.pasante];
   
-  let textoBtn = `${opcion.pasante.split(' ')[0]}`;
+  let textoBtn = `${getNombreDisplay(opcion.pasante)}`;
   if (esCompartido) {
     textoBtn += ` (divide con ${opcion.usuariaExistente})`;
   }
@@ -3500,10 +3500,35 @@ function closeModalListadoUsuarias() {
 }
 
 /**
- * Obtiene el nombre corto del pasante (primer nombre + inicial del apellido)
+ * Obtiene el nombre preferido para mostrar (casos especiales)
+ */
+function getNombreDisplay(nombreCompleto) {
+  if (!nombreCompleto) return '';
+  
+  // Casos especiales: usar segundo nombre
+  if (nombreCompleto.includes('Andrea Ofelia')) return 'Ofelia';
+  if (nombreCompleto.includes('Leslie Amellali')) return 'Amellali';
+  
+  // Por defecto, usar primer nombre
+  return nombreCompleto.split(' ')[0];
+}
+
+/**
+ * Obtiene el nombre corto del pasante (nombre preferido + inicial del apellido)
  */
 function getNombreCorto(nombreCompleto) {
   if (!nombreCompleto) return '';
+  
+  // Casos especiales
+  if (nombreCompleto.includes('Andrea Ofelia')) {
+    const parts = nombreCompleto.split(' ');
+    return `Ofelia ${parts[parts.length - 1][0]}.`;
+  }
+  if (nombreCompleto.includes('Leslie Amellali')) {
+    const parts = nombreCompleto.split(' ');
+    return `Amellali ${parts[parts.length - 1][0]}.`;
+  }
+  
   const parts = nombreCompleto.split(' ');
   if (parts.length >= 2) {
     return `${parts[0]} ${parts[parts.length - 1][0]}.`;
