@@ -334,19 +334,32 @@ function getApoyosLista() {
   ];
 }
 
-// ===== MIGRACIÓN INMEDIATA: Agregar personas nuevas a localStorage =====
+// ===== MIGRACIÓN INMEDIATA: Limpiar duplicados y agregar personas nuevas =====
 (function() {
   const personasNuevas = [
     { nombre: 'Sebastián Camacho Silva' },
     { nombre: 'Camille Dor Dufour' }
   ];
   
+  // Nombres a eliminar (duplicados o nombres cortos)
+  const nombresAEliminar = ['Sebastián', 'Sebastian', 'Camille'];
+  
   // Actualizar hsv_pasantes
   const savedPasantes = localStorage.getItem('hsv_pasantes');
   if (savedPasantes) {
     try {
-      const pasantes = JSON.parse(savedPasantes);
+      let pasantes = JSON.parse(savedPasantes);
       let cambios = false;
+      
+      // Eliminar nombres cortos/duplicados
+      const antes = pasantes.length;
+      pasantes = pasantes.filter(p => !nombresAEliminar.includes(p.nombre));
+      if (pasantes.length !== antes) {
+        cambios = true;
+        console.log('✅ Eliminados nombres duplicados de pasantes');
+      }
+      
+      // Agregar nombres completos si no existen
       personasNuevas.forEach(persona => {
         if (!pasantes.some(p => p.nombre === persona.nombre)) {
           pasantes.push(persona);
@@ -355,7 +368,7 @@ function getApoyosLista() {
       });
       if (cambios) {
         localStorage.setItem('hsv_pasantes', JSON.stringify(pasantes));
-        console.log('✅ Personas nuevas agregadas a pasantes');
+        console.log('✅ Pasantes actualizados');
       }
     } catch(e) { console.warn('Error migrando pasantes', e); }
   }
@@ -364,8 +377,18 @@ function getApoyosLista() {
   const savedApoyos = localStorage.getItem('hsv_apoyos');
   if (savedApoyos) {
     try {
-      const apoyos = JSON.parse(savedApoyos);
+      let apoyos = JSON.parse(savedApoyos);
       let cambios = false;
+      
+      // Eliminar nombres cortos/duplicados
+      const antes = apoyos.length;
+      apoyos = apoyos.filter(a => !nombresAEliminar.includes(a.nombre));
+      if (apoyos.length !== antes) {
+        cambios = true;
+        console.log('✅ Eliminados nombres duplicados de apoyos');
+      }
+      
+      // Agregar nombres completos si no existen
       personasNuevas.forEach(persona => {
         if (!apoyos.some(a => a.nombre === persona.nombre)) {
           apoyos.push(persona);
@@ -374,7 +397,7 @@ function getApoyosLista() {
       });
       if (cambios) {
         localStorage.setItem('hsv_apoyos', JSON.stringify(apoyos));
-        console.log('✅ Personas nuevas agregadas a apoyos');
+        console.log('✅ Apoyos actualizados');
       }
     } catch(e) { console.warn('Error migrando apoyos', e); }
   }
