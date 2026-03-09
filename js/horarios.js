@@ -2323,7 +2323,7 @@ function renderVistaGlobal() {
             if (apoyosAsignados.length > 0 || tieneApoyoSimple) {
               const listaApoyos = apoyosAsignados.length > 0 ? apoyosAsignados : [horario.apoyo];
               const nombresCortos = listaApoyos.map(a => a.split(' ')[0]).join(', ');
-              apoyosInfo = `<br><span style="color:#ec4899;font-size:9px;">❤️ ${nombresCortos}</span>`;
+              apoyosInfo = `<br><span style="color:#ec4899;font-size:9px;">Apoyo: ${nombresCortos}</span>`;
             }
             
             miniItem.innerHTML = `
