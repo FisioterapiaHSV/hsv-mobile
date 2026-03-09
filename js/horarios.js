@@ -2194,10 +2194,13 @@ function renderVistaGlobal() {
   setTimeout(() => {
     grid.innerHTML = '';
     
+    // Filtrar lista de pasantes (excluir a Tavata)
+    const pasantesFiltrados = RESPONSABLES_LISTA.filter(p => !p.includes('Tavata'));
+    
     // Crear tabla para alinear los días correctamente
     const table = document.createElement('div');
     table.style.display = 'grid';
-    table.style.gridTemplateColumns = `80px repeat(${RESPONSABLES_LISTA.length}, 1fr)`;
+    table.style.gridTemplateColumns = `80px repeat(${pasantesFiltrados.length}, 1fr)`;
     table.style.gap = '8px';
     table.style.width = '100%';
     table.style.overflowX = 'auto';
@@ -2208,7 +2211,7 @@ function renderVistaGlobal() {
     headerEmpty.style.padding = '8px';
     table.appendChild(headerEmpty);
     
-    RESPONSABLES_LISTA.forEach((pasante) => {
+    pasantesFiltrados.forEach((pasante) => {
       const pasanteHeader = document.createElement('div');
       pasanteHeader.style.fontWeight = '700';
       pasanteHeader.style.padding = '8px';
@@ -2242,9 +2245,9 @@ function renderVistaGlobal() {
       table.appendChild(dayLabel);
       
       // Celdas para cada pasante en este día
-      RESPONSABLES_LISTA.forEach((pasante) => {
+      pasantesFiltrados.forEach((pasante) => {
         const cell = document.createElement('div');
-        cell.style.minHeight = '120px';
+        cell.style.minHeight = '150px';
         cell.style.padding = '6px';
         cell.style.borderRadius = '6px';
         cell.style.fontSize = '10px';
@@ -2266,14 +2269,14 @@ function renderVistaGlobal() {
         } else {
           dayHorarios.forEach((horario) => {
             const miniItem = document.createElement('div');
-            miniItem.style.padding = '4px';
-            miniItem.style.marginBottom = '4px';
+            miniItem.style.padding = '6px';
+            miniItem.style.marginBottom = '6px';
             miniItem.style.borderRadius = '4px';
-            miniItem.style.backgroundColor = 'rgba(255,255,255,0.7)';
-            miniItem.style.fontSize = '9px';
-            miniItem.style.lineHeight = '1.3';
+            miniItem.style.backgroundColor = 'rgba(255,255,255,0.85)';
+            miniItem.style.fontSize = '10px';
+            miniItem.style.lineHeight = '1.4';
             
-            // Detectar si es apoyo (color rosa)
+            // Detectar si es apoyo
             if (horario.esApoyo) {
               miniItem.style.backgroundColor = '#fce7f3';
               miniItem.style.borderLeft = '2px solid #ec4899';
@@ -2281,13 +2284,25 @@ function renderVistaGlobal() {
             
             // Detectar solapamiento
             const tieneConflicto = detectarSolapamiento(dayHorarios, horario);
+            let conflictoHTML = '';
             if (tieneConflicto) {
               miniItem.style.backgroundColor = '#fef3c7';
               miniItem.style.borderLeft = '2px solid #f59e0b';
-              miniItem.innerHTML = `⚠️ `;
+              conflictoHTML = '⚠️ ';
             }
             
-            miniItem.innerHTML += `<strong>${horario.horaInicio}-${horario.horaFin}</strong><br>${(horario.nombre || horario.nombreTaller || '').substring(0, 15)}`;
+            // Mostrar información completa
+            const nombre = horario.nombre || horario.nombreTaller || '';
+            const habitacion = horario.habitacion ? `🚪 Hab. ${horario.habitacion}` : '';
+            const lugar = horario.lugar ? `📍 ${horario.lugar}` : '';
+            const apoyoTag = horario.esApoyo ? '<span style="color:#ec4899;font-weight:600;">(APOYO)</span>' : '';
+            
+            miniItem.innerHTML = `
+              ${conflictoHTML}<strong>${horario.horaInicio}-${horario.horaFin}</strong> ${apoyoTag}<br>
+              <span style="font-weight:600;">${nombre}</span>
+              ${habitacion ? `<br><span style="color:#666;">${habitacion}</span>` : ''}
+              ${lugar ? `<br><span style="color:#666;">${lugar}</span>` : ''}
+            `;
             cell.appendChild(miniItem);
           });
         }
