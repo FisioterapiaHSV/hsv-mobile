@@ -1598,8 +1598,14 @@ function loadApoyos() {
   
   if (!select) return;
   
-  // Limpiar opciones (ya no necesitamos la opción "Sin apoyo" porque es múltiple)
+  // Limpiar opciones
   select.innerHTML = '';
+  
+  // Agregar opción para sin apoyo
+  const optNone = document.createElement('option');
+  optNone.value = '';
+  optNone.textContent = '-- Sin apoyo --';
+  select.appendChild(optNone);
   
   APOYOS_LISTA.forEach((apoyo) => {
     const option = document.createElement('option');
@@ -2453,6 +2459,12 @@ function loadApoyosInSelect(selectId) {
 
   // Limpiar todas las opciones
   select.innerHTML = '';
+  
+  // Agregar opción para quitar apoyo (deseleccionar todos)
+  const optNone = document.createElement('option');
+  optNone.value = '';
+  optNone.textContent = '-- Sin apoyo --';
+  select.appendChild(optNone);
   
   // Agregar grupo de practicantes
   const groupPracticantes = document.createElement('optgroup');
