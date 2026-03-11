@@ -1,5 +1,5 @@
 // Service Worker para PWA - HSV Mobile
-const CACHE_NAME = 'hsv-mobile-v1.0.0';
+const CACHE_NAME = 'hsv-mobile-v1.0.11';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
