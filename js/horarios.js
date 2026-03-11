@@ -2293,9 +2293,9 @@ function renderVistaGlobal() {
             return (hA * 60 + mA) - (hB * 60 + mB);
           });
           
-          // Calcular huecos libres entre sesiones (jornada 8:00 - 15:00)
+          // Calcular huecos libres entre sesiones (jornada 8:00 - 13:30)
           const jornadaInicio = 8 * 60; // 8:00 en minutos
-          const jornadaFin = 15 * 60;   // 15:00 en minutos
+          const jornadaFin = 13 * 60 + 30;   // 13:30 en minutos
           let ultimaHoraFin = jornadaInicio;
           
           dayHorarios.forEach((horario) => {
@@ -2376,7 +2376,7 @@ function renderVistaGlobal() {
             cell.appendChild(miniItem);
           });
           
-          // Mostrar hueco libre al final del día si termina antes de las 15:00
+          // Mostrar hueco libre al final del día si termina antes de las 13:30
           if (ultimaHoraFin < jornadaFin - 5) {
             const hLibreIni = Math.floor(ultimaHoraFin / 60);
             const mLibreIni = ultimaHoraFin % 60;
@@ -2390,7 +2390,7 @@ function renderVistaGlobal() {
             libreItem.style.borderLeft = '2px solid #22c55e';
             libreItem.style.fontSize = '9px';
             libreItem.style.color = '#16a34a';
-            libreItem.innerHTML = `<strong>${horaLibreInicio}-15:00</strong> Libre`;
+            libreItem.innerHTML = `<strong>${horaLibreInicio}-13:30</strong> Libre`;
             cell.appendChild(libreItem);
           }
         }
