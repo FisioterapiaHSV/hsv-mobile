@@ -2394,14 +2394,27 @@ function renderVistaGlobal() {
             const apoyoTag = horario.esApoyo ? '<span style="color:#ec4899;font-weight:600;">(APOYO)</span>' : '';
             const disabledTag = isDisabled ? '<span style="color:#999;font-size:9px;">🚫 Cancelada</span>' : '';
             
-            // Verificar si la sesión tiene apoyos asignados (filtrar vacíos)
+            // Si es sesión de apoyo, mostrar "Apoyar a: [responsable]"
+            let apoyarAInfo = '';
+            if (horario.esApoyo && horario.responsableOriginal) {
+              const responsableCorto = horario.responsableOriginal.split(' ')[0];
+              apoyarAInfo = `<br><span style="color:#ec4899;font-size:9px;">Apoyar a: ${responsableCorto}</span>`;
+            }
+            
+            // Verificar si la sesión tiene apoyos asignados (filtrar vacíos) - solo si NO es sesión de apoyo
             const apoyosAsignados = (horario.apoyos || []).filter(a => a && a.trim() !== '');
             const tieneApoyoSimple = horario.apoyo && horario.apoyo.trim() !== '';
             let apoyosInfo = '';
-            if (!isDisabled && (apoyosAsignados.length > 0 || tieneApoyoSimple)) {
+            if (!isDisabled && !horario.esApoyo && (apoyosAsignados.length > 0 || tieneApoyoSimple)) {
               const listaApoyos = apoyosAsignados.length > 0 ? apoyosAsignados : [horario.apoyo];
               const nombresCortos = listaApoyos.map(a => a.split(' ')[0]).join(', ');
               apoyosInfo = `<br><span style="color:#ec4899;font-size:9px;">Apoyo: ${nombresCortos}</span>`;
+            }
+            
+            // Mostrar notas si existen
+            let notasInfo = '';
+            if (horario.notas && horario.notas.trim() !== '') {
+              notasInfo = `<br><span style="color:#666;font-size:8px;font-style:italic;">📝 ${horario.notas}</span>`;
             }
             
             miniItem.innerHTML = `
@@ -2409,7 +2422,9 @@ function renderVistaGlobal() {
               <span style="font-weight:600;${isDisabled ? 'color:#999;' : ''}">${nombre}</span>
               ${habitacion ? `<br><span style="color:#666;">${habitacion}</span>` : ''}
               ${lugar ? `<br><span style="color:#666;">${lugar}</span>` : ''}
+              ${apoyarAInfo}
               ${apoyosInfo}
+              ${notasInfo}
             `;
             cell.appendChild(miniItem);
           });
