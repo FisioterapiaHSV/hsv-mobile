@@ -2426,6 +2426,15 @@ function renderVistaGlobal() {
               ${apoyosInfo}
               ${notasInfo}
             `;
+            
+            // Permitir editar sesiones al hacer clic (solo si no es apoyo de otra sesión)
+            if (!horario.esApoyo) {
+              miniItem.style.cursor = 'pointer';
+              miniItem.addEventListener('click', () => {
+                editHorario(horario);
+              });
+            }
+            
             cell.appendChild(miniItem);
           });
           
