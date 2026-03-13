@@ -2280,6 +2280,23 @@ function renderVistaGlobal() {
           cell.style.borderLeft = '3px solid #e5e7eb';
         }
         
+        // Mostrar nombre del pasante arriba de cada celda
+        const nombreHeader = document.createElement('div');
+        nombreHeader.style.fontWeight = '700';
+        nombreHeader.style.fontSize = '9px';
+        nombreHeader.style.textAlign = 'center';
+        nombreHeader.style.marginBottom = '6px';
+        nombreHeader.style.padding = '3px';
+        nombreHeader.style.borderRadius = '4px';
+        nombreHeader.style.color = 'white';
+        if (PASANTE_COLORS[pasante]) {
+          nombreHeader.style.backgroundColor = PASANTE_COLORS[pasante].bg;
+        } else {
+          nombreHeader.style.backgroundColor = '#9ca3af';
+        }
+        nombreHeader.textContent = getNombreDisplay(pasante);
+        cell.appendChild(nombreHeader);
+        
         // Obtener horarios para este día y pasante
         const dayHorarios = getHorariosForDay(dayName, date, pasante, null);
         
@@ -2335,14 +2352,34 @@ function renderVistaGlobal() {
             miniItem.style.fontSize = '10px';
             miniItem.style.lineHeight = '1.4';
             
+            // Detectar si la sesión está deshabilitada (usuaria ausente)
+            let isDisabled = false;
+            if (horario.nombre && date) {
+              if (typeof isUsuariaAusente === 'function' && isUsuariaAusente(horario.nombre, date)) {
+                isDisabled = true;
+              }
+            }
+            
+            // Aplicar estilo de deshabilitado si corresponde
+            if (isDisabled) {
+              miniItem.style.opacity = '0.5';
+              miniItem.style.backgroundColor = '#f5f5f5';
+              miniItem.style.borderLeft = '2px solid #999';
+            }
             // Detectar si es apoyo
-            if (horario.esApoyo) {
+            else if (horario.esApoyo) {
               miniItem.style.backgroundColor = '#fce7f3';
               miniItem.style.borderLeft = '2px solid #ec4899';
             }
             
             // Detectar solapamiento
-            const tieneConflicto = detectarSolapamiento(dayHorarios, horario);
+            const tieneConflicto = !isDisabled && detectarSolapamiento(dayHorarios.filter(h => {
+              // Solo detectar conflictos con sesiones NO deshabilitadas
+              if (h.nombre && date && typeof isUsuariaAusente === 'function') {
+                return !isUsuariaAusente(h.nombre, date);
+              }
+              return true;
+            }), horario);
             let conflictoHTML = '';
             if (tieneConflicto) {
               miniItem.style.backgroundColor = '#fef3c7';
@@ -2355,20 +2392,21 @@ function renderVistaGlobal() {
             const habitacion = horario.habitacion ? `Hab. ${horario.habitacion}` : '';
             const lugar = horario.lugar ? `📍 ${horario.lugar}` : '';
             const apoyoTag = horario.esApoyo ? '<span style="color:#ec4899;font-weight:600;">(APOYO)</span>' : '';
+            const disabledTag = isDisabled ? '<span style="color:#999;font-size:9px;">🚫 Cancelada</span>' : '';
             
             // Verificar si la sesión tiene apoyos asignados (filtrar vacíos)
             const apoyosAsignados = (horario.apoyos || []).filter(a => a && a.trim() !== '');
             const tieneApoyoSimple = horario.apoyo && horario.apoyo.trim() !== '';
             let apoyosInfo = '';
-            if (apoyosAsignados.length > 0 || tieneApoyoSimple) {
+            if (!isDisabled && (apoyosAsignados.length > 0 || tieneApoyoSimple)) {
               const listaApoyos = apoyosAsignados.length > 0 ? apoyosAsignados : [horario.apoyo];
               const nombresCortos = listaApoyos.map(a => a.split(' ')[0]).join(', ');
               apoyosInfo = `<br><span style="color:#ec4899;font-size:9px;">Apoyo: ${nombresCortos}</span>`;
             }
             
             miniItem.innerHTML = `
-              ${conflictoHTML}<strong>${horario.horaInicio}-${horario.horaFin}</strong> ${apoyoTag}<br>
-              <span style="font-weight:600;">${nombre}</span>
+              ${conflictoHTML}<strong style="${isDisabled ? 'color:#999;' : ''}">${horario.horaInicio}-${horario.horaFin}</strong> ${apoyoTag}${disabledTag ? '<br>' + disabledTag : ''}<br>
+              <span style="font-weight:600;${isDisabled ? 'color:#999;' : ''}">${nombre}</span>
               ${habitacion ? `<br><span style="color:#666;">${habitacion}</span>` : ''}
               ${lugar ? `<br><span style="color:#666;">${lugar}</span>` : ''}
               ${apoyosInfo}
