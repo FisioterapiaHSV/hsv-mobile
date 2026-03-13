@@ -3658,6 +3658,183 @@ function closeModalListadoUsuarias() {
 }
 
 /**
+ * Exporta el listado de sesiones por usuaria a PDF
+ */
+function exportarListadoUsuariasPDF() {
+  // Obtener datos
+  const sesionesData = obtenerTodasLasSesiones();
+  const sesionesAgrupadas = agruparSesionesPorUsuaria(sesionesData);
+  const usuariasOrdenadas = Object.keys(sesionesAgrupadas).sort((a, b) => a.localeCompare(b, 'es'));
+  
+  if (usuariasOrdenadas.length === 0) {
+    showMessage('No hay sesiones para exportar', 'error');
+    return;
+  }
+  
+  // Crear contenido HTML para el PDF
+  const fechaActual = new Date().toLocaleDateString('es-MX', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+  
+  let htmlContent = `
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; 
+          padding: 20px;
+          font-size: 11px;
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 20px;
+          padding-bottom: 15px;
+          border-bottom: 2px solid #4a90e2;
+        }
+        .header h1 {
+          font-size: 18px;
+          color: #333;
+          margin-bottom: 5px;
+        }
+        .header p {
+          font-size: 11px;
+          color: #666;
+        }
+        .usuaria-card {
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          margin-bottom: 12px;
+          page-break-inside: avoid;
+          overflow: hidden;
+        }
+        .usuaria-header {
+          background: #f5f5f5;
+          padding: 8px 12px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid #ddd;
+        }
+        .usuaria-nombre {
+          font-weight: 600;
+          font-size: 12px;
+          color: #333;
+        }
+        .sesiones-count {
+          background: #4a90e2;
+          color: white;
+          padding: 2px 10px;
+          border-radius: 12px;
+          font-size: 10px;
+          font-weight: 600;
+        }
+        .sesiones-list {
+          padding: 8px;
+        }
+        .sesion-item {
+          display: flex;
+          align-items: center;
+          padding: 6px 10px;
+          margin-bottom: 4px;
+          border-radius: 4px;
+          border-left: 3px solid #ccc;
+          background: #fafafa;
+        }
+        .sesion-dia {
+          font-weight: 600;
+          min-width: 70px;
+        }
+        .sesion-hora {
+          color: #666;
+          min-width: 100px;
+        }
+        .sesion-responsable {
+          margin-left: auto;
+          padding: 2px 8px;
+          border-radius: 10px;
+          font-size: 10px;
+          font-weight: 600;
+          color: white;
+        }
+        @media print {
+          body { padding: 10px; }
+          .usuaria-card { page-break-inside: avoid; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>📋 Listado de Sesiones por Usuaria</h1>
+        <p>HSV - Fisioterapia | ${fechaActual}</p>
+      </div>
+  `;
+  
+  usuariasOrdenadas.forEach(usuaria => {
+    const sesiones = sesionesAgrupadas[usuaria];
+    const totalSesiones = sesiones.length;
+    
+    // Ordenar sesiones por día
+    const ordenDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+    sesiones.sort((a, b) => {
+      const indexA = ordenDias.indexOf(a.dia);
+      const indexB = ordenDias.indexOf(b.dia);
+      if (indexA !== indexB) return indexA - indexB;
+      return a.horaInicio.localeCompare(b.horaInicio);
+    });
+    
+    htmlContent += `
+      <div class="usuaria-card">
+        <div class="usuaria-header">
+          <span class="usuaria-nombre">👤 ${usuaria}</span>
+          <span class="sesiones-count">${totalSesiones} ${totalSesiones === 1 ? 'sesión' : 'sesiones'}/sem</span>
+        </div>
+        <div class="sesiones-list">
+    `;
+    
+    sesiones.forEach(sesion => {
+      const colors = PASANTE_COLORS[sesion.responsable] || { bg: '#888' };
+      const nombreCorto = getNombreCorto(sesion.responsable);
+      const prefijo = getPrefijoPasante(sesion.responsable);
+      
+      htmlContent += `
+        <div class="sesion-item" style="border-left-color: ${colors.bg}; background: ${colors.light || '#fafafa'};">
+          <span class="sesion-dia">${sesion.dia}</span>
+          <span class="sesion-hora">${sesion.horaInicio} - ${sesion.horaFin}</span>
+          <span class="sesion-responsable" style="background: ${colors.bg};">${prefijo}. ${nombreCorto}</span>
+        </div>
+      `;
+    });
+    
+    htmlContent += `
+        </div>
+      </div>
+    `;
+  });
+  
+  htmlContent += `
+    </body>
+    </html>
+  `;
+  
+  // Abrir en nueva ventana para imprimir
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(htmlContent);
+  printWindow.document.close();
+  
+  // Esperar a que cargue y abrir diálogo de impresión
+  printWindow.onload = function() {
+    printWindow.print();
+  };
+  
+  showMessage('✅ PDF generado - Usa "Guardar como PDF" en el diálogo de impresión', 'success');
+}
+
+/**
  * Obtiene el nombre preferido para mostrar (casos especiales)
  */
 function getNombreDisplay(nombreCompleto) {
