@@ -2310,8 +2310,8 @@ function renderVistaGlobal() {
             return (hA * 60 + mA) - (hB * 60 + mB);
           });
           
-          // Calcular huecos libres entre sesiones (jornada 8:00 - 13:30)
-          const jornadaInicio = 8 * 60; // 8:00 en minutos
+          // Calcular huecos libres entre sesiones (jornada 9:30 - 13:30)
+          const jornadaInicio = 9 * 60 + 30; // 9:30 en minutos
           const jornadaFin = 13 * 60 + 30;   // 13:30 en minutos
           let ultimaHoraFin = jornadaInicio;
           
